@@ -3,8 +3,9 @@
 
 <h2>RUN THE PROJECT</h2>
 
-To run on 42 Machines :       
-* `npm i --save-dev @nestjs/cli` or `npm install @nestjs/cli` (you cant install nest directly)
+To run on 42 Machines :   
+* run `npm install` (installs all the dependencies i.e external modules or libraries that the project needs to function correctly)
+* `npm i --save-dev @nestjs/cli` or `npm install @nestjs/cli` (installs the NestJS CLI as a development dependency)
 * Cd in the backend folder
 * `npm run start:dev` to be in watch mode (refreshes everytime you amend the code)
 * else simple `npm run start`  
