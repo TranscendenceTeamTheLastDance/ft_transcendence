@@ -9,26 +9,13 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_URL: ${POSTGRES_URL}
     volumes:
       - db_data:/var/lib/postgresql/data
     networks:
       - ft_transcendence
-
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   image: frontend:latest
-  #   container_name: frontend
-  #   restart: unless-stopped
-  #   env_file:
-  #     - .env
-  #   networks:
-  #     - ft_transcendence
-  #   volumes:
-  #     - frontend_data:/frontend
-  #   ports:
-  #     - 3000:3000
+    ports:
+      - 5432:5432
 
   backend:
     build:
@@ -45,16 +32,14 @@ services:
       - postgres
     volumes:
       - backend_data:/backend
-    expose:
-      - 3333
+    ports:
+      - 3333:3333
 
 volumes:
   db_data:
     name: db_data
   backend_data:
     name: backend_data
-  # frontend_data:
-  #   name: frontend_data
 
 networks:
   ft_transcendence:
