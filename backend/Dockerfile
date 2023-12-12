@@ -6,6 +6,13 @@ ENV NODE_ENV=development
 RUN mkdir -p /backend
 WORKDIR /backend
 
+COPY package*.json ./
+COPY prisma ./prisma/
+
+RUN npm install
+
+COPY . .
+
 EXPOSE 3333
 EXPOSE 5555
 
