@@ -7,6 +7,8 @@ RUN mkdir -p /backend
 WORKDIR /backend
 
 EXPOSE 3333
+EXPOSE 5555
+
 
 COPY ./backend.sh /backend.sh
 RUN chmod 755 /backend.sh
