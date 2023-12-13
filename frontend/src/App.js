@@ -1,20 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import logo from './logo.svg';
+import './App.css';
+import LoginSignup from './components/LoginSignup/LoginSignup';
 
-function TestComponent() {
-    const [message, setMessage] = useState('');
-
-    useEffect(() => {
-        axios.get('http://localhost:8080/auth/test')
-             .then(response => setMessage(response.data))
-             .catch(error => console.error('Error fetching data:', error));
-    }, []);
-
-    return (
-        <div>
-            <h1>{message}</h1>
-        </div>
-    );
+function App() {
+  return (
+    <div>
+     <LoginSignup/>
+    </div>
+  );
 }
 
-export default TestComponent;
+export default App;
