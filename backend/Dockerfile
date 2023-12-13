@@ -6,17 +6,7 @@ ENV NODE_ENV=development
 RUN mkdir -p /backend
 WORKDIR /backend
 
-COPY package*.json ./
-COPY prisma ./prisma/
-
-# I dont think you need this as its already in backend.sh
-RUN npm install 
-
-COPY . .
-
 EXPOSE 3333
-EXPOSE 5555
-
 
 COPY ./backend.sh /backend.sh
 RUN chmod 755 /backend.sh

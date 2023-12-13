@@ -31,7 +31,7 @@ services:
     depends_on:
       - postgres
     volumes:
-      - backend_data:/backend
+      - ./backend:/backend
     ports:
       - 8080:8080
       - 5555:5555
@@ -49,17 +49,13 @@ services:
     networks:
       - ft_transcendence
     volumes:
-      - frontend_data:/frontend
+      - ./frontend:/frontend
     ports:
       - 3000:3000
 
 volumes:
   db_data:
     name: db_data
-  backend_data:
-    name: backend_data
-  frontend_data:
-    name: frontend_data
 
 networks:
   ft_transcendence:

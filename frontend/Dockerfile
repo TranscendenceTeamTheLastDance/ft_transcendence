@@ -6,10 +6,6 @@ ENV NODE_ENV=development
 RUN mkdir -p /frontend
 WORKDIR /frontend
 
-COPY package*.json ./
-
-COPY . .
-
 EXPOSE 3000
 
 COPY ./frontend.sh /frontend.sh
