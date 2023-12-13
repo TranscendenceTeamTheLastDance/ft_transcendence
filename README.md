@@ -28,3 +28,5 @@ A module is a class. It is annotated with a `@Module()` decorator which provides
 - [ ] Notify : Encore une fois, basé sur des sockets.
 
 Then each module has at least one controller and one provider. Controllers are responsible for handling incoming requests and returning responses to the client. So Controllers should handle HTTP requests but they delegate more complex tasks to providers.
+
+test des notif discord 
