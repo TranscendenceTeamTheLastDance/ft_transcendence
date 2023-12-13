@@ -8,7 +8,7 @@ export class AuthController {
 
 	@Get('test')
 	test(){
-		return 'Hello World'
+		return 'Hello !! World'
 	}
 
 	// this function creates a user in the database 
