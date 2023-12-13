@@ -18,12 +18,12 @@ services:
       - 5432:5432
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
     image: backend:latest
     container_name: backend
     restart: unless-stopped
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     env_file:
       - .env
     networks:
@@ -37,11 +37,29 @@ services:
       - 5555:5555
       - 3333:3333
 
+  frontend:
+    image: frontend
+    container_name: frontend
+    restart: unless-stopped
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    networks:
+      - ft_transcendence
+    volumes:
+      - frontend_data:/frontend
+    ports:
+      - 3000:3000
+
 volumes:
   db_data:
     name: db_data
   backend_data:
     name: backend_data
+  frontend_data:
+    name: frontend_data
 
 networks:
   ft_transcendence:

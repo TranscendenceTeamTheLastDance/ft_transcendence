@@ -9,7 +9,8 @@ WORKDIR /backend
 COPY package*.json ./
 COPY prisma ./prisma/
 
-RUN npm install
+# I dont think you need this as its already in backend.sh
+RUN npm install 
 
 COPY . .
 

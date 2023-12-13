@@ -6,16 +6,12 @@ ENV NODE_ENV=development
 RUN mkdir -p /frontend
 WORKDIR /frontend
 
-# meme logique que pour le backend
-# COPY package*.json ./
-
-RUN npm install
-
+COPY package*.json ./
 
 COPY . .
 
-
 EXPOSE 3000
 
-# TODO besoin de changer pour la production à la fin 
-CMD ["npm", "start"]
+COPY ./frontend.sh /frontend.sh
+RUN chmod 755 /frontend.sh
+ENTRYPOINT ["/frontend.sh"]
