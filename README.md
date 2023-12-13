@@ -3,15 +3,19 @@
 
 <h2>RUN THE PROJECT</h2>
 
-To run on 42 Machines :   
+To run on 42 Machines, you can just `make` to launch every container. To see if they are working correctly : 
+* `docker ps` to see if they have all been created
+* `localhost:3000` to check the frontend
+* `localhost:5555` to check the database via prisma studio
+* try sending requests to `localhost:3333/auth/test` or `localhost:8080/auth/test` for the backend   
+
+If you want to just launch one container (easier for debugging) : 
+
 * run `npm install` (installs all the dependencies i.e external modules or libraries that the project needs to function correctly)
-* `npm i --save-dev @nestjs/cli` or `npm install @nestjs/cli` (installs the NestJS CLI as a development dependency)
-* Cd in the backend folder
+* if you want to test the backend : `npm i --save-dev @nestjs/cli` or `npm install @nestjs/cli`
+* Cd in the folder of either front or backend
 * `npm run start:dev` to be in watch mode (refreshes everytime you amend the code)
 * else simple `npm run start`  
-
-The list of npm commands is in `package.json`.
-
 
 <h2>ARCHITECTURE (WIP)</h2>
 
