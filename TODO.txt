@@ -1,2 +1,3 @@
-- comprendre pourquoi on ne peut pas modifier l'url de la db par la variable 
-d'environnemntdans schema.primsa: DATABASE_URL
+- comprendre pourquoi on ne peut pas modifier l'url de la db par la variable d'environnemntdans schema.primsa: DATABASE_URL
+
+- creation d'un module primsa ? ce qui remplacera le dossier prisma a la racine (42min dans le tuto nestjs)
