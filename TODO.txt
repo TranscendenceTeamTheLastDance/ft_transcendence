@@ -1,0 +1,2 @@
+- comprendre pourquoi on ne peut pas modifier l'url de la db par la variable 
+d'environnemntdans schema.primsa: DATABASE_URL
