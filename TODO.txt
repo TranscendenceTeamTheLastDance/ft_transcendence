@@ -1,3 +1,5 @@
 - comprendre pourquoi on ne peut pas modifier l'url de la db par la variable d'environnemntdans schema.primsa: DATABASE_URL
+Surement car la migration n'a pas ete push vers la db avec le commande : npx prisma {db_name} push
+https://www.youtube.com/watch?v=uAKzFhE3rxU?t=17m50s
 
 - creation d'un module primsa ? ce qui remplacera le dossier prisma a la racine (42min dans le tuto nestjs)
