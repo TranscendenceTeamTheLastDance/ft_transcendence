@@ -1,39 +1,26 @@
-name: Build backend
+name: Docker Compose CI/CD
 
 on:
   push:
     branches:
       - main
-      - ci_implementation_nico
-  pull_request:
-    branches: [ "main" ]
-    paths:
-      - 'backend/**'
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: backend/
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+    - name: Checkout Repository
+      uses: actions/checkout@v2
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16.13'
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
+    - name: Set up Docker Compose
+      run: docker-compose version
 
-      - name: Install dependencies
-        run: npm install
+    - name: Build and Deploy with Docker Compose
+      run: docker-compose up -d
 
-      - name: Generate prisma client
-        run: npx prisma generate
-      
-      - name: Build
-        run: npm run build
+    # - name: Test the deployed service (adjust as needed)
+    #   run: docker-compose exec your-service-name sh -c "your-test-command"
+
+    - name: Clean up
+      run: docker-compose down
