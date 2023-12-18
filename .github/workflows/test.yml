@@ -18,4 +18,4 @@ jobs:
       uses: docker/setup-docker-buildx-action@v1
 
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag ${{ github.repository }}:latest
+      run: make
