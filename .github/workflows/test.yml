@@ -1,18 +1,34 @@
-name: Docker Image CI
+name: Build backend
 
 on:
-  push:
-    branches: [ "main", "ci_implementation_nico" ]
   pull_request:
-    branches: [ "main" ]
+    paths:
+      - backend/**
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
+    defaults:
+      run:
+        working-directory: backend/
 
-    - name: Build the Docker image
-      run: make
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14'  # Spécifiez la version de Node.js que vous utilisez dans votre projet
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate prisma client
+        run: npx prisma generate
+      
+      - name: Build
+        run: npm run build  # Assurez-vous que votre script de build est correctement défini dans votre fichier package.json
