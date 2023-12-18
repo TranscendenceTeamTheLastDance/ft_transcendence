@@ -1,37 +1,32 @@
-name: Build backend
-
-on:
-  push:
-    branches: [ "main", "ci_implementation_nico" ]
-  pull_request:
-    branches: [ "main" ]
-    paths:
-      - backend/**
-
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: backend/
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
-      - name: Setup Node
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '14'  # Spécifiez la version de Node.js que vous utilisez dans votre projet
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
+          node-version: '18'
 
-      - name: Install dependencies
-        run: npm install
+      - name: Build Backend
+        run: |
+          cd backend
+          npm install
 
-      - name: Generate prisma client
-        run: npx prisma generate
-      
-      - name: Build
-        run: npm run build  # Assurez-vous que votre script de build est correctement défini dans votre fichier package.json
+      - name: Run Prisma Migrations
+        run: |
+          cd backend
+          ./backend.sh
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy Backend (Example: Deploy to AWS Elastic Beanstalk)
+        run: |
+          cd backend
+          npm run deploy
