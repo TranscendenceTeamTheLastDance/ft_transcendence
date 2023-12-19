@@ -1,6 +1,10 @@
 name: Build frontend
 
 on:
+  push:
+    branches:
+      - main
+      - ci_implementation_nico
   pull_request:
     paths:
       - frontend/**
