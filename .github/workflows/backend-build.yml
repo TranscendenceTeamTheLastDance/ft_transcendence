@@ -2,8 +2,6 @@ name: Build backend
 
 on:
   push:
-    branches:
-      - main
       - ci_implementation_nico
   pull_request:
     paths:
