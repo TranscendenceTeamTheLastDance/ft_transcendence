@@ -1,30 +1,38 @@
-name: Docker Compose CI/CD
+name: Build backend
 
 on:
-  push:
-    branches:
-      - main
-      - ci_implementation_nico
   pull_request:
-    branches:
-      - main
+    paths:
+      - backend/**
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: backend/
+
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Set up Docker Compose
-      run: docker-compose version
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
 
-    - name: Build and Deploy with Docker Compose
-      run: docker-compose up -d
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          cache: 'pnpm'
+          cache-dependency-path: backend/pnpm-lock.yaml
 
-    # - name: Test the deployed service (adjust as needed)
-    #   run: docker-compose exec your-service-name sh -c "your-test-command"
+      - name: Install dependencies
+        run: pnpm install
 
-    - name: Clean up
-      run: docker-compose down
+      - name: Generate prisma client
+        run: pnpm prisma:generate
+      
+      - name: Build
+        run: pnpm build
