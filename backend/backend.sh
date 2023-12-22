@@ -5,7 +5,7 @@ npx prisma generate
 
 echo "-----Migrating database-----"
 
-npx prisma migrate dev --name init --preview-feature
+npx prisma migrate deploy
 
 echo "-----Starting Prisma Studio on port 5555-----"
 
