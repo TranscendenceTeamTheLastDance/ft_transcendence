@@ -3,6 +3,6 @@
     "@nestjs/cli": "^10.2.1"
   },
   "devDependencies": {
-    "prisma": "^5.7.0"
+    "prisma": "^5.7.1"
   }
 }

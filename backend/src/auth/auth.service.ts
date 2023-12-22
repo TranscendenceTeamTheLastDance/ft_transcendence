@@ -7,6 +7,14 @@ export class AuthService {
 	constructor(private database: DatabaseService) {}
 	
 	async signup(dto:AuthDto) {
+		const existingUser = await this.database.user.findUnique({
+			where: { email: dto.email },
+		});
+	
+		if (existingUser) {
+			throw new Error('Email already in use');
+		}
+		
 		const user = await this.database.user.create({
 			data: {
 				name: dto.name,
@@ -32,7 +40,6 @@ export class AuthService {
 		if (!pwMatch) {
 			throw new ForbiddenException('Credientials Incorrect',);
 		}
-
 		return user;
 	}
 }
