@@ -30,7 +30,8 @@
     "@prisma/client": "^5.7.0",
     "pnpm": "^8.12.1",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "socket.io": "^4.7.3"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.2.1",
