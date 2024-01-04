@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 import './LoginSignup.css'
 
 import user_icon from '../assets/person.png'
@@ -6,7 +7,7 @@ import email_icon from '../assets/email.png'
 import password_icon from '../assets/password.png'
 
 const LoginSignup = () => {
-
+	const navigate = useNavigate();
 	const [formData, setFormData] = useState({ name: '', email: '', password: '' });
 
 	const handleChange = (e) => {
@@ -29,6 +30,7 @@ const LoginSignup = () => {
 			throw new Error('Signup failed');
 		}
 		const data = await response.json();
+		navigate('/home');
 		console.log('Signup successful:', data); }
 	catch (error) {
 		console.error('Error during signup:', error); }
@@ -48,6 +50,7 @@ const LoginSignup = () => {
 			throw new Error('Signin failed');
 		}
 		const data = await response.json();
+		navigate('/home');
 		console.log('Signin successful:', data); }
 	catch (error) {
 		console.error('Error during signin:', error); }
