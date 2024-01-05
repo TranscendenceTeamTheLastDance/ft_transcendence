@@ -5,6 +5,7 @@ import Particles from './Particles.tsx';
 const navigation = [
   { name: "CHAT", href: "/chat" },
   { name: "PLAY", href: "/play" },
+  { name: "USER", href: "/user" },
 ];
 
 const Home = () => {
