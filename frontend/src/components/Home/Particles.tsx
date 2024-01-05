@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect, useCallback } from 'react';
-import { useMousePosition } from './Mouse.ts';
+import { useMousePosition } from './Mouse';
 
 
 interface Circle {

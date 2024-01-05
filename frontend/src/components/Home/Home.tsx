@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Particles from './Particles.tsx';
+import Particles from './Particles';
 
 const navigation = [
-  { name: "CHAT", href: "/chat" },
+  { name: "CHAT", href: "/conversations" },
   { name: "PLAY", href: "/play" },
 ];
 
