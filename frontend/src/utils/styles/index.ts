@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { PageProps } from './styleTypes';
 
 export const SIDEBAR_WIDTH = 400;
