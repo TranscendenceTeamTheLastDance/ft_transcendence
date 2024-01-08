@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Particles from '../Home/Particles.tsx';
 import avatar_icon from '../assets/avatar.png';
 import axios from 'axios';
@@ -6,7 +6,24 @@ import axios from 'axios';
 
 const User = () => {
 	const [selectedImage, setSelectedImage] = useState(avatar_icon);
+	const [userName, setUserName] = useState('');
 	const fileInputRef = useRef(null);
+
+	useEffect(() => {
+		const fetchUserData = async () => {
+		  try {
+			const response = await axios.get('http://localhost:8080/users/me', { withCredentials: true });
+			const userData = response.data;
+			setSelectedImage(userData.userPictu); // Set user's picture
+			setUserName(userData.name || 'John Doe'); // Set user's name or default
+		  	} catch (error) {
+			console.error('Error fetching user data:', error);
+			setUserName('John Doe'); // Default name in case of error
+		  }
+		};
+	
+		fetchUserData();
+	  }, []);
 
 	const handleImageChange = (e) => {
 		if (e.target.files && e.target.files[0]) {
@@ -24,17 +41,11 @@ const User = () => {
 	  
 		const formData = new FormData();
 		formData.append('file', fileInputRef.current.files[0]);
-		const token = localStorage.getItem('jwtToken');
-		console.log('JWT Token:', token);
 
 		
 		try {
 		  const response = await axios.post('http://localhost:8080/users/upload-profile-picture', formData, {
-			headers: {
-			  'Content-Type': 'multipart/form-data',
-			  'Authorization': `Bearer ${token}`,
-			  // Include any additional headers like authorization tokens if needed
-			},
+			withCredentials: true,
 		  });
 		  console.log('New profile pic successfully uploaded !', response.data);
 		} catch (error) {
@@ -53,13 +64,13 @@ const User = () => {
 				<div className="flex items-center mx-auto ml-5 mt-8">
 					<img src={selectedImage} alt="User Avatar" className="w-20 h-20 object-cover mx-auto ml-12 rounded-full cursor-pointer" onClick={handleImageClick} />
 					<input type="file" ref={fileInputRef} onChange={handleImageChange} className="hidden" />
-					<p className="text-lg font-bold ml-8">John Doe</p>
+					<p className="text-lg font-bold ml-8">{userName}</p>
 				</div>
 
 				{/* All the stats go here */}
 				<div className="bg-gray-200 p-4 rounded-lg mx-auto mt-8	w-3/4">
-					<p className="text-lg font-bold">RANK : </p>
-					<p className="text-lg">WINS & LOSSES </p>
+					<p className="text-center font-bold"> [STATS TO ADD] </p>
+					{/* <p className="text-lg">WINS & LOSSES </p> */}
 				</div>
 
 				{/* Amend button */}

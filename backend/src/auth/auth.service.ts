@@ -21,7 +21,7 @@ export class AuthService {
 
 			},
 		});
-		return this.signToken(user.id, user.email);
+		return this.signToken(user.id, user.name, user.email);
 	}
 
 	async signin(dto:AuthDto): Promise<{ access_token: string }>{
@@ -39,13 +39,14 @@ export class AuthService {
 			throw new ForbiddenException('Credientials Incorrect',);
 		}
 
-		return this.signToken(user.id, user.email);
+		return this.signToken(user.id, user.name, user.email);
 	}
 
-	async signToken(userId: string, email: string): Promise<{ access_token: string }> {
+	async signToken(userId: string, name: string, email: string): Promise<{ access_token: string }> {
 		const payload = {
 			sub: userId,
-			email
+			email,
+			name
 		}
 		const secret =  this.config.get('JWT_SECRET');
 

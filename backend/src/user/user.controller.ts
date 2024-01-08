@@ -16,17 +16,17 @@ export class UserController {
 		return user; // the user object is from the validate strategy
 	}
 
+	@UseGuards(JwtGuard)
 	@Post('upload-profile-picture')
 	@UseInterceptors(FileInterceptor('file'))
-	async uploadProfilePicture(@UploadedFile() file: Express.Multer.File, @GetUser() user: User) {
-	// Convert to Base64 and save
-	console.log(user); 
-	if (!user) {
-		throw new UnauthorizedException('User not found in request');
-	  }
+	async uploadProfilePicture(
+		@UploadedFile() file: Express.Multer.File, 
+		@GetUser() user: User) {
+	// console.log("Received file:", file);
+	const userId = user.id;
 	const imageBase64 = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
 	await this.prisma.user.update({
-		where: { id: user.id },
+		where: { id: userId },
 		data: { userPictu: imageBase64 },
 	});
 }
