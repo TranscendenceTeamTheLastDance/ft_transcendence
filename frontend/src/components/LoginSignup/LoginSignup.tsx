@@ -22,6 +22,7 @@ const LoginSignup = () => {
 		try {
 			const response = await fetch('http://localhost:8080/auth/signup', {
 			method: 'POST',
+			credentials: 'include',
 			headers: {
 				'Content-Type': 'application/json',
 			},
@@ -42,6 +43,7 @@ const LoginSignup = () => {
 		try {
 			const response = await fetch('http://localhost:8080/auth/signin', {
 			method: 'POST',
+			credentials: 'include',
 			headers: {
 				'Content-Type': 'application/json',
 			},
