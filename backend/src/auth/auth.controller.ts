@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Res, Controller, Get, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { Response } from 'express';
 import { AuthDto } from './dto';
 
 @Controller('auth')
@@ -15,8 +16,16 @@ export class AuthController {
 	// unless you delete the volume
 	// you can access your users on localhost:5555
 	@Post('signup')
-	signup(@Body() dto:AuthDto){
-		return this.authService.signup(dto);
+	signup(@Body() dto:AuthDto, @Res() res:Response){
+		this.authService
+			.signup(dto, res)
+			.then((user) => {
+				console.log(user);
+				res.status(201).json(user);
+			})
+			.catch((err) => {
+				res.status(401).json({ message: 'signup rate' });
+			});
 	}
 
 	// this function will return Wrong Credentials
