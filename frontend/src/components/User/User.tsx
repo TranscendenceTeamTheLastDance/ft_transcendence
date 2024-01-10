@@ -151,13 +151,13 @@ const User = () => {
 		<div className="flex items-center justify-center min-h-screen relative pb-8">
 		  <Particles className="absolute inset-0 -z-10" quantity={1000} />
 	  
-		  <div className="flex"> {/* Main Flex Container */}
+		  <div className="flex justify-start"> {/* Main Flex Container */}
 	  
 			{/* Left Section: User Information and Friends */}
 			<div className="flex flex-col mr-8"> {/* Margin right to separate from Game Stats */}
 	  
 			  {/* User Information Box */}
-			  <div className="bg-white w-[600px] mt-[200px] pb-[30px] rounded-lg z-10">
+			  <div className="bg-white w-[600px] pb-[30px] rounded-lg z-10">
 				<h1 className="text-black text-2xl font-bold mx-auto mt-8 text-center">USER INFORMATION</h1>
 	  
 				<div className="flex mt-8 mx-auto w-3/4">
@@ -209,21 +209,20 @@ const User = () => {
 			</div>
 	  
 			{/* Right Section: Game Stats */}
-			<div className="bg-white w-[600px] pb-[30px] rounded-lg z-10">
-			  <h2 className="text-black text-xl font-bold mx-auto pt-4 text-center">GAME STATS</h2>
-			  <div className="p-4 flex flex-col items-center">
-				<div className="font-bold">Total Games Played</div>
-				<div>{gameStats.totalGamesPlayed}</div>
-				<div className="font-bold mt-4">Wins</div>
-				  <CircularProgress winPercentage={winPercentage} />
-			  	<div className="font-bold mt-4">Losses</div>
-				  <CircularProgress winPercentage={lossPercentage} />
+			<div className="bg-white rounded-lg z-10">
+				<h2 className="text-black text-xl font-bold mx-auto pt-4 text-center">GAME STATS</h2>
+				<div className="p-4 flex flex-col items-center">
+					<div className="font-bold">Total Games Played</div>
+					<div>{gameStats.totalGamesPlayed}</div>
+					<div className="font-bold mt-4">Wins</div>
+					<CircularProgress winPercentage={winPercentage} />
+					<div className="font-bold mt-4">Losses</div>
+					<CircularProgress winPercentage={lossPercentage} />
 				</div>
 			</div>
-		  </div>
 		</div>
+	</div>
 	);
-
 }
 
 export default User;
