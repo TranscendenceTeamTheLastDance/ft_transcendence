@@ -23,6 +23,7 @@ const LoginSignup = () => {
 		try {
 			const response = await fetch('http://localhost:8080/auth/signup', {
 			method: 'POST',
+			credentials: 'include',
 			headers: {
 				'Content-Type': 'application/json',
 			},
@@ -50,7 +51,7 @@ const LoginSignup = () => {
 			body: JSON.stringify(formData),
 		});
 		if (!response.ok) {
-			throw new Error('Signin failed');
+			throw new Error('Signin failed encule');
 		}
 		const data = await response.json();
 		navigate('/home');
@@ -106,19 +107,32 @@ const LoginSignup = () => {
 			
 			</div>
 		</div>
-		{action==="Sign Up" ? <div></div>:
-		<div className='forgot-password'>Lost Password ? <span>Click Here</span></div> }
+		{action==="Sign Up" ? <div></div>:<div className='forgot-password'>Lost Password ? <span>Click Here</span></div> }
 		<div className='submit-container'>
 			<div 
 				className={action==="Login"?"submit grey":"submit"} 
-				onClick={(e) =>{setAction("Sign Up"); handleSignUp(e);}}
+				onClick={(e) =>{setAction("Sign Up");}}
 				>Sign Up</div>
 			
 			<div 
 				className={action==="Sign Up"?"submit grey":"submit"} 
-				onClick={(e)=>{setAction("Login"); handleSignIn(e);}}
+				onClick={(e)=>{setAction("Login");}}
 				>Login</div>	
-		</div>`
+		</div>
+		<div className='submit-button'>
+			<button
+				className="button"
+				onClick={(e) => {
+					if (action === "Sign Up") {
+					handleSignUp(e);
+					} else {
+					handleSignIn(e);
+					}
+				}}
+				>
+				Submit
+			</button>
+		</div>
 	</div>
   )
 }
