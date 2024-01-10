@@ -187,9 +187,9 @@ const User = () => {
 				<h2 className="text-black text-xl font-bold mx-auto pt-4 text-center">FRIENDS</h2>
 				<div className="flex overflow-x-auto py-4 px-4">
 				  {friends.map((friend, index) => (
-					<div key={index} className="flex flex-col items-center mr-4">
-					  <div className="w-20 h-20 bg-gray-300 rounded-full"></div> {/* Replace with friend's image */}
-					  <div className="flex items-center">
+					<div key={index} className="flex flex-col items-center mr-10">
+					  <img src={avatar_icon} alt="User Avatar"></img>{/* Replace with friend's image */}
+					  <div className="flex items-center mt-2">
 						<p className="text-center font-bold mr-2">{friend.nickname}</p>
 						<span className={`h-3 w-3 rounded-full ${friend.online ? 'bg-green-500' : 'bg-red-500'}`}></span>
 					  </div>
