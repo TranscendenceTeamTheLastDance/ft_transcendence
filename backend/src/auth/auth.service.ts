@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable } from "@nestjs/common";
 import { DatabaseService } from '../database/database.service';
-import { AuthDto } from "./dto/auth.dto";
+import { SigninDto, SignupDto } from "./dto/auth.dto";
 import * as argon from "argon2";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { JwtService } from "@nestjs/jwt";
@@ -13,29 +13,32 @@ export class AuthService {
 	constructor(private prismaService: DatabaseService, 
 				private jwt: JwtService,
 				private config: ConfigService) {} //ConfigService is used to get the JWT_SECRET value from the .env file
-	async signin(dto:AuthDto) {
+	
+	async signin(dto:SigninDto, res:Response) : Promise<User>{
 		// find the user by email in the database
 		const user = await this.prismaService.user.findUnique({
 			where: {
 				email: dto.email,
 			}
-		
 		})
 		// if the user does not exist, throw an error
 		if (!user) {
+			console.log("user not found");
 			throw new ForbiddenException("Credential Incorrect")
 		}
 		// compare password
 		const pwMatches = await argon.verify(user.hash, dto.password)
 		// if paswsword does not match, throw an error
 		if (!pwMatches) {
+			console.log("password not found");
 			throw new ForbiddenException("Credential Incorrect")
 		}
-		return this.signToken(user.id, user.email, user.name);
+		await this.generateToken(user.id, user.email, user.name, res);
+		return user;
 	}
 
 	
-	async signup(dto:AuthDto, res:Response) : Promise<User>{
+	async signup(dto:SignupDto, res:Response) : Promise<User>{
 		// generate the password hash
 		const hash = await argon.hash(dto.password)
 		// save the new user to the database
@@ -61,12 +64,15 @@ export class AuthService {
 
 	async generateToken(userId:number, email:string, name:string, res:Response) {
 		const accessToken = await this.signToken(userId, email, name);
+		console.log(accessToken.JWTtoken);
 		res.cookie(this.config.get('JWT_ACCESS_TOKEN_COOKIE'),
 			accessToken.JWTtoken,
 			{
 				httpOnly: true,
 				secure: false,
 				sameSite: 'strict',
+				domain: 'localhost',
+				path: '/',
 			},
 		)
 	}
