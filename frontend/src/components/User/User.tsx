@@ -45,6 +45,7 @@ const User = () => {
 	const [userName, setUserName] = useState('');
 	const fileInputRef = useRef(avatar_icon);
 	const [winPercentage, setWinPercentage] = useState(0);
+	const [lossPercentage, setLossPercentage] = useState(0);
 	
 	useEffect(() => {
 		const fetchUserData = async () => {
@@ -137,6 +138,14 @@ const User = () => {
 		}
 	  }, [gameStats.totalWins, gameStats.totalGamesPlayed]);
 
+	  useEffect(() => {
+		if (gameStats.totalGamesPlayed > 0) {
+		  const lossPct = (gameStats.totalLosses / gameStats.totalGamesPlayed) * 100;
+		  setLossPercentage(Math.round(lossPct));
+		}
+	  }, [gameStats.totalLosses, gameStats.totalGamesPlayed]);
+
+
 
 	  return (
 		<div className="flex items-center justify-center min-h-screen relative pb-8">
@@ -205,11 +214,11 @@ const User = () => {
 			  <div className="p-4 flex flex-col items-center">
 				<div className="font-bold">Total Games Played</div>
 				<div>{gameStats.totalGamesPlayed}</div>
-				<div className="mt-4">
+				<div className="font-bold mt-4">Wins</div>
 				  <CircularProgress winPercentage={winPercentage} />
+			  	<div className="font-bold mt-4">Losses</div>
+				  <CircularProgress winPercentage={lossPercentage} />
 				</div>
-				<div className="mt-2">Wins: {gameStats.totalWins} / {gameStats.totalGamesPlayed}</div>
-			  </div>
 			</div>
 		  </div>
 		</div>
