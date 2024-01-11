@@ -1,19 +1,52 @@
-import { ForbiddenException, Injectable } from "@nestjs/common";
+import { ForbiddenException, Injectable, Query } from "@nestjs/common";
 import { DatabaseService } from '../database/database.service';
 import { SigninDto, SignupDto } from "./dto/auth.dto";
 import * as argon from "argon2";
+import axios from "axios";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { Response } from "express"
 import { User } from "@prisma/client";
+import { create } from "domain";
 
 @Injectable({})
 export class AuthService {
 	constructor(private prismaService: DatabaseService, 
 				private jwt: JwtService,
 				private config: ConfigService) {} //ConfigService is used to get the JWT_SECRET value from the .env file
-	
+
+
+	async signin42(code: string, res:Response): Promise<User>{
+		try {
+			const accessToken = await axios.post('https://api.intra.42.fr/oauth/token', {
+				grant_type: 'authorization_code',
+				client_id: process.env.API_UID,
+				client_secret: process.env.API_SECRET,
+				code: code,
+				redirect_uri: 'http://localhost:3000/signwith42',
+			},
+			{ headers: { 'Content-Type': 'application/json' } },);
+			if (!accessToken.data['access_token']) {
+				throw new ForbiddenException("Credential Incorrect");
+			}
+			const bearerToken = accessToken.data['access_token'];
+			const user42info = await axios.get('https://api.intra.42.fr/v2/me',
+				{ headers: { Authorization: `Bearer ${bearerToken}`} },);
+			if(!user42info.data['email'] || !user42info.data['login']) {
+				throw new ForbiddenException("Credential Incorrect");
+			}
+			const email = user42info.data['email'];
+			const name = user42info.data['login'];
+			const user = await this.createupdateUser(email, name);
+			user.hash = undefined;
+            await this.generateToken(user.id, user.email, user.name, res);
+            return user;
+		} catch (error) {
+            throw new ForbiddenException('Invalid authorization code');
+        }
+	}
+
 	async signin(dto:SigninDto, res:Response) : Promise<User>{
 		// find the user by email in the database
 		const user = await this.prismaService.user.findUnique({
@@ -33,6 +66,7 @@ export class AuthService {
 			console.log("password not found");
 			throw new ForbiddenException("Credential Incorrect")
 		}
+		this.createupdateUser(user.email, user.name);
 		await this.generateToken(user.id, user.email, user.name, res);
 		return user;
 	}
@@ -48,6 +82,7 @@ export class AuthService {
 					email: dto.email,
 					hash,
 					name: dto.name,
+					//connectionNb: 1,
 				},
 			});
 			await this.generateToken(user.id, user.email, user.name, res);
@@ -59,6 +94,39 @@ export class AuthService {
 				}
 			}
 			throw error;
+		}
+	}
+
+	async createupdateUser(email:string, name:string): Promise<User> {
+		const userAlreadyExist = await this.prismaService.user.findUnique({
+			where: {
+				email: email,
+			}
+		})
+		if (userAlreadyExist) {
+			if (userAlreadyExist.hash)
+			{
+				throw new ForbiddenException("Email already exists")
+			};
+			const updatedUser = await this.prismaService.user.update({
+				where: {
+					email: email,
+				},
+				data: {
+					name: name,
+				},
+			});
+			return updatedUser;
+		} else {
+			const newUser = await this.prismaService.user.create({
+				data: {
+					email: email,
+					hash: undefined,
+					name: name,
+					//connectionNb: 1,
+				},
+			});
+			return newUser;
 		}
 	}
 

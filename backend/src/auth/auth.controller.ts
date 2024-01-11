@@ -1,4 +1,4 @@
-import { Body, Res, Controller, Get, Post } from '@nestjs/common';
+import { Body, Res, Controller, Get, Post, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { SignupDto, SigninDto } from './dto';
@@ -10,6 +10,21 @@ export class AuthController {
 	@Get('test')
 	test(){
 		return 'Hello !! World'
+	}
+
+	@Get('signin42')
+	signin42(@Query() params:any, @Res() res:Response){
+		this.authService
+			.signin42(params.code, res)
+			.then((user) => {
+				console.log(user);
+				res.status(201).json({
+					message: 'signin with 42 success',
+					user});
+				})
+			.catch((err) => {
+				res.status(401).json({ message: 'wrong credentials' });
+			});
 	}
 
 	// this function creates a user in the database 
