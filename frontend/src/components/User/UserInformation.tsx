@@ -19,7 +19,7 @@ const UserInformation = ({ selectedImage, handleImageClick, userName, userDetail
 					{Object.entries(userDetails).map(([key, value]) => (
 					  <div key={key} className="flex justify-between mb-2">
 						<span className="font-bold capitalize">{key}:</span>
-						<span>{value}</span>
+						<span>{typeof value === 'string' ? value : 'Default value'}</span>
 					  </div>
 					))}
 					<div className="flex justify-between">
