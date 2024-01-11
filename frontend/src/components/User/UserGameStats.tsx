@@ -1,7 +1,27 @@
 import React from 'react';
+import { useState, useEffect } from 'react';
 import CircularProgress from './CircularProgress.tsx';
 
-const UserGameStats = ({ gameStats, winPercentage, lossPercentage }) => {
+const UserGameStats = ({ gameStats}) => {
+
+	const [winPercentage, setWinPercentage] = useState(0);
+	const [lossPercentage, setLossPercentage] = useState(0);
+
+	useEffect(() => {
+		if (gameStats.totalGamesPlayed > 0) {
+		  const winPct = (gameStats.totalWins / gameStats.totalGamesPlayed) * 100;
+		  setWinPercentage(Math.round(winPct));
+		}
+	  }, [gameStats.totalWins, gameStats.totalGamesPlayed]);
+
+	  useEffect(() => {
+		if (gameStats.totalGamesPlayed > 0) {
+		  const lossPct = (gameStats.totalLosses / gameStats.totalGamesPlayed) * 100;
+		  setLossPercentage(Math.round(lossPct));
+		}
+	  }, [gameStats.totalLosses, gameStats.totalGamesPlayed]);
+
+
 	return (
 	<div className="bg-white rounded-lg z-10">
 		<h2 className="text-black text-xl font-bold mx-auto pt-4 text-center">GAME STATS</h2>

@@ -11,9 +11,8 @@ const User = () => {
 	const [selectedImage, setSelectedImage] = useState('');
 	const [userName, setUserName] = useState('');
 	const fileInputRef = useRef(avatar_icon);
-	const [winPercentage, setWinPercentage] = useState(0);
-	const [lossPercentage, setLossPercentage] = useState(0);
-	
+
+	//THE USE EFFECTS
 	useEffect(() => {
 		const fetchUserData = async () => {
 		  try {
@@ -22,6 +21,7 @@ const User = () => {
 				setSelectedImage(userData.userPictu || avatar_icon ); // Set user's picture
 				setUserName(userData.name || 'DEFAULT NAME'); // Set user's name or default
 				if (userData.twoFactorAuthEnabled !== undefined) {
+					console.log('2FA is now:', is2FAEnabled);
 					setIs2FAEnabled(userData.twoFactorAuthEnabled);
 				  }
 		  	} 
@@ -33,6 +33,7 @@ const User = () => {
 		fetchUserData();
 	  }, []);
 
+	// ALL THE HANDLERS
 	const handleImageChange = (e) => {
 		if (e.target.files && e.target.files[0]) {
 			let img = e.target.files[0];
@@ -66,11 +67,8 @@ const User = () => {
 		setIs2FAEnabled(currentState => !currentState);
 	};
 
-	useEffect(() => {
-		console.log('2FA is now:', is2FAEnabled);
-	  }, [is2FAEnabled]);
 
-
+	//@@@TODO: Fetch data from backend 
 	const userDetails = {
 		firstName: 'John',
 		lastName: 'Doe',
@@ -87,7 +85,6 @@ const User = () => {
 		{ nickname: 'Friend6', online: false },
 		{ nickname: 'Friend7', online: true },
 		{ nickname: 'Friend8', online: false },
-		// ... add more friends
 	];
 
 	const gameStats = {
@@ -95,22 +92,7 @@ const User = () => {
 		totalWins: 20,
 		totalLosses: 10,
 		Rank: 1,
-		// ... other stats
 	  };
-
-	  useEffect(() => {
-		if (gameStats.totalGamesPlayed > 0) {
-		  const winPct = (gameStats.totalWins / gameStats.totalGamesPlayed) * 100;
-		  setWinPercentage(Math.round(winPct));
-		}
-	  }, [gameStats.totalWins, gameStats.totalGamesPlayed]);
-
-	  useEffect(() => {
-		if (gameStats.totalGamesPlayed > 0) {
-		  const lossPct = (gameStats.totalLosses / gameStats.totalGamesPlayed) * 100;
-		  setLossPercentage(Math.round(lossPct));
-		}
-	  }, [gameStats.totalLosses, gameStats.totalGamesPlayed]);
 
 
 	  return (
@@ -140,9 +122,7 @@ const User = () => {
 			{/* Right Section: Game Stats */}
 				{/* Game Stats Box */}
 				<UserGameStats 
-					gameStats={gameStats}
-					winPercentage={winPercentage}
-					lossPercentage={lossPercentage} />
+					gameStats={gameStats}/>
 
 		</div>
 	</div>
