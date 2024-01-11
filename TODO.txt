@@ -1,1 +1,2 @@
 - not signed in page
+- turn all buttons(and other functional stuff) into React.FC components? 

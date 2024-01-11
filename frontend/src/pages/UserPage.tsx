@@ -4,6 +4,7 @@ import UserGameStats from '../components/User/UserGameStats.tsx';
 import FriendsList from '../components/User/UserFriendsList.tsx';
 import avatar_icon from '../components/assets/avatar.png';
 import Particles from '../components/Home/Particles.tsx';
+import NotConnected from '../components/NotSignedIn.tsx';
 import axios from 'axios';
 
 const User = () => {
@@ -19,7 +20,7 @@ const User = () => {
 				const response = await axios.get('http://localhost:8080/users/me', { withCredentials: true });
 				const userData = response.data;
 				setSelectedImage(userData.userPictu || avatar_icon ); // Set user's picture
-				setUserName(userData.name || 'DEFAULT NAME'); // Set user's name or default
+				setUserName(userData.name || ''); // Set user's name or default
 				if (userData.twoFactorAuthEnabled !== undefined) {
 					console.log('2FA is now:', is2FAEnabled);
 					setIs2FAEnabled(userData.twoFactorAuthEnabled);
@@ -95,7 +96,7 @@ const User = () => {
 	  };
 
 
-	  return (
+	  return userName ? (
 		<div className="flex items-center justify-center min-h-screen relative pb-8">
 			<Particles className="absolute inset-0 -z-10" quantity={1000} />
 			<div className="flex justify-start"> 
@@ -126,6 +127,9 @@ const User = () => {
 
 		</div>
 	</div>
+	)
+	: (
+		<NotConnected message="You need to log in to access your settings" />
 	);
 }
 
