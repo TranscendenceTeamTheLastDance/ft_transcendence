@@ -3,3 +3,5 @@
 - prepare the passing of user data through a UserContext
 - connect the UserContext to an AuthContext to handle auth status
 - prepare the types (User, Game Stats etc) for any data that will be shared
+- pull main asap not to diverge too much
+- push UserPage + NotConnectedPage with no backend fetching to main
