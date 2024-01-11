@@ -10,16 +10,11 @@ const UserGameStats = ({ gameStats}) => {
 	useEffect(() => {
 		if (gameStats.totalGamesPlayed > 0) {
 		  const winPct = (gameStats.totalWins / gameStats.totalGamesPlayed) * 100;
-		  setWinPercentage(Math.round(winPct));
-		}
-	  }, [gameStats.totalWins, gameStats.totalGamesPlayed]);
-
-	  useEffect(() => {
-		if (gameStats.totalGamesPlayed > 0) {
 		  const lossPct = (gameStats.totalLosses / gameStats.totalGamesPlayed) * 100;
 		  setLossPercentage(Math.round(lossPct));
+		  setWinPercentage(Math.round(winPct));
 		}
-	  }, [gameStats.totalLosses, gameStats.totalGamesPlayed]);
+	}, [gameStats.totalWins, gameStats.totalLosses, gameStats.totalGamesPlayed]);
 
 
 	return (
@@ -27,9 +22,9 @@ const UserGameStats = ({ gameStats}) => {
 		<h2 className="text-black text-xl font-bold mx-auto pt-4 text-center">GAME STATS</h2>
 			<div className="p-4 flex flex-col items-center">
 			<div className="font-bold mt-4">Wins</div>
-			<CircularProgress winPercentage={winPercentage} />
+			<CircularProgress greenPercentage={winPercentage} />
 			<div className="font-bold mt-4">Losses</div>
-			<CircularProgress winPercentage={lossPercentage} />
+			<CircularProgress greenPercentage={lossPercentage} />
 			<div className="font-bold mt-4">Total Games Played</div>
 			<div>{gameStats.totalGamesPlayed}</div>
 			<div className="font-bold mt-4">Ranking</div>

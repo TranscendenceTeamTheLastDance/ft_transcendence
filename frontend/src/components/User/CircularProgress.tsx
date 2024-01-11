@@ -1,7 +1,7 @@
-const CircularProgress = ({ winPercentage }) => {
+const CircularProgress = ({ greenPercentage }) => {
 	const radius = 40;
 	const circumference = 2 * Math.PI * radius;
-	const greenStrokeLength = (winPercentage / 100) * circumference; // The length of the green part
+	const greenStrokeLength = (greenPercentage / 100) * circumference; // The length of the green part
 	const greyStrokeLength = circumference - greenStrokeLength; // The remaining part should be grey
 
 	return (
@@ -26,7 +26,7 @@ const CircularProgress = ({ winPercentage }) => {
 				cy={50}
 			/>
 			<text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle">
-				{winPercentage}%
+				{greenPercentage}%
 			</text>
 		</svg>
 	);
