@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import Particles from '../Home/Particles';
 
 
 const Signwith42 = () => {
@@ -21,13 +20,13 @@ const Signwith42 = () => {
 		const fetchToken = async () => {
 			try {
 				const response = await axios.get('http://localhost:8080/auth/signin42', 
-					{ params: code, withCredentials: true });
+					{ params: {code}, withCredentials: true });
 				if (response.data.user) {
 					console.log(response.data.user);
 					navigate('/home');
 				}
 			} catch (error: any) {
-				setError(error.response.message);
+				setError(error.response?.message || 'An unknown error occurred');
 			}
 		};
 		fetchToken();
@@ -36,7 +35,7 @@ const Signwith42 = () => {
 	useEffect(() => {
         if (error) {
             const timeout = setTimeout(() => {
-                navigate('/signin');
+                navigate('/');
             }, 3000);
 
             return () => {
