@@ -23,7 +23,7 @@ export class AuthController {
 					user});
 				})
 			.catch((err) => {
-				res.status(401).json({ message: 'wrong credentials' });
+				res.status(401).json({ message: 'wrong credentials ma couille' });
 			});
 	}
 

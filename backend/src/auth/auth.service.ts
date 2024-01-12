@@ -121,9 +121,7 @@ export class AuthService {
 			const newUser = await this.prismaService.user.create({
 				data: {
 					email: email,
-					hash: undefined,
 					name: name,
-					//connectionNb: 1,
 				},
 			});
 			return newUser;
@@ -132,7 +130,6 @@ export class AuthService {
 
 	async generateToken(userId:number, email:string, name:string, res:Response) {
 		const accessToken = await this.signToken(userId, email, name);
-		console.log(accessToken.JWTtoken);
 		res.cookie(this.config.get('JWT_ACCESS_TOKEN_COOKIE'),
 			accessToken.JWTtoken,
 			{

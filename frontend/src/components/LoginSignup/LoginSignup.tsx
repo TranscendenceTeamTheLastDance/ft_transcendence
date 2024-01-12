@@ -64,7 +64,7 @@ const LoginSignup = () => {
 
 	const handleRedir42 = (event: React.FormEvent) => {
         event.preventDefault();
-        window.location.href = `https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-41beb070e684ccfa63093ccd4b2f2dcf1750963fb5986134f469a5d953365d02&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fhome&response_type=code`;
+        window.location.href = `https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-fefc1c5e4c70bebd2ed7324e9922eba3a64229d2bb0de7c6842cec51f3ee8f2b&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fsignwith42&response_type=code`;
     };
 
 	return (
