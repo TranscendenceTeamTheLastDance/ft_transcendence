@@ -5,8 +5,6 @@ import Signwith42 from './components/LoginSignup/Signwith42';
 import Home from './components/Home/Home';
 import { ConversationChannelPage } from './pages/ConversationChannelPage';
 import { ConversationPage } from './pages/ConversationPage';
-import LoginSignup from './components/LoginSignup/LoginSignup';
-import Home from './components/Home/Home';
 import User from './pages/UserPage';
 
 function App() {
