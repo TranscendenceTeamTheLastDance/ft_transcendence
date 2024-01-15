@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import './LoginSignup.css'
+import Particles from '../Home/Particles';
 
 import user_icon from '../assets/person.png';
 import email_icon from '../assets/email.png';
@@ -50,7 +51,7 @@ const LoginSignup = () => {
 			body: JSON.stringify(formData),
 		});
 		if (!response.ok) {
-			throw new Error('Signin failed');
+			throw new Error('Signin failed encule');
 		}
 		const data = await response.json();
 		navigate('/home');
@@ -61,8 +62,14 @@ const LoginSignup = () => {
 
 	const[action, setAction] = useState("Sign Up");
 
+	const handleRedir42 = (event: React.FormEvent) => {
+        event.preventDefault();
+        window.location.href = `https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-fefc1c5e4c70bebd2ed7324e9922eba3a64229d2bb0de7c6842cec51f3ee8f2b&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fsignwith42&response_type=code`;
+    };
+
 	return (
 	<div className ='container'>
+		<Particles className="absolute inset-0 -z-10 animate-fade-in" quantity={1000} />
 		<div className='header'>
 			<div className='text'>{action}</div>
 			<div className='underline'></div>
@@ -105,19 +112,38 @@ const LoginSignup = () => {
 			
 			</div>
 		</div>
-		{action==="Sign Up" ? <div></div>:
-		<div className='forgot-password'>Lost Password ? <span>Click Here</span></div> }
+		{action==="Sign Up" ? <div></div>:<div className='forgot-password'>Lost Password ? <span>Click Here</span></div> }
 		<div className='submit-container'>
 			<div 
 				className={action==="Login"?"submit grey":"submit"} 
-				onClick={(e) =>{setAction("Sign Up"); handleSignUp(e);}}
+				onClick={(e) =>{setAction("Sign Up");}}
 				>Sign Up</div>
 			
 			<div 
 				className={action==="Sign Up"?"submit grey":"submit"} 
-				onClick={(e)=>{setAction("Login"); handleSignIn(e);}}
+				onClick={(e)=>{setAction("Login");}}
 				>Login</div>	
-		</div>`
+		</div>
+		<div className='submit-button'>
+			<button
+				className="button"
+				onClick={(e) => {
+					if (action === "Sign Up") {
+					handleSignUp(e);
+					} else {
+					handleSignIn(e);
+					}
+				}}
+				>
+				Submit
+			</button>
+		</div>
+		<div className='42button'>
+			<button 
+				className="42buttonsubmit" onClick={handleRedir42}
+				> login with 42
+			</button>
+		</div>
 	</div>
   )
 }

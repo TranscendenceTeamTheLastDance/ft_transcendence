@@ -50,6 +50,6 @@
     "postcss": "^8.4.32",
     "react-avatar-editor": "^13.0.2",
     "tailwindcss": "^3.3.6",
-    "typescript": "^5.3.3"
+    "typescript": "^4.5.4"
   }
 }
