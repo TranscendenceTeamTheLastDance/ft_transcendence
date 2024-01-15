@@ -37,7 +37,56 @@ const PongGame: React.FC = () => {
         const ctx = canvas?.getContext('2d');
         if (!canvas || !ctx) return;
 
-        // ... Initialisation de vos objets ici (ball, user, com, etc.)
+        const ball: Ball = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: 10,
+            velocityX: 5,
+            velocityY: 5,
+            speed: 7,
+            color: "WHITE",
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0
+        };
+    
+        // Initialisation de la raquette de l'utilisateur
+        const user: Paddle = {
+            x: 0,
+            y: (canvas.height - 100) / 2,
+            width: 10,
+            height: 100,
+            score: 0,
+            color: "WHITE",
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0
+        };
+    
+        // Initialisation de la raquette de l'ordinateur
+        const com: Paddle = {
+            x: canvas.width - 10,
+            y: (canvas.height - 100) / 2,
+            width: 10,
+            height: 100,
+            score: 0,
+            color: "WHITE",
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0
+        };
+    
+        // Initialisation du filet
+        const net = {
+            x: (canvas.width - 2) / 2,
+            y: 0,
+            width: 2,
+            height: 10,
+            color: "WHITE"
+        };
 
         const gameLoop = () => {
             if (!isPaused) {
