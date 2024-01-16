@@ -6,12 +6,13 @@ import avatar_icon from '../components/assets/avatar.png';
 import Particles from '../components/Home/Particles.tsx';
 import NotConnected from '../components/NotSignedIn.tsx';
 import axios from 'axios';
+import { useUserContext } from '../context/UserContext';
 
 const User = () => {
 	const [is2FAEnabled, setIs2FAEnabled] = useState(false);
 	const [selectedImage, setSelectedImage] = useState('');
-	const [userName, setUserName] = useState('');
 	const fileInputRef = useRef(avatar_icon);
+	const {user, updateUser } = useUserContext();
 
 	//THE USE EFFECTS
 	useEffect(() => {
@@ -32,7 +33,7 @@ const User = () => {
 		};
 	
 		fetchUserData();
-	  }, []);
+	  }, [is2FAEnabled]);
 
 	// ALL THE HANDLERS
 	const handleImageChange = (e) => {
@@ -65,18 +66,12 @@ const User = () => {
 		};
 	
 	const handle2FAToggle = () => {
-		setIs2FAEnabled(currentState => !currentState);
+		const new2FAStatus = !user.twoFactorEnabled;
+		updateUser({ twoFactorEnabled: new2FAStatus });
 	};
 
 
 	//@@@TODO: Fetch data from backend 
-	const userDetails = {
-		firstName: 'John',
-		lastName: 'Doe',
-		email: 'john.doe@example.com',
-		password: '********',
-	};
-
 	const friends = [
 		{ nickname: 'Friend1', online: true },
 		{ nickname: 'Friend2', online: false },
@@ -96,7 +91,7 @@ const User = () => {
 	  };
 
 
-	  return userName ? (
+	  return user ? (
 		<div className="flex items-center justify-center min-h-screen relative pb-8">
 			<Particles className="absolute inset-0 -z-10" quantity={1000} />
 			<div className="flex justify-start"> 
@@ -107,9 +102,6 @@ const User = () => {
 				<UserInformation 
 					selectedImage={selectedImage} 
 					handleImageClick={handleImageClick}
-					userName={userName}
-					userDetails={userDetails}
-					is2FAEnabled={is2FAEnabled}
 					handle2FAToggle={handle2FAToggle}
 					handleUpdateProfile={handleUpdateProfile} 
 					fileInputRef={fileInputRef}
