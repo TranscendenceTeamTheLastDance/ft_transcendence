@@ -9,7 +9,6 @@ import axios from 'axios';
 import { useUserContext } from '../context/UserContext';
 
 const User = () => {
-	const [is2FAEnabled, setIs2FAEnabled] = useState(false);
 	const [selectedImage, setSelectedImage] = useState('');
 	const fileInputRef = useRef(avatar_icon);
 	const {user, updateUser } = useUserContext();
@@ -21,19 +20,14 @@ const User = () => {
 				const response = await axios.get('http://localhost:8080/users/me', { withCredentials: true });
 				const userData = response.data;
 				setSelectedImage(userData.userPictu || avatar_icon ); // Set user's picture
-				setUserName(userData.name || ''); // Set user's name or default
-				if (userData.twoFactorAuthEnabled !== undefined) {
-					console.log('2FA is now:', is2FAEnabled);
-					setIs2FAEnabled(userData.twoFactorAuthEnabled);
-				  }
-		  	} 
+			} 
 			catch (error) {
 				console.error('Error fetching user data:', error);
-		  	}
+			}
 		};
 	
 		fetchUserData();
-	  }, [is2FAEnabled]);
+	  }, []);
 
 	// ALL THE HANDLERS
 	const handleImageChange = (e) => {
