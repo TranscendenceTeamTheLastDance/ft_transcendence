@@ -1,8 +1,9 @@
 import React from 'react';
+import Avatar from './UserAvatar';
 import ToggleSwitch from './2FAToggle.tsx';
 import { useUserContext } from '../../context/UserContext';
 
-const UserInformation = ({ selectedImage, handleImageClick, handle2FAToggle, handleUpdateProfile, fileInputRef, handleImageChange }) => {
+const UserInformation = ({handle2FAToggle, handleUpdateProfile, onAvatarFileSelect}) => {
 	const { user } = useUserContext();
 
 	return (
@@ -11,11 +12,12 @@ const UserInformation = ({ selectedImage, handleImageClick, handle2FAToggle, han
 	  
 				<div className="flex mt-8 mx-auto w-3/4">
 				  {/* Left side - Avatar and Nickname */}
-				  <div className="flex flex-col items-center justify-center w-1/4 bg-gray-100 p-4 rounded-lg mr-4">
+				  {/* <div className="flex flex-col items-center justify-center w-1/4 bg-gray-100 p-4 rounded-lg mr-4">
 					<img src={selectedImage} alt="User Avatar" className="w-20 h-20 object-cover rounded-full cursor-pointer mb-2" onClick={handleImageClick} />
 					<p className="text-center font-bold">{user.nickName}</p>
 					<input type="file" ref={fileInputRef} onChange={handleImageChange} className="hidden" />
-				</div>
+				</div> */}
+				 <Avatar onFileSelect={onAvatarFileSelect} />
 				{/* Right side - User Details*/}
 				<div className="w-3/4 bg-gray-100 p-4 rounded-lg">
 					{user && (

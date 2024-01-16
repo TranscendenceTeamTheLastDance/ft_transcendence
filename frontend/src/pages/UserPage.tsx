@@ -1,63 +1,41 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import UserInformation from '../components/User/UserInformation.tsx';
 import UserGameStats from '../components/User/UserGameStats.tsx';
 import FriendsList from '../components/User/UserFriendsList.tsx';
-import avatar_icon from '../components/assets/avatar.png';
 import Particles from '../components/Home/Particles.tsx';
 import NotConnected from '../components/NotSignedIn.tsx';
 import axios from 'axios';
 import { useUserContext } from '../context/UserContext';
 
 const User = () => {
-	const [selectedImage, setSelectedImage] = useState('');
-	const fileInputRef = useRef(avatar_icon);
 	const {user, updateUser } = useUserContext();
-
-	//THE USE EFFECTS
-	useEffect(() => {
-		const fetchUserData = async () => {
-		  try {
-				const response = await axios.get('http://localhost:8080/users/me', { withCredentials: true });
-				const userData = response.data;
-				setSelectedImage(userData.userPictu || avatar_icon ); // Set user's picture
-			} 
-			catch (error) {
-				console.error('Error fetching user data:', error);
-			}
-		};
+	const [avatarFile, setAvatarFile] = useState(null);
 	
-		fetchUserData();
-	  }, []);
-
 	// ALL THE HANDLERS
-	const handleImageChange = (e) => {
-		if (e.target.files && e.target.files[0]) {
-			let img = e.target.files[0];
-			setSelectedImage(URL.createObjectURL(img));
-		}
-	};
-
-	const handleImageClick = () => {
-		if (fileInputRef.current) {
-			fileInputRef.current.click();
-		}
+	const onAvatarFileSelect = (file) => {
+		setAvatarFile(file);
 	};
 
 	const handleUpdateProfile = async () => {
-		if (!fileInputRef.current.files[0]) return; // Check if a file is selected
-	  
-		const formData = new FormData();
-		formData.append('file', fileInputRef.current.files[0]);
+		// Check if there's a new avatar to upload
+		if (avatarFile) {
+			const formData = new FormData();
+			formData.append('file', avatarFile);
+			console.log("Image being sent :", formData);
 
-		
-		try {
-		  const response = await axios.post('http://localhost:8080/users/upload-profile-picture', formData, {
-			withCredentials: true,
-		  });
-		  console.log('New profile pic successfully uploaded !', response.data);
-		} catch (error) {
-			console.error('Error uploading a new profile pic:', error); }
-		};
+			try {
+				const response = await axios.post('http://localhost:8080/users/upload-profile-picture', formData, {
+					withCredentials: true,
+				});
+				console.log('New profile pic successfully uploaded!', response.data);
+			} catch (error) {
+				console.error('Error uploading a new profile pic:', error);
+			}
+		} else {
+			console.log('No new avatar to upload');
+		}
+	};
+	
 	
 	const handle2FAToggle = () => {
 		const new2FAStatus = !user.twoFactorEnabled;
@@ -94,12 +72,9 @@ const User = () => {
 			<div className="flex flex-col mr-8"> {/* Margin right to separate from Game Stats */}
 				{/* User Information Box */}
 				<UserInformation 
-					selectedImage={selectedImage} 
-					handleImageClick={handleImageClick}
 					handle2FAToggle={handle2FAToggle}
-					handleUpdateProfile={handleUpdateProfile} 
-					fileInputRef={fileInputRef}
-					handleImageChange={handleImageChange}
+					handleUpdateProfile={handleUpdateProfile}
+					onAvatarFileSelect={onAvatarFileSelect}
 					/>
 	  
 				{/* Friends Box */}

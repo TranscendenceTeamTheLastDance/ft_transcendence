@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-
+import avatar_icon from '../components/assets/avatar.png';
 const UserContext = createContext(null);
 
 
@@ -16,9 +16,8 @@ export const UserProvider = ({ children }) => {
 				email: "johndoe@example.com",
 				password: "*******",
 				twoFactorEnabled: false,
-				avatar: "path/to/avatar.jpg"
+				avatar: avatar_icon
 			};
-
 			setUser(userData);
 		};
 
