@@ -16,8 +16,8 @@ model User {
   name      String
   hash      String?
 
-  twoFactorAuth boolean @default(false)
-  twoFactorSecret string?
+  twoFactorAuth Boolean @default(false)
+  twoFactorSecret String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
