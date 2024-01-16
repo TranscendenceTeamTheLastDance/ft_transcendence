@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 interface Paddle  {
     top: number;
@@ -27,29 +27,41 @@ interface Ball  {
     color: string;
 };
 
+
+function drawRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, color: string): void {
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, w, h);
+}
+
+function drawNet(ctx: CanvasRenderingContext2D, net: { x: number, y: number, width: number, height: number, color: string }, canvasHeight: number): void {
+    for (let i = 0; i <= canvasHeight; i += 15) {
+        drawRect(ctx, net.x, net.y + i, net.width, net.height, net.color);
+    }
+}
+
+function drawArc(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, color: string): void {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2, true);
+    ctx.closePath();
+    ctx.fill();
+}
+
+function drawText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number): void {
+    ctx.fillStyle = "#FFF";
+    ctx.font = "75px fantasy";
+    ctx.fillText(text, x, y);
+}
+
+
 const PongGame: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [isPaused, setIsPaused] = useState(false);
 
     // Initialisation du jeu
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas?.getContext('2d');
         if (!canvas || !ctx) return;
-
-        const ball: Ball = {
-            x: canvas.width / 2,
-            y: canvas.height / 2,
-            radius: 10,
-            velocityX: 5,
-            velocityY: 5,
-            speed: 7,
-            color: "WHITE",
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0
-        };
     
         // Initialisation de la raquette de l'utilisateur
         const user: Paddle = {
@@ -64,8 +76,7 @@ const PongGame: React.FC = () => {
             left: 0,
             right: 0
         };
-    
-        // Initialisation de la raquette de l'ordinateur
+
         const com: Paddle = {
             x: canvas.width - 10,
             y: (canvas.height - 100) / 2,
@@ -78,7 +89,21 @@ const PongGame: React.FC = () => {
             left: 0,
             right: 0
         };
-    
+
+        const ball: Ball = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: 10,
+            velocityX: 5,
+            velocityY: 5,
+            speed: 7,
+            color: "WHITE",
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0
+        };
+        
         // Initialisation du filet
         const net = {
             x: (canvas.width - 2) / 2,
@@ -88,17 +113,30 @@ const PongGame: React.FC = () => {
             color: "WHITE"
         };
 
+        // creation des formes
+
         const gameLoop = () => {
-            if (!isPaused) {
-                // Mettre à jour et rendre le jeu
-            }
+            drawRect(ctx, 0, 0, canvas.width, canvas.height, "#000");
+            drawRect(ctx, user.x, user.y, user.width, user.height, user.color);
+            drawNet(ctx, net, canvas.height);
         };
 
         const loop = setInterval(gameLoop, 1000 / 50);
 
         // Gestionnaire d'événements
         const mouseMoveHandler = (event: MouseEvent) => {
-            // Logique de déplacement de la raquette
+            // Obtenir la position relative de la souris dans le canvas
+            const rect = canvas.getBoundingClientRect();
+            const mouseY = event.clientY - rect.top;
+
+            // Mettre à jour la position Y de la raquette
+            // On s'assure que la raquette ne sort pas du canvas en bas
+            user.y = Math.min(mouseY - user.height / 2, canvas.height - user.height);
+
+            // Empêcher la raquette de sortir du canvas en haut
+            if (user.y < 0) {
+                user.y = 0;
+            }
         };
 
         canvas.addEventListener('mousemove', mouseMoveHandler);
@@ -108,16 +146,11 @@ const PongGame: React.FC = () => {
             clearInterval(loop);
             canvas.removeEventListener('mousemove', mouseMoveHandler);
         };
-    }, [isPaused]);
-
-    const togglePause = () => {
-        setIsPaused(!isPaused);
-    };
+    }, []);
 
     return (
         <div>
             <canvas ref={canvasRef} width="800" height="400" />
-            <button onClick={togglePause}>{isPaused ? "Resume" : "Pause"}</button>
         </div>
     );
 };
