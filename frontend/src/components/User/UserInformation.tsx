@@ -9,15 +9,16 @@ const UserInformation = ({handle2FAToggle, handleUpdateProfile, onAvatarFileSele
 	return (
 		<div className="bg-white w-[600px] pb-[30px] rounded-lg z-10">
 				<h1 className="text-black text-2xl font-bold mx-auto mt-8 text-center">USER INFORMATION</h1>
-	  
 				<div className="flex mt-8 mx-auto w-3/4">
-				  {/* Left side - Avatar and Nickname */}
-				  {/* <div className="flex flex-col items-center justify-center w-1/4 bg-gray-100 p-4 rounded-lg mr-4">
-					<img src={selectedImage} alt="User Avatar" className="w-20 h-20 object-cover rounded-full cursor-pointer mb-2" onClick={handleImageClick} />
+				
+					{/* Left side - Avatar and Nickname */}
+					<div className="flex flex-col items-center justify-center w-1/4 bg-gray-100 p-4 rounded-lg mr-4">
+					{/* <img src={selectedImage} alt="User Avatar" className="w-20 h-20 object-cover rounded-full cursor-pointer mb-2" onClick={handleImageClick} />
 					<p className="text-center font-bold">{user.nickName}</p>
-					<input type="file" ref={fileInputRef} onChange={handleImageChange} className="hidden" />
-				</div> */}
-				 <Avatar onFileSelect={onAvatarFileSelect} />
+					<input type="file" ref={fileInputRef} onChange={handleImageChange} className="hidden" /> */}
+					<Avatar onFileSelect={onAvatarFileSelect} />
+					</div>
+				
 				{/* Right side - User Details*/}
 				<div className="w-3/4 bg-gray-100 p-4 rounded-lg">
 					{user && (
