@@ -15,6 +15,10 @@ model User {
   email     String   @unique
   name      String
   hash      String?
+
+  twoFactorAuth boolean @default(false)
+  twoFactorSecret string?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
