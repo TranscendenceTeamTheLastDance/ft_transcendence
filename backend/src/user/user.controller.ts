@@ -27,7 +27,7 @@ export class UserController {
 	const imageBase64 = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
 	await this.prisma.user.update({
 		where: { id: userId },
-		data: { userPictu: imageBase64 },
+		data: { profilePic: imageBase64 },
 	});
 }
 

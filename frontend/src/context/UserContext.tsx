@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
 import avatar_icon from '../components/assets/avatar.png';
 const UserContext = createContext(null);
 
@@ -6,21 +7,23 @@ const UserContext = createContext(null);
 export const UserProvider = ({ children }) => {
 	const [user, setUser] = useState(null);
 
-	//TODO: Fetch data from backend
-	useEffect(() => {
 	const fetchUserData = async () => {
-			const userData = {
-				firstName: "John",
-				lastName: "Doe",
-				nickName: "Johnny",
-				email: "johndoe@example.com",
-				password: "*******",
-				twoFactorEnabled: false,
-				avatar: avatar_icon
-			};
-			setUser(userData);
-		};
+		try {
+		  const response = await axios.get('http://localhost:8080/users/me', { withCredentials: true });
+		  const userData = response.data;
+		  if (userData) {
+			setUser({
+			  ...userData,
+			  avatar: userData.profilePic || avatar_icon,
+			});
+		  }
+		} catch (error) {
+		  setUser(null);
+			// console.error('Error fetching user data:', error);
+		}
+	  };
 
+	useEffect(() => {
 		fetchUserData();
 	}, []);
 
@@ -42,7 +45,7 @@ export const UserProvider = ({ children }) => {
 	};
 
 	return (
-		<UserContext.Provider value={{ user, setUser, updateUser }}>
+		<UserContext.Provider value={{ user, setUser, updateUser, fetchUserData}}>
 			{children}
 		</UserContext.Provider>
 	);

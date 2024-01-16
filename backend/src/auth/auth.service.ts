@@ -37,10 +37,10 @@ export class AuthService {
 				throw new ForbiddenException("Credential Incorrect");
 			}
 			const email = user42info.data['email'];
-			const name = user42info.data['login'];
-			const user = await this.createupdateUser(email, name);
+			const username = user42info.data['login'];
+			const user = await this.createupdateUser(email, username);
 			user.hash = undefined;
-            await this.generateToken(user.id, user.email, user.name, res);
+            await this.generateToken(user.id, user.email, user.username, res);
             return user;
 		} catch (error) {
             throw new ForbiddenException('Invalid authorization code');
@@ -66,8 +66,8 @@ export class AuthService {
 			console.log("password not found");
 			throw new ForbiddenException("Credential Incorrect")
 		}
-		this.createupdateUser(user.email, user.name);
-		await this.generateToken(user.id, user.email, user.name, res);
+		this.createupdateUser(user.email, user.username);
+		await this.generateToken(user.id, user.email, user.username, res);
 		return user;
 	}
 
@@ -81,11 +81,11 @@ export class AuthService {
 				data: {
 					email: dto.email,
 					hash,
-					name: dto.name,
+					username: dto.username,
 					//connectionNb: 1,
 				},
 			});
-			await this.generateToken(user.id, user.email, user.name, res);
+			await this.generateToken(user.id, user.email, user.username, res);
 			return user;
 		} catch (error) {
 			if (error instanceof PrismaClientKnownRequestError) {
@@ -97,7 +97,7 @@ export class AuthService {
 		}
 	}
 
-	async createupdateUser(email:string, name:string): Promise<User> {
+	async createupdateUser(email:string, username:string): Promise<User> {
 		const userAlreadyExist = await this.prismaService.user.findUnique({
 			where: {
 				email: email,
@@ -113,7 +113,7 @@ export class AuthService {
 					email: email,
 				},
 				data: {
-					name: name,
+					username: username,
 				},
 			});
 			return updatedUser;
@@ -121,15 +121,15 @@ export class AuthService {
 			const newUser = await this.prismaService.user.create({
 				data: {
 					email: email,
-					name: name,
+					username: username,
 				},
 			});
 			return newUser;
 		}
 	}
 
-	async generateToken(userId:number, email:string, name:string, res:Response) {
-		const accessToken = await this.signToken(userId, email, name);
+	async generateToken(userId:number, email:string, username:string, res:Response) {
+		const accessToken = await this.signToken(userId, email, username);
 		res.cookie(this.config.get('JWT_ACCESS_TOKEN_COOKIE'),
 			accessToken.JWTtoken,
 			{
@@ -142,11 +142,11 @@ export class AuthService {
 		)
 	}
 
-	async signToken(userId:number, email:string, name:string): Promise<{ JWTtoken: string }> {
+	async signToken(userId:number, email:string, username:string): Promise<{ JWTtoken: string }> {
 		const payload = { // here payload is the data we want to store in the token
 			sub:userId,// here sub is used because it is the standard for the subject of the token
 			email,
-			name,
+			username,
 		}
 		const secret = this.config.get('JWT_SECRET')
 	

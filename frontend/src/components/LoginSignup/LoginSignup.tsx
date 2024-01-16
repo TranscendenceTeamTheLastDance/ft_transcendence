@@ -10,7 +10,7 @@ import password_icon from '../assets/password.png';
 
 const LoginSignup = () => {
 	const navigate = useNavigate();
-	const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+	const [formData, setFormData] = useState({ username: '', email: '', password: '' });
 
 	const handleChange = (e) => {
 		const newFormData = ({ ...formData, [e.target.name]: e.target.value });
@@ -82,9 +82,9 @@ const LoginSignup = () => {
 				<img src={user_icon} alt='' />
 				<input 
 					type= "text" 
-					name ="name"
-					placeholder="name"
-					value={formData.name}
+					name ="username"
+					placeholder="username"
+					value={formData.username}
 					onChange={handleChange}
 				/>
 			</div>}

@@ -21,6 +21,10 @@ const UserInformation = ({handle2FAToggle, handleUpdateProfile, onAvatarFileSele
 						{user && (
 							<>
 								<div className="flex justify-between mb-2">
+									<span className="font-bold">Username:</span>
+									<span>{user.username}</span>
+								</div>
+								<div className="flex justify-between mb-2">
 									<span className="font-bold">First Name:</span>
 									<span>{user.firstName}</span>
 								</div>
@@ -34,7 +38,7 @@ const UserInformation = ({handle2FAToggle, handleUpdateProfile, onAvatarFileSele
 								</div>
 								<div className="flex justify-between mb-2">
 									<span className="font-bold">Password:</span>
-									<span>{user.password}</span>
+									<span>*******</span>
 								</div>
 							</>
 						)}

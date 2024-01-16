@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import UserInformation from '../components/User/UserInformation.tsx';
 import UserGameStats from '../components/User/UserGameStats.tsx';
 import FriendsList from '../components/User/UserFriendsList.tsx';
@@ -8,9 +8,13 @@ import axios from 'axios';
 import { useUserContext } from '../context/UserContext';
 
 const User = () => {
-	const {user, updateUser } = useUserContext();
+	const {user, updateUser, fetchUserData } = useUserContext();
 	const [avatarFile, setAvatarFile] = useState(null);
 	
+	useEffect(() => {
+		fetchUserData();
+	  }, []);
+
 	// ALL THE HANDLERS
 	const onAvatarFileSelect = (file) => {
 		setAvatarFile(file);
