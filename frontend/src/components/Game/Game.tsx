@@ -1,4 +1,9 @@
 import React, { useEffect, useRef } from 'react';
+import io from 'socket.io-client';
+// Assurez-vous que socket.io-client est installé
+// npm install socket.io-client
+
+const socket = io('http://localhost:3000'); // Utilisez l'URL de votre serveur
 
 interface Paddle  {
     top: number;
@@ -118,6 +123,8 @@ const PongGame: React.FC = () => {
         const gameLoop = () => {
             drawRect(ctx, 0, 0, canvas.width, canvas.height, "#000");
             drawRect(ctx, user.x, user.y, user.width, user.height, user.color);
+            drawRect(ctx, com.x, com.y, com.width, com.height, com.color);
+            drawArc(ctx, ball.x, ball.y, ball.radius, ball.color);
             drawNet(ctx, net, canvas.height);
         };
 
