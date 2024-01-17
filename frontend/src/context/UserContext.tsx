@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import avatar_icon from '../components/assets/avatar.png';
 const UserContext = createContext(null);
@@ -7,7 +7,7 @@ const UserContext = createContext(null);
 export const UserProvider = ({ children }) => {
 	const [user, setUser] = useState(null);
 
-	const fetchUserData = async () => {
+	const fetchUserData = useCallback(async () => {
 		try {
 		  const response = await axios.get('http://localhost:8080/users/me', { withCredentials: true });
 		  const userData = response.data;
@@ -17,15 +17,17 @@ export const UserProvider = ({ children }) => {
 			  avatar: userData.profilePic || avatar_icon,
 			});
 		  }
-		} catch (error) {
-		  setUser(null);
-			// console.error('Error fetching user data:', error);
+		} catch (error: any) {
+			if (error.response && error.response.status === 401) {
+		 	 setUser(null);
+			 console.error('Error fetching user data: unautorized or Not existent (yet):', error);
 		}
-	  };
+	}
+	  }, []);
 
 	useEffect(() => {
 		fetchUserData();
-	}, []);
+	}, [fetchUserData]);
 
 	// For debug purposes, prints latest user info 
 	useEffect(() => {
