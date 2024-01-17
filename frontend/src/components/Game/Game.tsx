@@ -1,9 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import io from 'socket.io-client';
-// Assurez-vous que socket.io-client est installé
-// npm install socket.io-client
-
-const socket = io('http://localhost:3000'); // Utilisez l'URL de votre serveur
 
 interface Paddle  {
     top: number;
@@ -52,22 +48,34 @@ function drawArc(ctx: CanvasRenderingContext2D, x: number, y: number, r: number,
     ctx.fill();
 }
 
-function drawText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number): void {
-    ctx.fillStyle = "#FFF";
-    ctx.font = "75px fantasy";
-    ctx.fillText(text, x, y);
-}
+// function drawText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number): void {
+//     ctx.fillStyle = "#FFF";
+//     ctx.font = "75px fantasy";
+//     ctx.fillText(text, x, y);
+// }
 
 
 const PongGame: React.FC = () => {
-    const canvasRef = useRef<HTMLCanvasElement>(null);
+const canvasRef = useRef<HTMLCanvasElement>(null);
+// const socketReff = useRef(io('http://localhost:3000'));
 
-    // Initialisation du jeu
-    useEffect(() => {
-        const canvas = canvasRef.current;
+// Initialisation du jeu
+useEffect(() => {
+    const canvas = canvasRef.current;
+    const socketRef = io('http://localhost:8080');
+    socketRef.on('connect', () => {
+        console.log('Connected to the server');
+    });
+    
+    socketRef.on('connect_error', (err) => {
+        console.error('Connection error:', err);
+    });
         const ctx = canvas?.getContext('2d');
+
+
         if (!canvas || !ctx) return;
     
+        
         // Initialisation de la raquette de l'utilisateur
         const user: Paddle = {
             x: 0,
@@ -144,14 +152,21 @@ const PongGame: React.FC = () => {
             if (user.y < 0) {
                 user.y = 0;
             }
+            // console.log("pute");
+            // socket.emit('user-paddle-move', { y: user.y });
         };
 
         canvas.addEventListener('mousemove', mouseMoveHandler);
 
-        // Nettoyage
+        // socket.on('paddle-move-ack', (data) => {
+        //     console.log('Confirmation du serveur:', data.status);
+        //     // Vous pouvez effectuer d'autres actions en réponse à la confirmation ici
+        // });
+
         return () => {
             clearInterval(loop);
             canvas.removeEventListener('mousemove', mouseMoveHandler);
+            // socket.off('paddle-move-ack');
         };
     }, []);
 

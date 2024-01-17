@@ -3,14 +3,16 @@ import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/web
 import { Server } from 'socket.io';
 
 @WebSocketGateway()
-export class MyGateway {
-  @WebSocketServer()
-  server: Server;
+export class GameGateway {
+    @WebSocketServer()
+    server: Server;
 
-  @SubscribeMessage('position')
-  handleCustomEvent(client: any, data: any): void {
-    console.log('Data received from client:', data);
-    // Vous pouvez traiter les données ici et même envoyer une réponse
-    // client.emit('response-event', { status: 'Data received' });
-  }
+    @SubscribeMessage('user-paddle-move')
+    handlePaddleMove(client: any, data: { y: number }) {
+        console.log('Position Y de la raquette utilisateur reçue:', data.y);
+        // Traiter les données ici
+
+        // Envoyer un message de confirmation au client
+        client.emit('paddle-move-ack', { status: 'received' });
+    }
 }
