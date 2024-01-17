@@ -2,6 +2,7 @@ import React from 'react';
 import Avatar from './UserAvatar';
 import ToggleSwitch from './2FAToggle.tsx';
 import { useUserContext } from '../../context/UserContext';
+import Button from './CoolButton.tsx';
 
 const UserInformation = ({handle2FAToggle, handleUpdateProfile, onAvatarFileSelect}) => {
 	const { user } = useUserContext();
@@ -51,10 +52,8 @@ const UserInformation = ({handle2FAToggle, handleUpdateProfile, onAvatarFileSele
 
 				{/* Update Profile Button */}
 				<div className="flex justify-center mt-4">
-					<button className="bg-gray-500 text-white py-2 px-4 rounded-lg text-lg font-bold mx-2" onClick={handleUpdateProfile}>
-						Update Profile
-					</button>
-				</div>
+					<Button buttonText="Update Profile" modalText="🛸 profile updated successfully 🛸" clickFunction={handleUpdateProfile} />
+				</div> 
 		</div>
 	);
 }
