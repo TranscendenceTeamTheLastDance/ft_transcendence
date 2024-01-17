@@ -5,6 +5,7 @@ import Particles from './Particles';
 const navigation = [
   { name: "CHAT", href: "/conversations" },
   { name: "PLAY", href: "/play" },
+  { name: "USER", href: "/user" },
 ];
 
 const Home = () => {

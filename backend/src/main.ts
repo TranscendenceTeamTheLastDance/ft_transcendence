@@ -1,8 +1,8 @@
 import { ValidationPipe } from '@nestjs/common'; // this is the validation pipe that will be used to validate the data sent to the server
 import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 import * as cookieParser from 'cookie-parser';
-import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
