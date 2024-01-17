@@ -13,7 +13,7 @@ const User = () => {
 	
 	useEffect(() => {
 		fetchUserData();
-	  }, []);
+	  }, [fetchUserData]);
 
 	// ALL THE HANDLERS
 	const onAvatarFileSelect = (file) => {
