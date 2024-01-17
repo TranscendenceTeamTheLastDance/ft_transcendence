@@ -2,6 +2,7 @@ import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import LoginSignup from './components/LoginSignup/LoginSignup';
 import Signwith42 from './components/LoginSignup/Signwith42';
+import TwoFactorForm from './components/LoginSignup/TwoFactorForm';
 import Home from './components/Home/Home';
 import { ConversationChannelPage } from './pages/ConversationChannelPage';
 import { ConversationPage } from './pages/ConversationPage';
