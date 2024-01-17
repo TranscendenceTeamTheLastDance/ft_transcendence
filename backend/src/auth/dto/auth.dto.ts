@@ -11,7 +11,7 @@ export class SignupDto {
 
   @IsString()
   @IsNotEmpty()
-  name: string;
+  username: string;
 }
 
 export class SigninDto {
