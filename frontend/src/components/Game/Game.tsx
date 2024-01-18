@@ -48,23 +48,31 @@ function drawArc(ctx: CanvasRenderingContext2D, x: number, y: number, r: number,
     ctx.fill();
 }
 
-// function drawText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number): void {
-//     ctx.fillStyle = "#FFF";
-//     ctx.font = "75px fantasy";
-//     ctx.fillText(text, x, y);
-// }
+function drawText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number): void {
+    ctx.fillStyle = "#FFF";
+    ctx.font = "75px fantasy";
+    ctx.fillText(text, x, y);
+}
+
+function resetBall(ball : Ball, canvas : HTMLCanvasElement): void {
+    ball.x = canvas.width / 2;
+    ball.y = canvas.height / 2;
+    ball.velocityX = -ball.velocityX;
+    ball.speed = 7;
+}
 
 
 const PongGame: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const socketReff = useRef(io('http://localhost:8080/game'));
+    const socketRef = useRef(io('http://localhost:8080/game'));
+    socketRef.current.emit('start');
 
 // Initialisation du jeu
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas?.getContext('2d');
-        const socket = socketReff.current;
-        if (!canvas || !ctx) return;
+        const socket = socketRef?.current;
+        if (!canvas || !ctx || !socket) return;
     
         
         // Initialisation de la raquette de l'utilisateur

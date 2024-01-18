@@ -1,6 +1,9 @@
 // my.gateway.ts
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
+import { PongService } from './game.service';
+import { Interval } from '@nestjs/schedule';
+
 
 @WebSocketGateway({
     cors: {
@@ -9,12 +12,13 @@ import { Server } from 'socket.io';
     namespace: 'game',//specification pour pas que sa rentre en conflit
 })
 export class GameGateway {
+    constructor() {}
     @WebSocketServer()
     server: Server;
 
     @SubscribeMessage('user-paddle-move')
     handlePaddleMove(client: any, data: { y: number }) {
-        console.log('Position Y de la raquette utilisateur reçue:', data.y);
+        // console.log('Position Y de la raquette utilisateur reçue:', data.y);
         // Traiter les données ici
 
         // Envoyer un message de confirmation au client
