@@ -21,6 +21,24 @@ const User = () => {
 	};
 
 	const handleUpdateProfile = async () => {
+
+		// Send new data if updated
+		const userData = {
+			username: user.username,
+			firstName: user.firstName,
+			lastName: user.lastName,
+			email: user.email,
+		  };
+		  console.log("data being passed to back:", userData);
+		  try {
+			const response = await axios.patch('http://localhost:8080/users', userData, {
+			  withCredentials: true,
+			});
+			console.log('User information successfully updated!', response.data);
+		  } catch (error) {
+			console.error('Error updating user information:', error);
+		  }
+		
 		// Check if there's a new avatar to upload
 		if (avatarFile) {
 			const formData = new FormData();

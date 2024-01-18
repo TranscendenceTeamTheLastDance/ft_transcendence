@@ -52,7 +52,6 @@ const UserInformation = ({ handle2FAToggle, handleUpdateProfile, onAvatarFileSel
   };
 
   const handleUpdateClick = () => {
-    updateUser(editableUser);
     handleUpdateProfile(user);
   };
 
@@ -96,15 +95,15 @@ const UserInformation = ({ handle2FAToggle, handleUpdateProfile, onAvatarFileSel
 
       {/* Update Profile Button */}
     	<div className="flex justify-center mt-4">
-		<UpdateButton 
+      {!isEditMode ? (<UpdateButton 
 					buttonText="Update Profile" 
 					modalText="🛸 profile updated successfully 🛸" 
-					clickFunction={handleUpdateClick} />
-		{isEditMode ? (
-		  <EditButton text="✅" onClick={toggleEditMode} />	
-        ) : (
-          <EditButton text="✏️" onClick={toggleEditMode} />
-        )}
+					clickFunction={handleUpdateClick} /> ) : null }
+      {isEditMode ? (
+        <EditButton text="✅" onClick={toggleEditMode} />	
+          ) : (
+            <EditButton text="✏️" onClick={toggleEditMode} />
+          )}
       </div>
     </div>
   );
