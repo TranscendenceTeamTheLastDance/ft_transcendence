@@ -2,7 +2,12 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 
-@WebSocketGateway()
+@WebSocketGateway({
+    cors: {
+        origin : 'http://localhost:3000'//l'origine du message pour autoriser la connection
+    },
+    namespace: 'game',//specification pour pas que sa rentre en conflit
+})
 export class GameGateway {
     @WebSocketServer()
     server: Server;
@@ -13,6 +18,6 @@ export class GameGateway {
         // Traiter les données ici
 
         // Envoyer un message de confirmation au client
-        client.emit('paddle-move-ack', { status: 'received' });
+        client.emit('paddle-move-ack', { y: data.y });
     }
 }

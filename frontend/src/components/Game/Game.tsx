@@ -56,23 +56,14 @@ function drawArc(ctx: CanvasRenderingContext2D, x: number, y: number, r: number,
 
 
 const PongGame: React.FC = () => {
-const canvasRef = useRef<HTMLCanvasElement>(null);
-// const socketReff = useRef(io('http://localhost:3000'));
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const socketReff = useRef(io('http://localhost:8080/game'));
 
 // Initialisation du jeu
-useEffect(() => {
-    const canvas = canvasRef.current;
-    const socketRef = io('http://localhost:8080');
-    socketRef.on('connect', () => {
-        console.log('Connected to the server');
-    });
-    
-    socketRef.on('connect_error', (err) => {
-        console.error('Connection error:', err);
-    });
+    useEffect(() => {
+        const canvas = canvasRef.current;
         const ctx = canvas?.getContext('2d');
-
-
+        const socket = socketReff.current;
         if (!canvas || !ctx) return;
     
         
@@ -153,20 +144,22 @@ useEffect(() => {
                 user.y = 0;
             }
             // console.log("pute");
-            // socket.emit('user-paddle-move', { y: user.y });
+            socket.emit('user-paddle-move', { y: user.y });
         };
 
         canvas.addEventListener('mousemove', mouseMoveHandler);
 
-        // socket.on('paddle-move-ack', (data) => {
-        //     console.log('Confirmation du serveur:', data.status);
-        //     // Vous pouvez effectuer d'autres actions en réponse à la confirmation ici
-        // });
+        socket.on('paddle-move-ack', (data) => {
+            // console.log('Confirmation du serveur:', data.y);
+            com.y = data.y;
+
+            // Vous pouvez effectuer d'autres actions en réponse à la confirmation ici
+        });
 
         return () => {
             clearInterval(loop);
             canvas.removeEventListener('mousemove', mouseMoveHandler);
-            // socket.off('paddle-move-ack');
+            socket.off('paddle-move-ack');
         };
     }, []);
 
