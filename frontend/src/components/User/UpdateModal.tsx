@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Modal = ({ show, message }) => {
+const UpdateModal = ({ show, message }) => {
     if (!show) {
         return null;
     }
@@ -14,4 +14,4 @@ const Modal = ({ show, message }) => {
     );
 };
 
-export default Modal;
+export default UpdateModal;
