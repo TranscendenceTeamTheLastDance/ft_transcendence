@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
-import Modal from './Modal.tsx';
+import UpdateModal from './UpdateModal.tsx';
 
-const Button = ({ buttonText, modalText, clickFunction }) => {
+const UpdateButton = ({ buttonText, modalText, clickFunction }) => {
     const [showModal, setShowModal] = useState(false);
 
     const handleClick = () => {
@@ -14,7 +14,7 @@ const Button = ({ buttonText, modalText, clickFunction }) => {
 
         setTimeout(() => {
             setShowModal(false);
-        }, 2000); // Hide modal after 2 seconds
+        }, 1000); // Hide modal after 2 seconds
     };
     return (
         <>
@@ -22,9 +22,9 @@ const Button = ({ buttonText, modalText, clickFunction }) => {
             onClick={handleClick}>
             {buttonText}
         </button>
-        <Modal show={showModal} message={modalText} />
+        <UpdateModal show={showModal} message={modalText} />
         </>
     );
 };
 
-export default Button;
+export default UpdateButton;
