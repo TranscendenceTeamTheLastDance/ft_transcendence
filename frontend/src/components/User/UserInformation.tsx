@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState} from 'react';
 import Avatar from './UserAvatar';
 import ToggleSwitch from './2FAToggle.tsx';
 import { useUserContext } from '../../context/UserContext';
@@ -12,13 +12,13 @@ const UserDetail = ({ label, value }) => (
   </div>
 );
 
-const EditableUserDetail = ({ label, value, onChange, isEditMode }) => (
+const EditableUserDetail = ({ label, value, onChange, isEditMode, editableUser }) => (
   <div className="flex justify-between mb-2">
     <span className="font-bold">{label}:</span>
     {isEditMode ? (
       <input
         type="text"
-        value={value}
+        value={editableUser[label] || '' }
         onChange={(e) => onChange(e, label)}
         className="border border-gray-300 rounded p-2"
         style={{ width: '150px', height: '30px' }}
@@ -30,18 +30,21 @@ const EditableUserDetail = ({ label, value, onChange, isEditMode }) => (
 );
 
 const UserInformation = ({ handle2FAToggle, handleUpdateProfile, onAvatarFileSelect }) => {
-  const { user } = useUserContext();
+  const { user, updateUser } = useUserContext();
   const [isEditMode, setIsEditMode] = useState(false);
   const [editableUser, setEditableUser] = useState({
-    username: '', // Default to an empty string
+    username: user?.username || '', // Default to an empty string
     firstName: '', // Default to an empty string
     lastName: '', // Default to an empty string
-    email: user.email, // Use the user's email as the default value
-    password: '', // Default to an empty string
+    email: user?.email || '' , // Use the user's email as the default value
+    password: user?.password || '*****', // Default to an empty string
   });
 
   const toggleEditMode = () => {
-    setIsEditMode(!isEditMode);
+    if (isEditMode) {
+      updateUser(editableUser)
+    }
+    setIsEditMode(!isEditMode); 
   };
 
   const handleChange = (e, field) => {
@@ -49,7 +52,8 @@ const UserInformation = ({ handle2FAToggle, handleUpdateProfile, onAvatarFileSel
   };
 
   const handleUpdateClick = () => {
-    handleUpdateProfile(editableUser);
+    updateUser(editableUser);
+    handleUpdateProfile(user);
   };
 
   return (
@@ -66,11 +70,11 @@ const UserInformation = ({ handle2FAToggle, handleUpdateProfile, onAvatarFileSel
           {isEditMode ? (
             /* Render EditableUserDetails in edit mode */
             <>
-              <EditableUserDetail label="Username" value={editableUser.username} onChange={handleChange} isEditMode={isEditMode} />
-              <EditableUserDetail label="First Name" value={editableUser.firstName} onChange={handleChange} isEditMode={isEditMode} />
-              <EditableUserDetail label="Last Name" value={editableUser.lastName} onChange={handleChange} isEditMode={isEditMode} />
-              <EditableUserDetail label="Email" value={editableUser.email} onChange={handleChange} isEditMode={isEditMode} />
-              <EditableUserDetail label="Password" value={editableUser.password} onChange={handleChange} isEditMode={isEditMode} />
+              <EditableUserDetail label="username" value={editableUser.username} onChange={handleChange} isEditMode={isEditMode} editableUser={editableUser}/>
+              <EditableUserDetail label="firstname" value={editableUser.firstName} onChange={handleChange} isEditMode={isEditMode} editableUser={editableUser}/>
+              <EditableUserDetail label="lastname" value={editableUser.lastName} onChange={handleChange} isEditMode={isEditMode} editableUser={editableUser}/>
+              <EditableUserDetail label="email" value={editableUser.email} onChange={handleChange} isEditMode={isEditMode} editableUser={editableUser}/>
+              <EditableUserDetail label="password" value={editableUser.password} onChange={handleChange} isEditMode={isEditMode} editableUser={editableUser}/>
             </>
           ) : (
             /* Render UserDetails in view mode */
