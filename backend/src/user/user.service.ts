@@ -30,6 +30,7 @@ export class UserService {
           ...dto,
         },
       });
+      console.log('backend: current user info:', user);
       return user;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {

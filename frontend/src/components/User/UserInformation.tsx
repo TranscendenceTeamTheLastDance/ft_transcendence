@@ -34,8 +34,8 @@ const UserInformation = ({ handle2FAToggle, handleUpdateProfile, onAvatarFileSel
   const [isEditMode, setIsEditMode] = useState(false);
   const [editableUser, setEditableUser] = useState({
     username: user?.username || '', // Default to an empty string
-    firstName: '', // Default to an empty string
-    lastName: '', // Default to an empty string
+    firstName: user?.firstName ||'', // Default to an empty string
+    lastName: user?.lastName ||'', // Default to an empty string
     email: user?.email || '' , // Use the user's email as the default value
     password: user?.password || '*****', // Default to an empty string
   });
@@ -70,8 +70,8 @@ const UserInformation = ({ handle2FAToggle, handleUpdateProfile, onAvatarFileSel
             /* Render EditableUserDetails in edit mode */
             <>
               <EditableUserDetail label="username" value={editableUser.username} onChange={handleChange} isEditMode={isEditMode} editableUser={editableUser}/>
-              <EditableUserDetail label="firstname" value={editableUser.firstName} onChange={handleChange} isEditMode={isEditMode} editableUser={editableUser}/>
-              <EditableUserDetail label="lastname" value={editableUser.lastName} onChange={handleChange} isEditMode={isEditMode} editableUser={editableUser}/>
+              <EditableUserDetail label="firstName" value={editableUser.firstName} onChange={handleChange} isEditMode={isEditMode} editableUser={editableUser}/>
+              <EditableUserDetail label="lastName" value={editableUser.lastName} onChange={handleChange} isEditMode={isEditMode} editableUser={editableUser}/>
               <EditableUserDetail label="email" value={editableUser.email} onChange={handleChange} isEditMode={isEditMode} editableUser={editableUser}/>
               <EditableUserDetail label="password" value={editableUser.password} onChange={handleChange} isEditMode={isEditMode} editableUser={editableUser}/>
             </>
