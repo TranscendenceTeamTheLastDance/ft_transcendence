@@ -1,29 +1,19 @@
-import { Logger, OnModuleInit } from '@nestjs/common';
-import {
-  MessageBody,
-  SubscribeMessage,
-  WebSocketGateway,
-  WebSocketServer,
-  WsResponse,
-} from '@nestjs/websockets';
+import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 
-import { ChatEvent } from './chat.state';
+@WebSocketGateway({
+    cors: {
+        origin : 'http://localhost:3000'//l'origine du message pour autoriser la connection
+    },
+    namespace: 'chat',//specification pour pas que sa rentre en conflit
+})
+export class ChatGateway {
+    @WebSocketServer()
+    server: Server;
 
-@WebSocketGateway()
-export class ChatGateway implements OnModuleInit {
-  @WebSocketServer()
-  io: Server;
-  private logger: Logger = new Logger('ChatGateway');
-
-  onModuleInit() {
-    this.io.on('connection', (socket) => {
-      this.logger.log('Client connected: ' + socket.id);
-    });
-  }
-
-  @SubscribeMessage(ChatEvent.Message)
-  onMessage(@MessageBody() message: string): WsResponse<string> {
-    return { event: ChatEvent.Message, data: 'You sent: ' + message };
-  }
+    @SubscribeMessage('message')
+    handleMessage(@MessageBody() message: string): void {
+        console.log(message);
+        this.server.emit('message', message);
+    }
 }
