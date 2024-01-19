@@ -22,10 +22,9 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @UseGuards(JwtGuard)
-  @Get('me') // catches any '/users' requests if empty, else any '/users/me'
+  @Get('me')
   getMe(@GetUser() user: User) {
-    // see 2h18 for specific info
-    return user; // the user object is from the validate strategy
+    return user;
   }
 
   @UseGuards(JwtGuard)
@@ -48,8 +47,8 @@ export class UserController {
     @Body() dto: EditUserDto,
     @Res() res: Response,
   ) {
-    console.log(dto);
     console.log('user id being amended:', userId);
+    console.log('dto of user being amended:', dto);
     await this.userService
       .editUser(userId, dto)
       .then(() => {

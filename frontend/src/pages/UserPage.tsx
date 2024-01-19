@@ -29,32 +29,32 @@ const User = () => {
 			lastName: user.lastName,
 			email: user.email,
 		  };
-		  console.log("data being passed to back:", userData);
+		  console.log("frontend: data being passed to back:", userData);
 		  try {
 			const response = await axios.patch('http://localhost:8080/users', userData, {
 			  withCredentials: true,
 			});
-			console.log('User information successfully updated!', response.data);
+			console.log('frontend: user information successfully updated!', response.data);
 		  } catch (error) {
-			console.error('Error updating user information:', error);
+			console.error('frontend: error updating user information:', error);
 		  }
 		
 		// Check if there's a new avatar to upload
 		if (avatarFile) {
 			const formData = new FormData();
 			formData.append('file', avatarFile);
-			console.log("Image being sent :", formData);
+			console.log("frontend: image being sent :", formData);
 
 			try {
 				const response = await axios.post('http://localhost:8080/users/upload-profile-picture', formData, {
 					withCredentials: true,
 				});
-				console.log('New profile pic successfully uploaded!', response.data);
+				console.log('frontend: new profile pic successfully uploaded!', response.data);
 			} catch (error) {
-				console.error('Error uploading a new profile pic:', error);
+				console.error('frontend: error uploading a new profile pic:', error);
 			}
 		} else {
-			console.log('No new avatar to upload');
+			console.log('frontend: no new avatar to upload, no request made to back.');
 		}
 	};
 	
