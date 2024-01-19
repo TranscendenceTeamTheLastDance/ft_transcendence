@@ -1,3 +1,4 @@
 - an AuthContext to handle auth status (logged in/logged out/ refresh)
 - verify error handling
 - verify useState / fetchUserState etc
+- write tests
