@@ -1,0 +1,5 @@
+Attention a bien implementer les GUARDS JWT
+Ne pas attendre que ca deviennt critique pour les comprendre
+et les appliquer et tester
+
+Letsgo for the show
