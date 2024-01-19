@@ -13,6 +13,7 @@ export class UserService {
         where: { id: userId },
         data: { profilePic: imageBase64 },
       });
+      console.log('backend: profile pic successfully updated');
       return user;
     } catch (error) {
       throw error;
