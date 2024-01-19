@@ -1,5 +1,0 @@
-- turn all buttons(and other functional stuff) into React.FC components
-- disallow big uploads
-- connect the UserContext to an AuthContext to handle auth status
-- fix 401 error on connection, see above ?
-- prepare the types (User, Game Stats etc) for any data that will be shared

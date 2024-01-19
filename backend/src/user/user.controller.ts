@@ -1,5 +1,6 @@
 import {
   ForbiddenException,
+  UnauthorizedException,
   Controller,
   Get,
   Res,
@@ -54,6 +55,7 @@ export class UserController {
       .then(() => {
         res.send('backend: user successfully updated!');
       })
+      // ForbiddenException : unautorized edit (email/username already exists, or wrong format)
       .catch((error: ForbiddenException) => {
         res.status(403).send(error.message);
       });
