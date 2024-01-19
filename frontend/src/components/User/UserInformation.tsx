@@ -1,9 +1,9 @@
 import React, { useState} from 'react';
 import Avatar from './UserAvatar';
-import ToggleSwitch from './2FAToggle.tsx';
+import ToggleSwitch from '../2FAToggle.tsx';
 import { useUserContext } from '../../context/UserContext';
-import UpdateButton from './UpdateButton.tsx';
-import EditButton from './EditButton.tsx';
+import EditButton from '../EditButton.tsx';
+
 
 const UserDetail = ({ label, value }) => (
   <div className="flex justify-between mb-2">
@@ -95,14 +95,13 @@ const UserInformation = ({ handle2FAToggle, handleUpdateProfile, onAvatarFileSel
 
       {/* Update Profile Button */}
     	<div className="flex justify-center mt-4">
-      {!isEditMode ? (<UpdateButton 
-					buttonText="Update Profile" 
-					modalText="🛸 profile updated successfully 🛸" 
-					clickFunction={handleUpdateClick} /> ) : null }
+      {!isEditMode ? (<EditButton 
+					text="Update Profile"
+					onClick={handleUpdateClick} /> ) : null }
       {isEditMode ? (
         <EditButton text="✅" onClick={toggleEditMode} />	
           ) : (
-            <EditButton text="✏️" onClick={toggleEditMode} />
+        <EditButton text="✏️" onClick={toggleEditMode} />
           )}
       </div>
     </div>
