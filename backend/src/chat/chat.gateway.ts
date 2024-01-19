@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import {
   MessageBody,
   SubscribeMessage,
@@ -14,11 +15,22 @@ import { Server } from 'socket.io';
 })
 export class ChatGateway {
   @WebSocketServer()
-  server: Server;
+  private io: Server;
+  private logger: Logger = new Logger(ChatGateway.name); // pour le log de l'envoi du message
+
+  afterInit(server : Server) {
+    this.io.on('connection', (socket) => {
+      this.logger.log('Client connected: ' + socket.id);
+    });
+    setInterval(() => { // pour envoyer un message toutes les 2 secondes
+      this.io.emit('message', 'Hello world!');
+    }, 2000);
+  }
+
 
   @SubscribeMessage('message')
-  handleMessage(@MessageBody() message: string): void {
-    console.log(message);
-    this.server.emit('message', message);
+  handleMessage(@MessageBody() message: string) {
+    this.logger.log('Message received: ' + message);
+    return { event: 'message', data: 'You sent: ' + message };
   }
 }

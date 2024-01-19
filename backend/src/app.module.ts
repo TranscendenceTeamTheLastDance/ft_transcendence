@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { PrismaModule } from 'nestjs-prisma';
 
 import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
@@ -12,6 +13,9 @@ import { DatabaseModule } from './database/database.module';
   imports: [
 	AuthModule, 
 	ChatModule, 
+	PrismaModule.forRoot({
+		isGlobal:true,
+	}),
 	GameModule, 
 	NotifyModule, 
 	UserModule, 
