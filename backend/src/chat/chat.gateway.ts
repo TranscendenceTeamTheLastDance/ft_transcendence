@@ -5,6 +5,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
+import { emit } from 'process';
 import { Server } from 'socket.io';
 
 @WebSocketGateway({
@@ -22,15 +23,15 @@ export class ChatGateway {
     this.io.on('connection', (socket) => {
       this.logger.log('Client connected: ' + socket.id);
     });
-    setInterval(() => { // pour envoyer un message toutes les 2 secondes
-      this.io.emit('message', 'Hello world!');
-    }, 2000);
+    // setInterval(() => { // pour envoyer un message toutes les 2 secondes
+    //   this.io.emit('message', 'Hello world!');
+    // }, 2000);
   }
 
 
   @SubscribeMessage('message')
   handleMessage(@MessageBody() message: string) {
     this.logger.log('Message received: ' + message);
-    return { event: 'message', data: 'You sent: ' + message };
+	this.io.emit('message', 'You sent: ' + message);
   }
 }

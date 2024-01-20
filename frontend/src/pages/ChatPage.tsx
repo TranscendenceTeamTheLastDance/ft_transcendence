@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 import React, { useEffect, useRef, useState } from "react";
 import io, { Socket } from "socket.io-client";
 import MessageInput from "./MessageInput";
@@ -30,6 +31,7 @@ const Chat: React.FC = () => {
     return () => {
       socket?.off("message", messageListener);
     };
+	// eslint-disable-next-line
   }, [messageListener]);
 
   // Rendu du composant Chat
