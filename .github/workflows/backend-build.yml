@@ -31,6 +31,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Add argon
+        run: pnpm add argon2
+
       - name: Generate prisma client
         run: pnpm prisma:generate
       
