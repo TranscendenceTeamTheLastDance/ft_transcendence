@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
 import { GameGateway } from './game.gateway';
-import { PongService } from './game.service';
+import { GameService } from './game.service';
 
 @Module({
     imports: [ ScheduleModule.forRoot()],
-    providers: [GameGateway, PongService],
+    providers: [GameGateway, GameService],
 })
 export class GameModule {}

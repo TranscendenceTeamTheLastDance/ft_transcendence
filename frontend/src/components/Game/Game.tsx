@@ -73,8 +73,9 @@ const PongGame: React.FC = () => {
         const ctx = canvas?.getContext('2d');
         const socket = socketRef?.current;
         if (!canvas || !ctx || !socket) return;
-    
         
+        let animationFrameId: number;
+            
         // Initialisation de la raquette de l'utilisateur
         const user: Paddle = {
             x: 0,
@@ -125,6 +126,15 @@ const PongGame: React.FC = () => {
             color: "WHITE"
         };
 
+        socket.on('game-state', (gameState) => {
+            com.y = gameState.padU2.y;
+            ball.x = gameState.ball.x;
+            ball.y = gameState.ball.y;
+            user.score = gameState.score.scoreU1;
+            com.score = gameState.score.scoreU2;
+            // Mettez à jour les scores ici si nécessaire
+        });
+        
         // creation des formes
 
         const gameLoop = () => {
@@ -133,9 +143,10 @@ const PongGame: React.FC = () => {
             drawRect(ctx, com.x, com.y, com.width, com.height, com.color);
             drawArc(ctx, ball.x, ball.y, ball.radius, ball.color);
             drawNet(ctx, net, canvas.height);
+            animationFrameId = requestAnimationFrame(gameLoop);
         };
 
-        const loop = setInterval(gameLoop, 1000 / 50);
+        gameLoop();
 
         // Gestionnaire d'événements
         const mouseMoveHandler = (event: MouseEvent) => {
@@ -157,17 +168,10 @@ const PongGame: React.FC = () => {
 
         canvas.addEventListener('mousemove', mouseMoveHandler);
 
-        socket.on('paddle-move-ack', (data) => {
-            // console.log('Confirmation du serveur:', data.y);
-            com.y = data.y;
-
-            // Vous pouvez effectuer d'autres actions en réponse à la confirmation ici
-        });
-
         return () => {
-            clearInterval(loop);
             canvas.removeEventListener('mousemove', mouseMoveHandler);
-            socket.off('paddle-move-ack');
+            cancelAnimationFrame(animationFrameId);
+            socket.off('game-state');
         };
     }, []);
 
