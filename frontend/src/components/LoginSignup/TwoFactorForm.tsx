@@ -2,6 +2,7 @@ import React from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useUserContext } from "../../context/UserContext";
 
 interface TwoFactorInputs {
     validationCode: string;
@@ -11,7 +12,8 @@ interface Props {
     username: string;
 }
 
-const TwoFactorForm = ({ username }: Props) => {
+const TwoFactorForm = () => {
+	const { user } = useUserContext();
 	const [inputs, setInputs] = useState<TwoFactorInputs>({
 		validationCode: "",
 	});
@@ -27,7 +29,7 @@ const TwoFactorForm = ({ username }: Props) => {
 		try {
 			const response = await axios.post(
 				"http://localhost:8080/auth/validate2fa",
-				{ ...inputs, username },
+				{ ...inputs, username: user.username },
 				{ withCredentials: true }
 			);
 			if (response.data.user) {

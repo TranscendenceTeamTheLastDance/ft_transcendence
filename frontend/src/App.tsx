@@ -8,6 +8,8 @@ import { ConversationChannelPage } from './pages/ConversationChannelPage';
 import { ConversationPage } from './pages/ConversationPage';
 import User from './pages/UserPage';
 import { UserProvider } from './context/UserContext';
+import { useUserContext } from './context/UserContext';
+
 
 function App() {
   return (
@@ -17,6 +19,7 @@ function App() {
 			<Route path="/signwith42" element={<Signwith42 />} />
 			<Route path="/home" element={<Home />} />
 			<Route path="/user" element={<User />} />
+			<Route path="/2fa" element={<TwoFactorForm />} />
 			<Route path="conversations" element={<ConversationPage />}>
 				<Route path=":id" element={<ConversationChannelPage />} />
 			</Route>
