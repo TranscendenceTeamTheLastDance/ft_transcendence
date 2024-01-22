@@ -33,5 +33,6 @@ export class ChatGateway {
   handleMessage(@MessageBody() message: string) {
     this.logger.log('Message received: ' + message);
 	this.io.emit('message', 'You sent: ' + message);
+  // return { event: 'message', data: 'You sent: ' + message };
   }
 }

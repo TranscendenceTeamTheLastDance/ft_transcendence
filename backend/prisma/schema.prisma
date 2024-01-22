@@ -48,6 +48,8 @@ model ChannelUser {
     channelId Int
     role      ChannelRole
     Message   Message[]
+
+    @@unique([userId, channelId])
 }
 
 model Channel {
