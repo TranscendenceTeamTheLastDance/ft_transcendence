@@ -6,12 +6,14 @@ npm add argon2
 
 npx prisma reset --force
 
-npx prisma generate
+npx prisma migrate deploy
 
 echo "-----Migrating database-----"
 
+
+sleep 10
 # npx prisma db push
-npx prisma migrate dev --name chat_model
+# npx prisma migrate dev --name sheesh
 
 echo "-----Starting Prisma Studio on port 5555-----"
 
