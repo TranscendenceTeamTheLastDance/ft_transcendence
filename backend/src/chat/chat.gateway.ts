@@ -44,7 +44,7 @@ export class ChatGateway implements OnGatewayInit {
       this.logger.log('Client connected: ' + socket.id);
     });
 
-    setInterval(() => this.io.emit('message', 'hello'), 2000);
+    // setInterval(() => this.io.emit('message', 'hello'), 2000);
   }
 
   @SubscribeMessage(ChatEvent.Create)
@@ -52,9 +52,9 @@ export class ChatGateway implements OnGatewayInit {
     @MessageBody() channel: CreateChannelDTO,
     @ConnectedSocket() client: Socket,
   ) {
-    this.logger.log('YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYyCreate channel: ' + channel.name);
+    this.logger.log(client.data.user);
+    this.logger.log('Create channel: ' + channel.name);
     await this.channelsService.createChannel(channel, client.data.user);
-    return { event: 'joinedChannel', data: channel.name };
   }
 
   @SubscribeMessage(ChatEvent.Join)

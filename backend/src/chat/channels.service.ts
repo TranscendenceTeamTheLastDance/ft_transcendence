@@ -11,10 +11,8 @@ export class ChannelsService {
   constructor(private prisma: PrismaService) {}
 
   async createChannel(channel: CreateChannelDTO, owner: User): Promise<void> {
-
     try {
-      console.log('Owner:', owner);
-      await this.prisma.channel.create({
+      const createdChannel: any = await this.prisma.channel.create({
         data: {
           name: channel.name,
           type: channel.type,
@@ -30,6 +28,9 @@ export class ChannelsService {
           },
         },
       });
+
+      return createdChannel;
+      
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
         throw new BadRequestException('Channel name must be unique');
