@@ -3,7 +3,7 @@ name: Build backend
 on:
   pull_request:
     paths:
-      - backend/**
+      - 'backend/**'
 
 jobs:
   build:
@@ -23,10 +23,9 @@ jobs:
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        options: '--health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5'
 
-
-   steps:
+    steps:
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -42,11 +41,11 @@ jobs:
 
       - name: Set up environment variables
         run: |
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}"
-          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}"
-          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}"
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}"
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}"
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> $GITHUB_ENV
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> $GITHUB_ENV
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> $GITHUB_ENV
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
 
       - name: Install dependencies
         run: pnpm install
