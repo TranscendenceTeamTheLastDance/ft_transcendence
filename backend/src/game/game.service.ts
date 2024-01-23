@@ -166,7 +166,6 @@ export class GameService {
     padU1.y = y;
   }
 
-
   broadcastGameState() : GameStateSend {
     return (new GameStateSend(this.gameState.ball, this.gameState.score, this.gameState.padU2));
   }

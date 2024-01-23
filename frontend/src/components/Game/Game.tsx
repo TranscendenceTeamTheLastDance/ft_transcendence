@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 
 interface Paddle  {
@@ -54,20 +54,10 @@ function drawText(ctx: CanvasRenderingContext2D, text: string, x: number, y: num
     ctx.fillText(text, x, y);
 }
 
-function resetBall(ball : Ball, canvas : HTMLCanvasElement): void {
-    ball.x = canvas.width / 2;
-    ball.y = canvas.height / 2;
-    ball.velocityX = -ball.velocityX;
-    ball.speed = 7;
-}
-
-
 const PongGame: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const socketRef = useRef(io('http://localhost:8080/game'));
     socketRef.current.emit('start');
-    const [player1Score, setPlayer1Score] = useState(0);
-    const [player2Score, setPlayer2Score] = useState(0);
 
 // Initialisation du jeu
     useEffect(() => {
@@ -133,12 +123,9 @@ const PongGame: React.FC = () => {
             ball.x = gameState.ball.x;
             ball.y = gameState.ball.y;
             user.score = gameState.score.scoreU1;
-            com.score = gameState.score.scoreU2;
+            com.score = gameState.score.scoreU2;           
         });
 
-        setPlayer1Score(user.score);
-        setPlayer2Score(com.score);
-        
         // creation des formes
 
         const gameLoop = () => {
@@ -147,8 +134,8 @@ const PongGame: React.FC = () => {
             drawRect(ctx, com.x, com.y, com.width, com.height, com.color);
             drawArc(ctx, ball.x, ball.y, ball.radius, ball.color);
             drawNet(ctx, net, canvas.height);
-            drawText(ctx, `Player 1: ${player1Score}`, 10, 30);
-            drawText(ctx, `Player 2: ${player2Score}`, canvas.width - 150, 30);
+            drawText(ctx, `Player 1: ${user.score}`, 10, 30);
+            drawText(ctx, `Player 2: ${com.score}`, canvas.width - 150, 30);
             animationFrameId = requestAnimationFrame(gameLoop);
         };
 
@@ -179,7 +166,7 @@ const PongGame: React.FC = () => {
             cancelAnimationFrame(animationFrameId);
             socket.off('game-state');
         };
-    }, [player1Score, player2Score]);
+    }, []);
 
     return (
         <div>
