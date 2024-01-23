@@ -60,6 +60,12 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Check if PostgreSQL is running
+        run: |
+          apt-get update
+          apt-get install -y postgresql-client
+          pg_isready -h localhost -p 5432 -U $POSTGRES_USER
+
       - name: Run End-to-End Tests
         run: pnpm test:e2e
         working-directory: backend/test
