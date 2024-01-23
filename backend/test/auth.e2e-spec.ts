@@ -8,9 +8,9 @@ describe('AuthController (e2e)', () => {
   let accessToken: string;
 
   const userData = {
-    email: 'test3@example.com',
-    username: 'test3user',
-    password: 'test3password',
+    email: 'test@example.com',
+    username: 'testuser',
+    password: 'testpassword',
   };
 
   beforeAll(async () => {
