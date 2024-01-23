@@ -2,10 +2,10 @@
 
 npm install -g pnpm
 
-echo --- Installing dependencies ----
+echo "--- Installing dependencies ----"
 pnpm install
 
-echo --- Argon being installed / rebuilded ----
+echo "--- Argon being installed / rebuilded ----"
 pnpm add class-validator class-transformer argon2
 # pnpm rebuild argon2
 
