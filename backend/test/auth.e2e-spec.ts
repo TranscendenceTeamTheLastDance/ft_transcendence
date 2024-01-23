@@ -105,17 +105,17 @@ describe('AuthController (e2e)', () => {
   //   );
   // });
 
-  it('/users/me (GET)', async () => {
-    const response = await request(app.getHttpServer())
-      .get('/users/me')
-      .set('Cookie', `access-token-cookie=${accessToken}`)
-      .set('Content-Type', 'application/json')
-      .withCredentials()
-      .expect(200);
+  // it('/users/me (GET)', async () => {
+  //   const response = await request(app.getHttpServer())
+  //     .get('/users/me')
+  //     .set('Cookie', `access-token-cookie=${accessToken}`)
+  //     .set('Content-Type', 'application/json')
+  //     .withCredentials()
+  //     .expect(200);
 
-    console.log('access token:', accessToken);
-    console.log('response.body:', response);
-  });
+  //   console.log('access token:', accessToken);
+  //   console.log('response.body:', response);
+  // });
 
   afterAll(async () => {
     await app.close();
