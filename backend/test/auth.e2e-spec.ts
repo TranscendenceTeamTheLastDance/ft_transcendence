@@ -6,6 +6,12 @@ import { AppModule } from '../src/app.module';
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
 
+  const userData = {
+    email: 'test@example.com',
+    username: 'testuser',
+    password: 'testpassword',
+  };
+
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -16,31 +22,37 @@ describe('AuthController (e2e)', () => {
   });
 
   // Test for user registration
+  // Define the signup data to send in the request body
+  // Amend that data if you re run this test as
+  // duplicate credientials will return a 401 error
   it('/auth/signup (POST)', async () => {
-    // Define the signup data to send in the request body
-    const signupData = {
-      email: 'test@example.com',
-      password: 'testpassword',
-      username: 'testuser',
-    };
+    console.log('Sending signup data:', userData);
 
-    // Use supertest to make a POST request to the /auth/signup endpoint
     const response = await request(app.getHttpServer())
       .post('/auth/signup')
-      .send(signupData)
-      .set('Accept', 'application/json') // Set the 'Accept' header
-      .withCredentials() // Include credentials in the request  
-      .expect(201); // Expect a 201 response code for successful signup
+      .send(userData)
+      .set('Content-Type', 'application/json')
+      .withCredentials()
+      .expect(201);
 
     // Add assertions to check the response body
-    //    expect(response.body).toHaveProperty('message', 'signup success');
-    // Additional assertions as necessary
+    expect(response.body).toHaveProperty('message', 'signup success');
+  });
 
-    // You can also make additional requests to verify the signup process, such as
-    // logging in with the newly created user and checking if they can access protected routes.
-  }, 100000);
+  // it('/auth/signin (POST)', async () => {
+  //   // Use commonSignupData for the signin test
+  //   const response = await request(app.getHttpServer())
+  //     .post('/auth/signin')
+  //     .send({
+  //       email: userData.email,
+  //       password: userData.password,
+  //     })
+  //     .set('Content-Type', 'application/json')
+  //     .withCredentials()
+  //     .expect(200);
 
-  // ... other test cases ...
+  //   expect(response.body).toHaveProperty('message', 'signin success');
+  // });
 
   afterAll(async () => {
     await app.close();
