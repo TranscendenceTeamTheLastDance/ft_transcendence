@@ -1,4 +1,4 @@
 #!/bin/sh
 
-npm install
-npm start
+pnpm install
+pnpm start
