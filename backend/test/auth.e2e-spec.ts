@@ -63,20 +63,20 @@ describe('AuthController (e2e)', () => {
   // Test for user signin
   // The signup data is used
   // error will return a 401 error
-  // it('/auth/signin (POST)', async () => {
-  //   const response = await request(app.getHttpServer())
-  //     .post('/auth/signin')
-  //     .send({
-  //       email: userData.email,
-  //       password: userData.password,
-  //     })
-  //     .set('Cookie', `access-token-cookie=${accessToken}`)
-  //     .set('Content-Type', 'application/json')
-  //     .withCredentials()
-  //     .expect(200);
+  it('/auth/signin (POST)', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/auth/signin')
+      .send({
+        email: userData.email,
+        password: userData.password,
+      })
+      .set('Cookie', `access-token-cookie=${accessToken}`)
+      .set('Content-Type', 'application/json')
+      .withCredentials()
+      .expect(200);
 
-  //   expect(response.body).toHaveProperty('message', 'signin success');
-  // });
+    expect(response.body).toHaveProperty('message', 'signin success');
+  });
 
   // it('/users (PATCH)', async () => {
   //   const editedUserData = {
