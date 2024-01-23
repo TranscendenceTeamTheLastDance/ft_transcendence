@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import CircularProgress from './CircularProgress.tsx';
+import CircularProgress from '../CircularProgress.tsx';
 
 const UserGameStats = ({ gameStats}) => {
 

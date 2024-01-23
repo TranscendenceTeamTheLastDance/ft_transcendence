@@ -3,11 +3,10 @@ import { Route, Routes } from 'react-router-dom';
 import LoginSignup from './components/LoginSignup/LoginSignup';
 import Signwith42 from './components/LoginSignup/Signwith42';
 import Home from './components/Home/Home';
-import { ConversationChannelPage } from './pages/ConversationChannelPage';
-import { ConversationPage } from './pages/ConversationPage';
 import PongGame from './components/Game/Game';
 import User from './pages/UserPage';
 import { UserProvider } from './context/UserContext';
+import Chat from './pages/ChatPage';
 
 function App() {
   return (
@@ -18,9 +17,7 @@ function App() {
 			<Route path="/home" element={<Home />} />
       <Route path="/play" element={<PongGame />} />
 			<Route path="/user" element={<User />} />
-			<Route path="conversations" element={<ConversationPage />}>
-				<Route path=":id" element={<ConversationChannelPage />} />
-			</Route>
+			<Route path="/chat" element={<Chat />} />
 		</Routes>
 	</UserProvider>
   );
