@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import io from 'socket.io-client';
 
 interface Paddle  {
@@ -50,7 +50,7 @@ function drawArc(ctx: CanvasRenderingContext2D, x: number, y: number, r: number,
 
 function drawText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number): void {
     ctx.fillStyle = "#FFF";
-    ctx.font = "75px fantasy";
+    ctx.font = "20px fantasy";
     ctx.fillText(text, x, y);
 }
 
@@ -66,6 +66,8 @@ const PongGame: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const socketRef = useRef(io('http://localhost:8080/game'));
     socketRef.current.emit('start');
+    const [player1Score, setPlayer1Score] = useState(0);
+    const [player2Score, setPlayer2Score] = useState(0);
 
 // Initialisation du jeu
     useEffect(() => {
@@ -132,8 +134,10 @@ const PongGame: React.FC = () => {
             ball.y = gameState.ball.y;
             user.score = gameState.score.scoreU1;
             com.score = gameState.score.scoreU2;
-            // Mettez à jour les scores ici si nécessaire
         });
+
+        setPlayer1Score(user.score);
+        setPlayer2Score(com.score);
         
         // creation des formes
 
@@ -143,6 +147,8 @@ const PongGame: React.FC = () => {
             drawRect(ctx, com.x, com.y, com.width, com.height, com.color);
             drawArc(ctx, ball.x, ball.y, ball.radius, ball.color);
             drawNet(ctx, net, canvas.height);
+            drawText(ctx, `Player 1: ${player1Score}`, 10, 30);
+            drawText(ctx, `Player 2: ${player2Score}`, canvas.width - 150, 30);
             animationFrameId = requestAnimationFrame(gameLoop);
         };
 
@@ -173,7 +179,7 @@ const PongGame: React.FC = () => {
             cancelAnimationFrame(animationFrameId);
             socket.off('game-state');
         };
-    }, []);
+    }, [player1Score, player2Score]);
 
     return (
         <div>
@@ -181,5 +187,6 @@ const PongGame: React.FC = () => {
         </div>
     );
 };
+
 
 export default PongGame;
