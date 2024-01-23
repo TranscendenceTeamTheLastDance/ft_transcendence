@@ -13,26 +13,49 @@ jobs:
       run:
         working-directory: backend/
 
-    steps:
+    services:
+      postgres:
+        image: postgres:15
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+
+   steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 8
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
         with:
-          cache: 'pnpm'
-          cache-dependency-path: backend/pnpm-lock.yaml
+          node-version: 16
+
+      - name: Set up environment variables
+        run: |
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}"
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}"
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}"
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}"
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}"
 
       - name: Install dependencies
         run: pnpm install
 
-      - name: Generate prisma client
+      - name: Generate Prisma client
         run: pnpm prisma:generate
-      
+
       - name: Build
         run: pnpm build
+
+      - name: Run End-to-End Tests
+        run: pnpm test:e2e
