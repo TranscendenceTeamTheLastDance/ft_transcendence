@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Socket } from 'socket.io';
 
 class Paddle {
+  id : Socket;
   x: number;
   y: number;
   width: number;
@@ -83,7 +84,6 @@ class GameStateSend {
   }
 };
 
-@Injectable()
 export class GameService {
     private gameState = new GameState(800, 400);
 
@@ -97,36 +97,31 @@ export class GameService {
 
     updateGameState(): void {
       let ball = this.gameState.ball;
-      let padU1 = this.gameState.padU1;
-      let padU2 = this.gameState.padU2;
 
       // Mise à jour de la position de la balle
       ball.x += ball.velocityX;
       ball.y += ball.velocityY;
 
-      // Mise à jour de la position de la raquette de l'ordinateur (IA simple)
-      padU2.y += ((ball.y - (padU2.y + padU2.height / 2)) * 0.1);
-
       // Collision avec les murs supérieur et inférieur
-      if (ball.y - ball.radius < 1 || ball.y + ball.radius > this.gameState.canvasHeight - 1) {
+      if (ball.y - ball.radius < 0 || ball.y + ball.radius > this.gameState.canvasHeight) {
           ball.velocityY = -ball.velocityY;
       }
 
       // Gestion des scores et réinitialisation de la balle
       if (ball.x - ball.radius < 0) {
-        this.gameState.score.scoreU2++;
+          this.gameState.score.scoreU2++;
           this.resetBall(this.gameState);
       } else if (ball.x + ball.radius > this.gameState.canvasWidth) {
-        this.gameState.score.scoreU1++;
+          this.gameState.score.scoreU1++;
           this.resetBall(this.gameState);
       }
 
       // Détection de la collision avec les raquettes
-      let player = ball.x + ball.radius < this.gameState.canvasWidth / 2 ? padU1 : padU2;
+      let player = (ball.x + ball.radius < this.gameState.canvasWidth / 2) ? this.gameState.padU1 : this.gameState.padU2;
       if (this.collision(ball, player)) {
           this.handleBallPaddleCollision(ball, player, this.gameState.canvasWidth);
       }
-  }
+    }
 
   collision(b: Ball, p: Paddle): boolean {
       let bTop = b.y - b.radius;
@@ -164,6 +159,11 @@ export class GameService {
   updateUserPaddle(y: number): void {
     let padU1 = this.gameState.padU1;
     padU1.y = y;
+  }
+
+  updateUserPaddle2(y: number): void {
+    let padU2 = this.gameState.padU2;
+    padU2.y = y;
   }
 
   broadcastGameState() : GameStateSend {

@@ -57,10 +57,12 @@ function drawText(ctx: CanvasRenderingContext2D, text: string, x: number, y: num
 const PongGame: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const socketRef = useRef(io('http://localhost:8080/game'));
-    socketRef.current.emit('start');
-
-// Initialisation du jeu
+    const waitingForPlayerRef = useRef(true); // Utiliser useRef pour gérer l'attente
+    const roomIdRef = useRef<string | null>(null);
+    
+    // Initialisation du jeu
     useEffect(() => {
+        socketRef.current.emit('join');
         const canvas = canvasRef.current;
         const ctx = canvas?.getContext('2d');
         const socket = socketRef?.current;
@@ -128,14 +130,24 @@ const PongGame: React.FC = () => {
 
         // creation des formes
 
+        socket.on('room-id', (id) => {
+            roomIdRef.current = id; // Stocker l'ID de la room
+            waitingForPlayerRef.current = false; // Commencer le jeu
+        });
+
         const gameLoop = () => {
-            drawRect(ctx, 0, 0, canvas.width, canvas.height, "#000");
-            drawRect(ctx, user.x, user.y, user.width, user.height, user.color);
-            drawRect(ctx, com.x, com.y, com.width, com.height, com.color);
-            drawArc(ctx, ball.x, ball.y, ball.radius, ball.color);
-            drawNet(ctx, net, canvas.height);
-            drawText(ctx, `Player 1: ${user.score}`, 10, 30);
-            drawText(ctx, `Player 2: ${com.score}`, canvas.width - 150, 30);
+            if (waitingForPlayerRef.current) {
+                drawText(ctx, "Waiting for another player...", canvas.width / 2 - 100, canvas.height / 2);
+            }
+            else {
+                drawRect(ctx, 0, 0, canvas.width, canvas.height, "#000");
+                drawRect(ctx, user.x, user.y, user.width, user.height, user.color);
+                drawRect(ctx, com.x, com.y, com.width, com.height, com.color);
+                drawArc(ctx, ball.x, ball.y, ball.radius, ball.color);
+                drawNet(ctx, net, canvas.height);
+                drawText(ctx, `Player 1: ${user.score}`, 10, 30);
+                drawText(ctx, `Player 2: ${com.score}`, canvas.width - 150, 30);
+            }
             animationFrameId = requestAnimationFrame(gameLoop);
         };
 
@@ -156,7 +168,7 @@ const PongGame: React.FC = () => {
                 user.y = 0;
             }
             // console.log("pute");
-            socket.emit('user-paddle-move', { y: user.y });
+            socket.emit('user-paddle-move', { y: user.y , roomId: roomIdRef.current});
         };
 
         canvas.addEventListener('mousemove', mouseMoveHandler);
