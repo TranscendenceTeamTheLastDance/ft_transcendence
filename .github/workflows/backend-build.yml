@@ -36,3 +36,7 @@ jobs:
       
       - name: Build
         run: pnpm build
+
+      - name: Run End-to-End Tests
+        run: pnpm test:e2e
+        working-directory: backend/test/e2e
