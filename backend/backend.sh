@@ -1,5 +1,7 @@
 #!/bin/sh
 
+npm install -g pnpm
+
 echo --- Installing dependencies ----
 pnpm install
 
