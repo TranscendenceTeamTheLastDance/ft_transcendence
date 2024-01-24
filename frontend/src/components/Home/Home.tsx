@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Particles from './Particles';
 
 const navigation = [
-  { name: "CHAT", href: "/conversations" },
+  { name: "CHAT", href: "/chat" },
   { name: "PLAY", href: "/play" },
   { name: "USER", href: "/user" },
 ];

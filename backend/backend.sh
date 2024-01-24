@@ -4,6 +4,8 @@ npm install
 npm i --save class-validator class-transformer
 npm add argon2
 
+npx prisma reset --force
+
 npx prisma generate
 
 echo "-----Migrating database-----"

@@ -23,7 +23,7 @@ export class AuthController {
 					user});
 				})
 			.catch((err) => {
-				res.status(401).json({ message: 'wrong credentials ma couille' });
+				res.status(401).json({ message: 'wrong credentials' });
 			});
 	}
 
@@ -54,7 +54,7 @@ export class AuthController {
 			.signin(dto, res)
 			.then((user) => {
 				console.log(user);
-				res.status(201).json({
+				res.status(200).json({
 					message: 'signin success',
 					user});
 				})
