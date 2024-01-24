@@ -54,7 +54,7 @@ export class AuthController {
 			.signin(dto, res)
 			.then((user) => {
 				console.log(user);
-				res.status(201).json({
+				res.status(200).json({
 					message: 'signin success',
 					user});
 				})
