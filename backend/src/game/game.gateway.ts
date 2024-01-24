@@ -3,8 +3,6 @@ import { WebSocketGateway, WebSocketServer, SubscribeMessage, ConnectedSocket, M
 import { Server, Socket } from 'socket.io';
 import { GameRoom } from './room.service';
 
-
-
 @WebSocketGateway({
     cors: {
         origin : 'http://localhost:3000'//mettre une variable pour pouvoir modifie en temp reel
@@ -18,7 +16,26 @@ export class GameGateway {
     private waitingPlayers: Socket[] = [];
     private gameRooms: Map<string, GameRoom> = new Map();
   
-    // ... autres méthodes ...
+    // handleDisconnect(@ConnectedSocket() client: Socket) {
+    //   // Identifier la salle de jeu du joueur déconnecté
+    //   let roomId: string | null = null;
+    //   this.gameRooms.forEach((room, id) => {
+    //     if (room.includesPlayer(client)) {
+    //       roomId = id;
+    //     }
+    //   });
+  
+    //   if (roomId) {
+    //     const gameRoom = this.gameRooms.get(roomId);
+    //     if (gameRoom) {
+    //       // Informer l'autre joueur de la déconnexion
+    //       gameRoom.notifyPlayerOfDisconnect(client);
+  
+    //       // Supprimer la salle de jeu
+    //       this.gameRooms.delete(roomId);
+    //     }
+    //   }
+    // }
   
     @SubscribeMessage('join')
     handleJoin(@ConnectedSocket() client: Socket) {
@@ -41,7 +58,6 @@ export class GameGateway {
     }
   
     private createRoomID(player1: Socket, player2: Socket): string {
-      // Créer un identifiant unique pour la salle de jeu
       return `room-${Date.now()}-${player1.id}-${player2.id}`;
     }
 
