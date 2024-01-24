@@ -1,0 +1,11 @@
+/* Game.css */
+.game-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.canvas {
+    border: 2px solid #ffffff; /* Bordure noire de 2 pixels */
+}

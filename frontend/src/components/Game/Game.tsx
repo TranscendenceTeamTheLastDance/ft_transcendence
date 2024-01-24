@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import io from 'socket.io-client';
+import './Game.css'
 
 interface Paddle  {
     top: number;
@@ -186,8 +187,8 @@ const PongGame: React.FC = () => {
     }, []);
 
     return (
-        <div>
-            <canvas ref={canvasRef} width="800" height="400" />
+        <div className='game-container'>
+            <canvas ref={canvasRef} width="800" height="400" className='canvas'/>
         </div>
     );
 };

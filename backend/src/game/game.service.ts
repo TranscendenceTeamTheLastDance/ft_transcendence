@@ -103,7 +103,7 @@ export class GameService {
       ball.y += ball.velocityY;
 
       // Collision avec les murs supérieur et inférieur
-      if (ball.y - ball.radius < 0 || ball.y + ball.radius > this.gameState.canvasHeight) {
+      if (ball.y - ball.radius < 1 || ball.y + ball.radius > this.gameState.canvasHeight - 1) {
           ball.velocityY = -ball.velocityY;
       }
 

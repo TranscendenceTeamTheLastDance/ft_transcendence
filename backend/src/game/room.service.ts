@@ -44,5 +44,4 @@ export class GameRoom {
     }
   }
 
-  // ... autres méthodes utiles, comme la gestion des déconnexions, etc. ...
 }
