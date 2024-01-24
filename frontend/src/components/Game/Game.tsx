@@ -131,8 +131,13 @@ const PongGame: React.FC = () => {
         // creation des formes
 
         socket.on('room-id', (id) => {
-            roomIdRef.current = id; // Stocker l'ID de la room
+            roomIdRef.current = id.roomID; // Stocker l'ID de la room
             waitingForPlayerRef.current = false; // Commencer le jeu
+            if (id.Nplayer === 2) {
+                const tmp = com.x;
+                com.x = user.x;
+                user.x = tmp;
+            }
         });
 
         const gameLoop = () => {
@@ -168,7 +173,7 @@ const PongGame: React.FC = () => {
                 user.y = 0;
             }
             // console.log("pute");
-            socket.emit('user-paddle-move', { y: user.y , roomId: roomIdRef.current});
+            socket.emit('user-paddle-move', { y: user.y , roomId: roomIdRef.current, x: user.x});
         };
 
         canvas.addEventListener('mousemove', mouseMoveHandler);

@@ -157,16 +157,19 @@ export class GameService {
   }
 
   updateUserPaddle(y: number): void {
-    let padU1 = this.gameState.padU1;
-    padU1.y = y;
+    this.gameState.padU1.y = y;
   }
 
   updateUserPaddle2(y: number): void {
-    let padU2 = this.gameState.padU2;
-    padU2.y = y;
+    this.gameState.padU2.y = y;
   }
 
-  broadcastGameState() : GameStateSend {
-    return (new GameStateSend(this.gameState.ball, this.gameState.score, this.gameState.padU2));
+
+  //le proble est la !!!!1
+  broadcastGameState(Nplayer: number) : GameStateSend {
+    if (Nplayer === 1)
+      return (new GameStateSend(this.gameState.ball, this.gameState.score, this.gameState.padU2));
+    else
+      return (new GameStateSend(this.gameState.ball, this.gameState.score, this.gameState.padU1));
   }
 }

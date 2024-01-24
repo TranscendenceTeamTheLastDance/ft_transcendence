@@ -7,7 +7,7 @@ import { GameRoom } from './room.service';
 
 @WebSocketGateway({
     cors: {
-        origin : 'http://localhost:3000'//l'origine du message pour autoriser la connection
+        origin : 'http://localhost:3000'//mettre une variable pour pouvoir modifie en temp reel
     },
     namespace: 'game',//specification pour pas que sa rentre en conflit
 })
@@ -34,8 +34,8 @@ export class GameGateway {
           this.gameRooms.set(roomID, gameRoom);
   
           // Informer les joueurs de l'ID de la salle
-          player1.emit('room-id', roomID);
-          player2.emit('room-id', roomID);
+          player1.emit('room-id', {roomID : roomID, Nplayer : 1});
+          player2.emit('room-id', {roomID : roomID, Nplayer : 2});
         }
       }
     }
@@ -46,75 +46,15 @@ export class GameGateway {
     }
 
     @SubscribeMessage('user-paddle-move')
-    handlePaddleMove(
-      @ConnectedSocket() client: Socket, 
-      @MessageBody() data: { y: number, roomId: string }
+    handlePaddleMove( 
+      @MessageBody() data: { y: number, roomId: string, x: number }
     ) {
       const roomId = data.roomId;
       const gameRoom = this.gameRooms.get(roomId);
     
       if (gameRoom) {
-        gameRoom.updatePaddlePosition(client.id, data.y);
+        gameRoom.updatePaddlePosition(data.y, data.x);
       }
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// @WebSocketGateway({
-//     cors: {
-//         origin : 'http://localhost:3000'//l'origine du message pour autoriser la connection
-//     },
-//     namespace: 'game',//specification pour pas que sa rentre en conflit
-// })
-// export class GameGateway {
-//     @WebSocketServer()
-//     server: Server;
-
-//     private updateInterval = 1000 / 50;
-//     private gameLoopInterval: string | number | NodeJS.Timeout;
-//     private players: Socket[] = [];
-
-//     constructor(private gameService: GameService) {}
-
-//     @SubscribeMessage('start')
-//     handleStart(@ConnectedSocket() client: Socket) {
-//         this.gameService.resetGameState(); // Réinitialisez l'état du jeu
-      
-//         this.gameLoopInterval = setInterval(() => {
-//           this.gameService.updateGameState(); // Met à jour l'état du jeu
-//           const gameState = this.gameService.broadcastGameState();
-      
-//           // Envoi des données de l'état du jeu
-//           this.server.emit('game-state', gameState);
-//         }, this.updateInterval);
-//     }
-
-//     @SubscribeMessage('user-paddle-move')
-//     handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: { y: number }) {
-//         this.gameService.updateUserPaddle(data.y);
-//     }
-
-//     @SubscribeMessage('stop')
-//     handleStop(@ConnectedSocket() client: Socket) {
-//     if (this.gameLoopInterval) {
-//         clearInterval(this.gameLoopInterval);
-//         this.gameLoopInterval = null;
-//     }
-//     }
-// }
