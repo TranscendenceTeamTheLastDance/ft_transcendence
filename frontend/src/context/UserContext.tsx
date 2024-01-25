@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import axios from 'axios';
 import avatar_icon from '../components/assets/avatar.png';
 import {Cookies} from 'react-cookie';
+import { User } from '../types';
 const UserContext = createContext(null);
 
 
@@ -60,7 +61,7 @@ export const UserProvider = ({ children }) => {
 	};
 
 	return (
-		<UserContext.Provider value={{ user, setUser, updateUser, fetchUserData}}>
+		<UserContext.Provider value={{ user, setUser, updateUser, fetchUserData,}}>
 			{children}
 		</UserContext.Provider>
 	);
