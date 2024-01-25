@@ -11,20 +11,22 @@ import { DatabaseModule } from './database/database.module';
 
 @Module({
   imports: [
-	AuthModule, 
-	ChatModule, 
-	PrismaModule.forRoot({
-		isGlobal:true,
-	}),
-	GameModule, 
-	NotifyModule, 
-	UserModule, 
-	DatabaseModule, 
-	ConfigModule.forRoot({
-		isGlobal:true,
-	}),
-	],
-	
+    AuthModule,
+    ChatModule,
+    PrismaModule.forRoot({
+      isGlobal: true,
+    }),
+    GameModule,
+    NotifyModule,
+    UserModule,
+    DatabaseModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath:
+        process.env.NODE_ENV === 'test' ? './test/.env.test' : './.env',
+    }),
+  ],
+
   controllers: [],
   providers: [],
 })
