@@ -105,8 +105,8 @@ const User = () => {
 		try {
 			const manage2FAInit = async () => {
 				console.log(is2FAEnabled ? "2FA ON - init" : "2FA OFF - init");
-				console.log(user.twoFactorEnabled ? "User 2FA TRUE" : "User 2FA FALSE");
-				if (is2FAEnabled === true && user.twoFactorEnabled === false) {
+				// console.log(user.twoFactorEnabled ? "User 2FA TRUE" : "User 2FA FALSE");
+				if (user && is2FAEnabled === true && user.twoFactorEnabled === false) {
 				const response = await axios.get('http://localhost:8080/users/2FAInit', {
 				withCredentials: true },);
 				setQrCodeDataUrl(response.data.qrCode);
@@ -114,7 +114,7 @@ const User = () => {
 				setDisplay2FAModal(true);
 				updateUser({ twoFactorEnabled: true });
 				}
-			else if (is2FAEnabled === false && user.twoFactorEnabled === true) {
+			else if (user && is2FAEnabled === false && user.twoFactorEnabled === true) {
 				setDisplay2FADisableModal(true);
 				updateUser({ twoFactorEnabled: false });
 				}
