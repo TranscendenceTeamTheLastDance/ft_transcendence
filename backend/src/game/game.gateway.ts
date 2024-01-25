@@ -16,26 +16,31 @@ export class GameGateway {
     private waitingPlayers: Socket[] = [];
     private gameRooms: Map<string, GameRoom> = new Map();
   
-    // handleDisconnect(@ConnectedSocket() client: Socket) {
-    //   // Identifier la salle de jeu du joueur déconnecté
-    //   let roomId: string | null = null;
-    //   this.gameRooms.forEach((room, id) => {
-    //     if (room.includesPlayer(client)) {
-    //       roomId = id;
-    //     }
-    //   });
+    handleDisconnect(@ConnectedSocket() client: Socket) {
+      // Identifier la salle de jeu du joueur déconnecté
+      let roomId: string | null = null;
+      this.gameRooms.forEach((room, id) => {
+        if (room.includesPlayer(client)) {
+          roomId = id;
+        }
+      });
   
-    //   if (roomId) {
-    //     const gameRoom = this.gameRooms.get(roomId);
-    //     if (gameRoom) {
-    //       // Informer l'autre joueur de la déconnexion
-    //       gameRoom.notifyPlayerOfDisconnect(client);
-  
-    //       // Supprimer la salle de jeu
-    //       this.gameRooms.delete(roomId);
-    //     }
-    //   }
-    // }
+      if (roomId) {
+        const gameRoom = this.gameRooms.get(roomId);
+        if (gameRoom) {
+          // Informer l'autre joueur de la déconnexion
+          gameRoom.notifyPlayerOfDisconnect(client);
+          // gameRoom.deletePlayer(client);
+          // Supprimer la salle de jeu
+          this.gameRooms.delete(roomId);
+        }
+      }
+    }
+
+    @SubscribeMessage('client-disconnect')
+    handleClientDisconnect(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+      this.handleDisconnect(client);
+    }
   
     @SubscribeMessage('join')
     handleJoin(@ConnectedSocket() client: Socket) {

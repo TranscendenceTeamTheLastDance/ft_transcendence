@@ -60,17 +60,20 @@ const PongGame: React.FC = () => {
     const socketRef = useRef(io('http://localhost:8080/game'));
     const waitingForPlayerRef = useRef(true); // Utiliser useRef pour gérer l'attente
     const roomIdRef = useRef<string | null>(null);
+    const playerLeftGame = useRef(false);
     
     // Initialisation du jeu
     useEffect(() => {
-        socketRef.current.emit('join');
         const canvas = canvasRef.current;
         const ctx = canvas?.getContext('2d');
         const socket = socketRef?.current;
-        if (!canvas || !ctx || !socket) return;
+        if (!canvas || !ctx || !socket) 
+            return;
         
         let animationFrameId: number;
-            
+        
+        socketRef.current.emit('join');
+        
         // Initialisation de la raquette de l'utilisateur
         const user: Paddle = {
             x: 0,
@@ -141,9 +144,19 @@ const PongGame: React.FC = () => {
             }
         });
 
+        socket.on('player-left-game',() => {
+            playerLeftGame.current = true;
+        });
+
         const gameLoop = () => {
             if (waitingForPlayerRef.current) {
                 drawText(ctx, "Waiting for another player...", canvas.width / 2 - 100, canvas.height / 2);
+            }
+            else if (playerLeftGame.current) {
+                drawRect(ctx, 0, 0, canvas.width, canvas.height, "#000");
+                drawText(ctx, `Player 2: ${com.score}`, canvas.width - 150, 30);
+                drawText(ctx, `Player 1: ${user.score}`, 10, 30);
+                drawText(ctx, "the other player has left the game", canvas.width / 2 - 100, canvas.height / 2);
             }
             else {
                 drawRect(ctx, 0, 0, canvas.width, canvas.height, "#000");
@@ -160,6 +173,14 @@ const PongGame: React.FC = () => {
         gameLoop();
 
         // Gestionnaire d'événements
+
+        //faut faire un systeme de ping-pong
+        const handleBeforeUnload = () => {
+            // Envoyer un message de déconnexion au serveur
+            console.log("retour de la page")
+            socketRef.current.emit('client-disconnect');
+        };
+
         const mouseMoveHandler = (event: MouseEvent) => {
             // Obtenir la position relative de la souris dans le canvas
             const rect = canvas.getBoundingClientRect();
@@ -177,10 +198,12 @@ const PongGame: React.FC = () => {
             socket.emit('user-paddle-move', { y: user.y , roomId: roomIdRef.current, x: user.x});
         };
 
+        window.addEventListener('beforeunload', handleBeforeUnload);
         canvas.addEventListener('mousemove', mouseMoveHandler);
 
         return () => {
             canvas.removeEventListener('mousemove', mouseMoveHandler);
+            window.removeEventListener('beforeunload', handleBeforeUnload);
             cancelAnimationFrame(animationFrameId);
             socket.off('game-state');
         };

@@ -71,7 +71,7 @@ export class AuthService {
       console.log('password not found');
       throw new ForbiddenException('Credential Incorrect');
     }
-    this.createupdateUser(user.email, user.username);
+    // this.createupdateUser(user.email, user.username);
     await this.generateToken(user.id, user.email, user.username, res);
     return user;
   }
