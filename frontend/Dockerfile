@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:16
 
 # TODO : changer pour la production à la fin
 ENV NODE_ENV=development
