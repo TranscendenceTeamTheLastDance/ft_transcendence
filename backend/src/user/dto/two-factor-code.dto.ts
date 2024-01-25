@@ -1,11 +1,11 @@
-import {IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import {IsString, IsNotEmpty, IsOptional, IsEmail } from 'class-validator';
 
 export class TwoFactorCodeDto {
   @IsString()
   @IsNotEmpty()
   code: string;
 
-  @IsString()
+  @IsEmail()
   @IsOptional()
-  nickname: string;
+  email?: string;
 }

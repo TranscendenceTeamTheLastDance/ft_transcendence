@@ -2,6 +2,7 @@ import { Body, Res, Controller, Get, Post, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { SignupDto, SigninDto } from './dto';
+import { TwoFactorCodeDto } from '../user/dto/two-factor-code.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -56,6 +57,21 @@ export class AuthController {
 				console.log(user);
 				res.status(200).json({
 					message: 'signin success',
+					user});
+				})
+			.catch((err) => {
+				res.status(401).json({ message: 'wrong credentials' });
+			});
+	}
+
+	@Post('Auth-2FA')
+	async auth2FA(@Body() dto:TwoFactorCodeDto, @Res() res:Response){
+		this.authService
+			.Authenticate2FA(dto.email, dto.code, res)
+			.then((user) => {
+				console.log(user);
+				res.status(200).json({
+					message: 'Authentication 2FA success',
 					user});
 				})
 			.catch((err) => {

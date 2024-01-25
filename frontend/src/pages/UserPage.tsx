@@ -127,14 +127,16 @@ const User = () => {
 
 	const enableTwoFactor = async (data: ModalInputs) => {
 		try {
+			console.log('frontend: data2FA being pass to back:', data);
 			await axios.post('http://localhost:8080/users/2FAEnable', 
-				{ validationCode: data.validationCode }, 
+				{code: data.validationCode }, 
 				{withCredentials: true});
 			setDisplay2FAModal(false);
 			setError(undefined);
 			updateUser({ twoFactorEnabled: true });
 		} catch (error: any) {
 			console.error('frontend: error enabling 2FA:', error);
+			console.log('frontend: error enabling 2FA:', error.response.data.message);
 			setError(error.response.data.message);
 		}
 	};
@@ -142,7 +144,7 @@ const User = () => {
 	const disableTwoFactor = async (data: ModalInputs) => {
 		try {
 			await axios.post('http://localhost:8080/users/2FADisable', 
-				{ validationCode: data.validationCode }, 
+				{code: data.validationCode }, 
 				{withCredentials: true});
 			setDisplay2FADisableModal(false);
 			setError(undefined);

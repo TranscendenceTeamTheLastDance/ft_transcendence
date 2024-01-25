@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { User } from '@prisma/client';
 import { create } from 'domain';
+import { authenticator } from 'otplib';
 
 @Injectable({})
 export class AuthService {
@@ -171,4 +172,29 @@ export class AuthService {
 
     return { JWTtoken: token };
   }
+
+  async Authenticate2FA(email: string, code: string, res: Response): Promise<User> {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      throw new ForbiddenException('Credential Incorrect');
+    }
+
+    const isCodeValid = authenticator.verify({
+      token: code,
+      secret: user.twoFactorSecret,
+    });
+
+    if (!isCodeValid) {
+      throw new ForbiddenException('Invalid code');
+    }
+
+    await this.generateToken(user.id, user.email, user.username, res);
+    return user;
+  }
+
 }

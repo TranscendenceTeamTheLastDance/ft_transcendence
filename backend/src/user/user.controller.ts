@@ -75,6 +75,7 @@ export class UserController {
   @UseGuards(JwtGuard)
   @Post('2FAEnable')
   async twoFactorAuthEnable(@GetUser() user: User, @Body() dto: TwoFactorCodeDto, @Res() res: Response) {
+    console.log('backend: 2FA ENABLE');
     this.userService
         .enableTwoFactorAuthentication(user, dto.code)
         .then(() => {
@@ -88,6 +89,7 @@ export class UserController {
   @UseGuards(JwtGuard)
   @Post('2FADisable')
   async twoFactorAuthDisable(@GetUser() user: User, @Body() dto: TwoFactorCodeDto, @Res() res: Response) {
+    console.log('backend: 2FA DISABLE');
     this.userService
         .disableTwoFactorAuthentication(user, dto.code)
         .then(() => {
