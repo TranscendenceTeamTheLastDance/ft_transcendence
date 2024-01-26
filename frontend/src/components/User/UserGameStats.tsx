@@ -1,11 +1,17 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import CircularProgress from '../CircularProgress.tsx';
+import LogOutButton from '../LogoutButton.tsx';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const UserGameStats = ({ gameStats}) => {
 
 	const [winPercentage, setWinPercentage] = useState(0);
 	const [lossPercentage, setLossPercentage] = useState(0);
+
+    const [error, setError] = useState(false);
+    const navigate = useNavigate();
 
 	useEffect(() => {
 		if (gameStats.totalGamesPlayed > 0) {
@@ -16,6 +22,20 @@ const UserGameStats = ({ gameStats}) => {
 		}
 	}, [gameStats.totalWins, gameStats.totalLosses, gameStats.totalGamesPlayed]);
 
+
+	const handleLogOut = async () => {
+		console.log('frontend: logging out...');
+		try {
+			const response = await axios.get('http://localhost:8080/auth/logout', {
+				withCredentials: true,
+			});
+			console.log(response.data);
+			navigate('/');
+		} catch (error: any) {
+			setError(true);
+			console.log(error.response.data.message);
+		}
+	};
 
 	return (
 	<div className="bg-white rounded-lg z-10">
@@ -29,6 +49,8 @@ const UserGameStats = ({ gameStats}) => {
 			<div>{gameStats.totalGamesPlayed}</div>
 			<div className="font-bold mt-4">Ranking</div>
 			<div>{gameStats.Rank} / 1</div>
+			<div className="font-bold mt-16"></div>
+			<LogOutButton onclick={handleLogOut}/>
 		</div>
 	</div>
 	);

@@ -3,57 +3,95 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useUserContext } from "../../context/UserContext";
+import { useForm } from 'react-hook-form';
 
 interface TwoFactorInputs {
     validationCode: string;
 }
 
 interface Props {
-    username: string;
+	modalID: string;
+    mail: string;
+	title: string;
+	closeModal: () => void;
 }
 
-const TwoFactorForm = () => {
-	const { user } = useUserContext();
-	const [inputs, setInputs] = useState<TwoFactorInputs>({
-		validationCode: "",
-	});
-	const [error, setError] = useState("");
-	const navigate = useNavigate();
-
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setInputs({ ...inputs, [e.target.name]: e.target.value });
-	};
-
-	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
+const TwoFactorFormMod: React.FC<Props> = ({
+	modalID,
+	mail,
+	title,
+	closeModal,
+}) => {
+	const {
+		handleSubmit,
+		register,
+		formState: { errors },
+	  } = useForm<TwoFactorInputs>({ mode: 'onTouched', criteriaMode: 'all' });
+	  const navigate = useNavigate();
+	  const [error, setError] = useState<string | undefined>();
+	const onSubmit = async (data: TwoFactorInputs) => {
 		try {
 			const response = await axios.post(
-				"http://localhost:8080/auth/validate2fa",
-				{ ...inputs, username: user.username },
+				"http://localhost:8080/auth/Auth-2FA", {
+				mail,
+				code: data.validationCode,
+				},
 				{ withCredentials: true }
 			);
-			if (response.data.user) {
-				navigate("/home");
-			}
+			const userData = response.data;
+			console.log("frontend: user data:", userData);
+			navigate("/home");
 		} catch (error: any) {
-			setError(error.response?.data.message || "An unknown error occurred");
+			setError(error.response.data.message);
 		}
 	};
 
+
 	return (
-		<div>
-			<form onSubmit={handleSubmit}>
-				<input
-					type="text"
-					name="validationCode"
-					value={inputs.validationCode}
-					onChange={handleChange}
-				/>
-				<button type="submit">Submit</button>
-			</form>
-			{error && <p>{error}</p>}
-		</div>
+		<>
+			<div
+			id={modalID}
+			className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none no-scrollbar"
+			>	
+				<div className="relative w-full max-w-lg max-h-full no-scrollbar">
+					<div className="relative bg-white rounded-lg shadow dark:bg-white p-5 space-y-2 no-scrollbar">
+						<div className="flex items-center justify-between border-b rounded-t dark:border-gray-600">
+							<h3 className="text-xl font-medium text-gray-900 dark:text-black font-bold">
+								{title}
+							</h3>
+							<button
+								type="button"
+								className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+								onClick={closeModal}
+							>
+								X
+								<span className="sr-only">Close modal</span>
+							</button>
+						</div>
+						<div className="space-y-4">
+							<p className="text-base leading-relaxed text-gray-500 dark:text-gray-700">
+								Please enter the validation code for two factor authentication
+							</p>
+							<form onSubmit={handleSubmit(onSubmit)}>
+								<input
+								    {...register('validationCode', {
+										required: 'This field is required',
+										pattern: {
+										  value: /^\d{6}$/,
+										  message: 'Must be a 6-digit code with only digits.',
+										},
+									})}
+									type="text"
+									name="validationCode"
+								/>
+								<button type="submit">Submit</button>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</>
 	);
 };
 
-export default TwoFactorForm;
+export default TwoFactorFormMod;

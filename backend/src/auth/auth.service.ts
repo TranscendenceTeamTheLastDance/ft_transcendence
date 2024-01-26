@@ -46,6 +46,10 @@ export class AuthService {
       const username = user42info.data['login'];
       const user = await this.createupdateUser(email, username);
       user.hash = undefined;
+      user.twoFactorSecret = undefined;
+      if (user.twoFactorEnabled) {
+        return user;
+    }
       await this.generateToken(user.id, user.email, user.username, res);
       return user;
     } catch (error) {
@@ -71,6 +75,11 @@ export class AuthService {
     if (!pwMatches) {
       console.log('password not found');
       throw new ForbiddenException('Credential Incorrect');
+    }
+    user.hash = undefined;
+    user.twoFactorSecret = undefined;
+    if (user.twoFactorEnabled) {
+        return user;
     }
     //this.createupdateUser(user.email, user.username);
     await this.generateToken(user.id, user.email, user.username, res);
@@ -197,4 +206,15 @@ export class AuthService {
     return user;
   }
 
+  async logout(res: Response) {
+    try {
+        res.clearCookie(this.config.get('JWT_ACCESS_TOKEN_COOKIE'), {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+        });
+        } catch (error) {
+            throw error;
+        }
+  }
 }

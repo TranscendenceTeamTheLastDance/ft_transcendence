@@ -7,10 +7,14 @@ import user_icon from '../assets/person.png';
 import email_icon from '../assets/email.png';
 import password_icon from '../assets/password.png';
 
+import TwoFactorFormMod from './TwoFactorForm';
+
 
 const LoginSignup = () => {
 	const navigate = useNavigate();
 	const [formData, setFormData] = useState({ username: '', email: '', password: '' });
+	const [twoFactor, setTwoFactor] = useState(false);
+	const [userMail, setUserMail] = useState('');
 
 	const handleChange = (e) => {
 		const newFormData = ({ ...formData, [e.target.name]: e.target.value });
@@ -54,7 +58,11 @@ const LoginSignup = () => {
 			throw new Error('Signin failed encule');
 		}
 		const data = await response.json();
-		navigate('/home');
+		if (data.user.twoFactorAuthentication) {
+			setUserMail(data.user.mail);
+			setTwoFactor(true);
+		} else {
+		navigate('/home');}
 		console.log('Signin successful:', data); }
 	catch (error) {
 		console.error('Error during signin:', error); }
@@ -144,6 +152,15 @@ const LoginSignup = () => {
 				> login with 42
 			</button>
 		</div>
+		{twoFactor ? (
+                <TwoFactorFormMod
+                    title="Disable two-factor authentication"
+                    modalId={'Disable-2fa-modal'}
+                    closeModal={() => setDisplay2FADisableModal(false)}
+                    onSubmit={disableTwoFactor}
+                    error={error}
+                />
+            ) : null}
 	</div>
   )
 }

@@ -4,6 +4,7 @@ import { Response } from 'express';
 import { SignupDto, SigninDto } from './dto';
 import { TwoFactorCodeDto } from '../user/dto/two-factor-code.dto';
 
+
 @Controller('auth')
 export class AuthController {
 	constructor (private authService: AuthService) {}
@@ -18,10 +19,17 @@ export class AuthController {
 		this.authService
 			.signin42(params.code, res)
 			.then((user) => {
+				if (user.twoFactorEnabled) {
+                    res.json({
+                        message: 'Two-Factor authentication required',
+                        user,
+                    });
+				} else {
 				console.log(user);
 				res.status(201).json({
 					message: 'signin with 42 success',
 					user});
+				}
 				})
 			.catch((err) => {
 				res.status(401).json({ message: 'wrong credentials' });
@@ -50,14 +58,20 @@ export class AuthController {
 	// if the email or the name is wrong
 	@Post('signin')
 	signin(@Body() dto:SigninDto, @Res() res:Response){
-		console.log(dto);
 		this.authService
 			.signin(dto, res)
 			.then((user) => {
+				if (user.twoFactorEnabled) {
+                    res.json({
+                        message: 'Two-Factor authentication required',
+                        user,
+                    });
+				} else {
 				console.log(user);
 				res.status(200).json({
 					message: 'signin success',
 					user});
+				}
 				})
 			.catch((err) => {
 				res.status(401).json({ message: 'wrong credentials' });
@@ -76,6 +90,18 @@ export class AuthController {
 				})
 			.catch((err) => {
 				res.status(401).json({ message: 'wrong credentials' });
+			});
+	}
+
+	@Get('logout')
+	logout(@Res() res:Response){
+		this.authService
+			.logout(res)
+			.then(() => {
+                res.send('Successfully logued out!');
+            })
+			.catch((err) => {
+				res.status(500).json({ message: 'Internal server error' });
 			});
 	}
 }
