@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import io from 'socket.io-client';
 import './Game.css';
 
@@ -62,45 +62,56 @@ const PongGame: React.FC = () => {
     const roomIdRef = useRef<string | null>(null);
     const playerLeftGame = useRef(false);
     
+
+    const [showOptions, setShowOptions] = useState(true); // Nouvel état pour gérer l'affichage des options
+
+    // ... useEffect et autres fonctions ...
+
+    const startGame = () => {
+        // Fonction pour démarrer le jeu
+        setShowOptions(true);
+    }
+    
     // Initialisation du jeu
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas?.getContext('2d');
         const socket = socketRef?.current;
         if (!canvas || !ctx || !socket) 
-            return;
-        
-        let animationFrameId: number;
-        
-        socket.emit('join');
-        
-        // Initialisation de la raquette de l'utilisateur
-        const user: Paddle = {
-            x: 0,
-            y: (canvas.height - 100) / 2,
-            width: 10,
-            height: 100,
-            score: 0,
-            color: "WHITE",
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0
-        };
+        return;
+    
+    let animationFrameId: number;
+    
+    socket.emit('join');
+    
+    // Initialisation de la raquette de l'utilisateur
+    const user: Paddle = {
+        x: 0,
+        y: (canvas.height - 100) / 2,
+        width: 10,
+        height: 100,
+        score: 0,
+        color: "WHITE",
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0
+    };
+    
+    const com: Paddle = {
+        x: canvas.width - 10,
+        y: (canvas.height - 100) / 2,
+        width: 10,
+        height: 100,
+        score: 0,
+        color: "WHITE",
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0
+    };
 
-        const com: Paddle = {
-            x: canvas.width - 10,
-            y: (canvas.height - 100) / 2,
-            width: 10,
-            height: 100,
-            score: 0,
-            color: "WHITE",
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0
-        };
-
+    
         const ball: Ball = {
             x: canvas.width / 2,
             y: canvas.height / 2,
@@ -203,6 +214,15 @@ const PongGame: React.FC = () => {
 
     return (
         <div className='game-container'>
+                {showOptions && (
+                <div className="options-container">
+                    {/* Ici, vous pouvez ajouter vos options de jeu */}
+                    <h2>Game Options</h2>
+                    {/* Exemple d'options */}
+                    {/* ... */}
+                    <button onClick={startGame}>Start Game</button>
+                </div>
+            )}
             <canvas ref={canvasRef} width="800" height="400" className='canvas'/>
         </div>
     );
