@@ -15,10 +15,15 @@ export class GameGateway {
 
     private waitingPlayers: Socket[] = [];
     private gameRooms: Map<string, GameRoom> = new Map();
+
+    deleteplayerInWaitList(client: Socket) {
+      this.waitingPlayers = this.waitingPlayers.filter(player => player.id !== client.id);
+    }
   
     handleDisconnect(@ConnectedSocket() client: Socket) {
       // Identifier la salle de jeu du joueur déconnecté
       let roomId: string | null = null;
+      this.deleteplayerInWaitList(client);
       this.gameRooms.forEach((room, id) => {
         if (room.includesPlayer(client)) {
           roomId = id;
@@ -30,7 +35,6 @@ export class GameGateway {
         if (gameRoom) {
           // Informer l'autre joueur de la déconnexion
           gameRoom.notifyPlayerOfDisconnect(client);
-          // gameRoom.deletePlayer(client);
           // Supprimer la salle de jeu
           this.gameRooms.delete(roomId);
         }

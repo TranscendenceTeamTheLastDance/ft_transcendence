@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import io from 'socket.io-client';
-import './Game.css'
+import './Game.css';
 
 interface Paddle  {
     top: number;
@@ -72,7 +72,7 @@ const PongGame: React.FC = () => {
         
         let animationFrameId: number;
         
-        socketRef.current.emit('join');
+        socket.emit('join');
         
         // Initialisation de la raquette de l'utilisateur
         const user: Paddle = {
@@ -172,14 +172,8 @@ const PongGame: React.FC = () => {
 
         gameLoop();
 
+        
         // Gestionnaire d'événements
-
-        //faut faire un systeme de ping-pong
-        const handleBeforeUnload = () => {
-            // Envoyer un message de déconnexion au serveur
-            console.log("retour de la page")
-            socketRef.current.emit('client-disconnect');
-        };
 
         const mouseMoveHandler = (event: MouseEvent) => {
             // Obtenir la position relative de la souris dans le canvas
@@ -194,17 +188,15 @@ const PongGame: React.FC = () => {
             if (user.y < 0) {
                 user.y = 0;
             }
-            // console.log("pute");
             socket.emit('user-paddle-move', { y: user.y , roomId: roomIdRef.current, x: user.x});
         };
 
-        window.addEventListener('beforeunload', handleBeforeUnload);
         canvas.addEventListener('mousemove', mouseMoveHandler);
 
         return () => {
             canvas.removeEventListener('mousemove', mouseMoveHandler);
-            window.removeEventListener('beforeunload', handleBeforeUnload);
             cancelAnimationFrame(animationFrameId);
+            socket.emit('client-disconnect');
             socket.off('game-state');
         };
     }, []);
@@ -215,6 +207,5 @@ const PongGame: React.FC = () => {
         </div>
     );
 };
-
 
 export default PongGame;

@@ -59,10 +59,11 @@ export class GameRoom {
     return (false);
   }
 
-  deletePlayer(client : Socket) {
+  deletePlayerInRoom(client : Socket) {
     if (client === this.player1)
       this.player1 = null;
     if (client === this.player2)
       this.player2 = null;
   }
+  
 }
