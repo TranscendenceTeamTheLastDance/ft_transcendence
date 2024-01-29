@@ -6,7 +6,6 @@ import Home from './components/Home/Home';
 import User from './pages/UserPage';
 import { UserProvider } from './context/UserContext';
 import Chat from './pages/ChatPage';
-import { useUserContext } from './context/UserContext';
 
 
 function App() {

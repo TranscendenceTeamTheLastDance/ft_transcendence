@@ -80,6 +80,11 @@ export class AuthController {
 
 	@Post('Auth-2FA')
 	async auth2FA(@Body() dto:TwoFactorCodeDto, @Res() res:Response){
+		console.log('CA RENTRE ICI');
+		console.log(dto);
+		console.log(dto.email);
+		console.log(dto.code);
+		console.log('-----------');
 		this.authService
 			.Authenticate2FA(dto.email, dto.code, res)
 			.then((user) => {

@@ -2,7 +2,6 @@ import React from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useUserContext } from "../../context/UserContext";
 import { useForm } from 'react-hook-form';
 
 interface TwoFactorInputs {
@@ -22,18 +21,19 @@ const TwoFactorFormMod: React.FC<Props> = ({
 	title,
 	closeModal,
 }) => {
+	console.log("frontend: mail:", mail);
 	const {
 		handleSubmit,
 		register,
-		formState: { errors },
 	  } = useForm<TwoFactorInputs>({ mode: 'onTouched', criteriaMode: 'all' });
 	  const navigate = useNavigate();
 	  const [error, setError] = useState<string | undefined>();
 	const onSubmit = async (data: TwoFactorInputs) => {
+
 		try {
 			const response = await axios.post(
 				"http://localhost:8080/auth/Auth-2FA", {
-				mail,
+				email: mail,
 				code: data.validationCode,
 				},
 				{ withCredentials: true }
@@ -68,6 +68,11 @@ const TwoFactorFormMod: React.FC<Props> = ({
 								<span className="sr-only">Close modal</span>
 							</button>
 						</div>
+						{error && (
+                			<p className="error mt-2 text-sm font-bold text-red-600 dark:text-red-500">
+                    		Failed to sign in: {error}
+                			</p>
+            			)}
 						<div className="space-y-4">
 							<p className="text-base leading-relaxed text-gray-500 dark:text-gray-700">
 								Please enter the validation code for two factor authentication

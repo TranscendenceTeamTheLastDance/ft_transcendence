@@ -204,7 +204,7 @@ const User = () => {
 		</div>
 		{display2FAModal ? (
                 <TwoFactorMod
-                    title="Enable two-factor authentication"
+                    title="TWO-FACTOR AUTHENTICATION"
                     qrCodeDataUrl={qrCodeDataUrl}
                     secret={twoFactorSecret}
                     modalId={'Enable-2fa-modal'}
@@ -215,7 +215,7 @@ const User = () => {
             ) : null}
         {display2FADisableModal ? (
                 <TwoFactorMod
-                    title="Disable two-factor authentication"
+                    title="TWO-FACTOR AUTHENTICATION"
                     modalId={'Disable-2fa-modal'}
                     closeModal={() => setDisplay2FADisableModal(false)}
                     onSubmit={disableTwoFactor}
