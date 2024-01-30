@@ -1,10 +1,15 @@
 node_modules
 dist
-TODO.txt
-
 .vscode
 
+# Optional npm cache directory
+.npm
 
+# Optional pnpm cache directory
+.pnpm-store
+
+# Optional eslint cache
+.eslintcache
 
 # Keep environment variables out of version control
 .env
