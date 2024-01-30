@@ -9,6 +9,7 @@ import { useUserContext } from '../context/UserContext';
 import UpdateModal from '../components/UpdateModal.tsx'
 import TwoFactorMod from '../components/LoginSignup/TwoFactorMod.tsx';
 import { ModalInputs } from '../components/LoginSignup/TwoFactorMod.tsx';
+import { set } from 'react-hook-form';
 
 const User = () => {
 	const {user, updateUser, fetchUserData } = useUserContext();
@@ -92,38 +93,36 @@ const User = () => {
 	};
 	
 	///2FA
+	const manage2FAInit = async () => {
+		console.log(is2FAEnabled ? "is2FAEnabled : ON - init" : "is2FAEnabled: OFF - init", is2FAEnabled);
+		console.log(user.twoFactorEnabled ? "FRONT User 2FA TRUE" : "FRONT User 2FA FALSE");
+		if (user && is2FAEnabled === false && user.twoFactorEnabled === false) {
+		const response = await axios.get('http://localhost:8080/users/2FAInit', {
+		withCredentials: true },);
+		setQrCodeDataUrl(response.data.qrCode);
+		setTwoFactorSecret(response.data.secret);
+		setDisplay2FAModal(true);
+		//updateUser({ twoFactorEnabled: true });
+		}
+	else if (user && user.twoFactorEnabled === true) {
+		setDisplay2FADisableModal(true);
+		//updateUser({ twoFactorEnabled: false });
+		}
+	};
+
 	const handle2FAToggle = () => {
-		const new2FAStatus = !user.twoFactorEnabled;
-		setIs2FAEnabled(new2FAStatus);
+		try {
+			manage2FAInit();
+		} catch (error: any) {
+			console.error('frontend: error initializing 2FA:', error);
+		}
 	};
 
 	useEffect(() => {
 		console.log(is2FAEnabled ? "2FA ON" : "2FA OFF");
 	  }, [is2FAEnabled]);
 
-	useEffect(() => {
-		try {
-			const manage2FAInit = async () => {
-				console.log(is2FAEnabled ? "2FA ON - init" : "2FA OFF - init");
-				// console.log(user.twoFactorEnabled ? "User 2FA TRUE" : "User 2FA FALSE");
-				if (user && is2FAEnabled === true && user.twoFactorEnabled === false) {
-				const response = await axios.get('http://localhost:8080/users/2FAInit', {
-				withCredentials: true },);
-				setQrCodeDataUrl(response.data.qrCode);
-				setTwoFactorSecret(response.data.secret);
-				setDisplay2FAModal(true);
-				updateUser({ twoFactorEnabled: true });
-				}
-			else if (user && is2FAEnabled === false && user.twoFactorEnabled === true) {
-				setDisplay2FADisableModal(true);
-				updateUser({ twoFactorEnabled: false });
-				}
-			};
-			manage2FAInit();
-		} catch (error: any) {
-			console.error('frontend: error initializing 2FA:', error);
-		}
-	}, [is2FAEnabled]);
+
 
 	const enableTwoFactor = async (data: ModalInputs) => {
 		try {
@@ -134,6 +133,9 @@ const User = () => {
 			setDisplay2FAModal(false);
 			setError(undefined);
 			updateUser({ twoFactorEnabled: true });
+			console.log('frontend: user information successfully updated!');
+			setIs2FAEnabled(true);
+			console.log('is2FAEnabled =====', is2FAEnabled)
 		} catch (error: any) {
 			console.error('frontend: error enabling 2FA:', error);
 			console.log('frontend: error enabling 2FA:', error.response.data.message);
@@ -149,6 +151,7 @@ const User = () => {
 			setDisplay2FADisableModal(false);
 			setError(undefined);
 			updateUser({ twoFactorEnabled: false });
+			setIs2FAEnabled(false);
 		} catch (error: any) {
 			console.error('frontend: error disabling 2FA:', error);
 			setError(error.response.data.message);

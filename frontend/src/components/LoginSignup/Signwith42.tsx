@@ -31,7 +31,6 @@ const Signwith42 = () => {
 						setTwoFactor(true);
 						setUserMail(response.data.user.email);
 					} else {
-					console.log('CONNARD');
 					console.log(response.data.user);
 					navigate('/home');}
 				}
