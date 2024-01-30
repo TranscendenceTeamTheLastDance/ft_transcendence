@@ -121,21 +121,20 @@ const LoginSignup = () => {
 			
 			</div>
 		</div>
-		{action==="Sign Up" ? <div></div>:<div className='forgot-password'>Lost Password ? <span>Click Here</span></div> }
 		<div className='submit-container'>
 			<div 
-				className={action==="Login"?"submit grey":"submit"} 
+				className={action==="Login"?"bg-gray-500 text-white py-2 px-4 rounded-lg text-lg font-bold mx-2":"bg-gray-100 py-2 px-4 rounded-lg text-lg font-bold mx-2"} 
 				onClick={(e) =>{setAction("Sign Up");}}
 				>Sign Up</div>
 			
 			<div 
-				className={action==="Sign Up"?"submit grey":"submit"} 
+				className={action==="Sign Up"?"bg-gray-500 text-white py-2 px-4 rounded-lg text-lg font-bold mx-2":"bg-gray-100 py-2 px-4 rounded-lg text-lg font-bold mx-2"} 
 				onClick={(e)=>{setAction("Login");}}
 				>Login</div>	
 		</div>
 		<div className='submit-button'>
 			<button
-				className="button"
+				className="bg-gray-500 text-white py-2 px-4 rounded-lg text-lg font-bold mx-2"
 				onClick={(e) => {
 					if (action === "Sign Up") {
 					handleSignUp(e);

@@ -38,11 +38,11 @@ const TwoFactorMod: React.FC<Props> = ({
       >
         <div className="relative w-full max-w-lg max-h-full no-scrollbar">
           <div className="relative bg-white rounded-lg shadow dark:bg-white p-5 space-y-2 no-scrollbar">
-            <div className="flex items-center justify-between border-b rounded-t dark:border-gray-600 text-center">
-                <span className="text-black text-2xl font-bold mx-auto mt-8 text-center">{title}</span> {/* Ajout de la classe font-bold */}
+            <div className="flex items-center justify-between border-b rounded-t dark:border-gray-300 text-center">
+                <span className="text-black text-2xl font-bold mx-auto mt-2 text-center">{title}</span> {/* Ajout de la classe font-bold */}
               <button
                 type="button"
-                className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                className="text-gray-600 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-500 dark:hover:text-white"
                 onClick={closeModal}
               >
                 X
