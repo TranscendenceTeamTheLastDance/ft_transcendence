@@ -5,6 +5,23 @@ CREATE TYPE "ChannelType" AS ENUM ('PUBLIC', 'PROTECTED', 'PRIVATE');
 CREATE TYPE "ChannelRole" AS ENUM ('USER', 'ADMIN', 'OWNER');
 
 -- CreateTable
+CREATE TABLE "Users" (
+    "id" SERIAL NOT NULL,
+    "email" TEXT NOT NULL,
+    "username" TEXT NOT NULL,
+    "firstName" TEXT,
+    "lastName" TEXT,
+    "hash" TEXT,
+    "profilePic" TEXT,
+    "twoFactorSecret" TEXT,
+    "twoFactorEnabled" BOOLEAN DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Users_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "ChannelUser" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
@@ -23,6 +40,7 @@ CREATE TABLE "Channel" (
     "type" "ChannelType" NOT NULL,
     "password" TEXT,
     "isDM" BOOLEAN NOT NULL DEFAULT false,
+    "ownerId" INTEGER NOT NULL,
 
     CONSTRAINT "Channel_pkey" PRIMARY KEY ("id")
 );
@@ -37,6 +55,12 @@ CREATE TABLE "Message" (
 
     CONSTRAINT "Message_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Users_email_key" ON "Users"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ChannelUser_userId_channelId_key" ON "ChannelUser"("userId", "channelId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Channel_name_key" ON "Channel"("name");

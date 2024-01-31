@@ -62,6 +62,7 @@ model Channel {
     users     ChannelUser[]
     messages  Message[]
     isDM      Boolean       @default(false) // is Direct Message
+    ownerId   Int
 }
 
 model Message {

@@ -1,19 +1,19 @@
 import { ChannelType } from '@prisma/client';
-import { IsEnum, IsNotEmpty, IsOptional, MaxLength, ValidateIf } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, MaxLength, ValidateIf } from 'class-validator';
 
 export class CreateChannelDTO {
-  @IsNotEmpty()
   @MaxLength(20)
   name: string;
 
-  @IsNotEmpty()
   @IsEnum(ChannelType)
   type: ChannelType;
 
   @ValidateIf((o) => o.type === ChannelType.PROTECTED)
-  @IsNotEmpty()
   @MaxLength(50)
   password: string;
+
+  @IsNumber()
+	ownerId: number;
 }
 
 export class CreateDmDTO {

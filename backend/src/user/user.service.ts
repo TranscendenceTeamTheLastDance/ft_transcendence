@@ -2,10 +2,22 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { EditUserDto } from './dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: DatabaseService) {}
+
+  async getUnique(id: number): Promise<User> {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id },
+      });
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
 
   async uploadAvatar(userId: number, imageBase64: string) {
     try {

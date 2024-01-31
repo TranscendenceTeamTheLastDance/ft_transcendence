@@ -4,16 +4,15 @@ npm install
 npm i --save class-validator class-transformer
 npm add argon2
 
-npx prisma reset --force
-
-npx prisma migrate deploy
+npx prisma migrate reset --force
 
 echo "-----Migrating database-----"
 
+npx prisma migrate dev --name sheesh
 
-sleep 10
-# npx prisma db push
-# npx prisma migrate dev --name sheesh
+echo "-----Seeding database-----"
+
+npx prisma db seed --preview-feature
 
 echo "-----Starting Prisma Studio on port 5555-----"
 

@@ -16,7 +16,7 @@ import { DatabaseModule } from './database/database.module';
 	PrismaModule.forRoot({
 		isGlobal:true,
 	}),
-	GameModule, 
+	GameModule,
 	NotifyModule, 
 	UserModule, 
 	DatabaseModule, 

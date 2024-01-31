@@ -1,7 +1,6 @@
-import { Logger, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Logger, OnModuleInit, UseGuards } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
-  ConnectedSocket,
   MessageBody,
   OnGatewayInit,
   SubscribeMessage,
@@ -9,60 +8,42 @@ import {
   WebSocketServer,
   WsResponse,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 
-import { BadRequestTransformationFilter } from '../utils/bad-request-exception.filter';
-
-import { ChannelsService } from './channels.service';
-import { CreateChannelDTO, JoinChannelDTO } from './chat.dto';
+import { WSAuthMiddleware } from '../auth/ws/ws.middleware';
 import { ChatEvent } from './chat.state';
+import { JwtGuard } from 'src/auth/guard';
 import { UserService } from 'src/user/user.service';
 
-@UsePipes(new ValidationPipe())
+
+@UseGuards(JwtGuard)
 @WebSocketGateway({
+  namespace: 'chat',
   cors: {
-    origin: 'http://localhost:3000', // l'origine du message pour autoriser la connection
+    origin: 'http://localhost:3000',
   },
-  namespace: 'chat', // spécification pour éviter les conflits
 })
-@UseFilters(BadRequestTransformationFilter)
 export class ChatGateway implements OnGatewayInit {
   @WebSocketServer()
   private io: Server;
   private logger: Logger = new Logger(ChatGateway.name);
+  private userService: UserService;
 
-  constructor(
-    private jwtService: JwtService,
-    private channelsService: ChannelsService,
-    private userService: UserService
-  ) {}
+  constructor(private jwtService: JwtService) {}
+
 
   afterInit(server: Server) {
-    this.logger.log('Initialized!');
+    const authMiddleware = WSAuthMiddleware(this.jwtService, this.userService);
+    server.use(authMiddleware);
 
     this.io.on('connection', (socket) => {
       this.logger.log('Client connected: ' + socket.id);
     });
 
-    // setInterval(() => this.io.emit('message', 'hello'), 2000);
+    setInterval(() => this.io.emit('message', 'hello'), 2000);
   }
 
-  @SubscribeMessage(ChatEvent.Create)
-  async onCreateChannel(
-    @MessageBody() channel: CreateChannelDTO,
-    @ConnectedSocket() client: Socket,
-  ) {
-    this.logger.log(client.data.user);
-    this.logger.log('Create channel: ' + channel.name);
-    await this.channelsService.createChannel(channel, client.data.user);
-  }
-
-  @SubscribeMessage(ChatEvent.Join)
-  async onJoinChannel(@MessageBody() channel: JoinChannelDTO, @ConnectedSocket() client: Socket) {
-    await this.channelsService.joinChannel(channel, client.data.user);
-    //client.join(channel.channel);
-  }
-
+  @UseGuards(JwtGuard)
   @SubscribeMessage(ChatEvent.Message)
   onMessage(@MessageBody() message: string): WsResponse<string> {
     return { event: ChatEvent.Message, data: 'You sent: ' + message };
