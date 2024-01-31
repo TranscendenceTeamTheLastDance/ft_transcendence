@@ -9,7 +9,6 @@ import { useUserContext } from '../context/UserContext';
 import UpdateModal from '../components/UpdateModal.tsx'
 import TwoFactorMod from '../components/LoginSignup/TwoFactorMod.tsx';
 import { ModalInputs } from '../components/LoginSignup/TwoFactorMod.tsx';
-import { set } from 'react-hook-form';
 
 const User = () => {
 	const {user, updateUser, fetchUserData } = useUserContext();
