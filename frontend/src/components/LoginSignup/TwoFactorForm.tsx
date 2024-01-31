@@ -55,7 +55,7 @@ const TwoFactorFormMod: React.FC<Props> = ({
 			>	
 				<div className="relative w-full max-w-lg max-h-full no-scrollbar">
 					<div className="relative bg-white rounded-lg shadow dark:bg-white p-5 space-y-2 no-scrollbar">
-						<div className="flex items-center justify-between border-b rounded-t dark:border-gray-300">
+						<div className="flex items-center justify-between text-center">
 						<span className="text-black text-2xl font-bold mx-auto mt-4 text-center">{title}</span> {/* Ajout de la classe font-bold */}
 						</div>
 						{error && (

@@ -183,32 +183,24 @@ export class AuthService {
   }
 
   async Authenticate2FA(email: string, code: string, res: Response): Promise<User> {
-    console.log('CA RENTRE LA');
-    console.log(email);
-    console.log(code);
     const user = await this.prismaService.user.findUnique({
       where: {
         email,
       },
     });
-    console.log('MESCOUILLES');
     if (!user) {
-      console.log('NON user not found');
       throw new ForbiddenException('Credential Incorrect');
     }
-    console.log('MABITE');
     const isCodeValid = authenticator.verify({
       token: code,
       secret: user.twoFactorSecret,
     });
 
     if (!isCodeValid) {
-      console.log('NON code not found');
       throw new ForbiddenException('Invalid code');
     }
 
     await this.generateToken(user.id, user.email, user.username, res);
-    console.log('TONFRONT');
     return user;
   }
 

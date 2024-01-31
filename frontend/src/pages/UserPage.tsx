@@ -94,8 +94,6 @@ const User = () => {
 	
 	///2FA
 	const manage2FAInit = async () => {
-		console.log(is2FAEnabled ? "is2FAEnabled : ON - init" : "is2FAEnabled: OFF - init", is2FAEnabled);
-		console.log(user.twoFactorEnabled ? "FRONT User 2FA TRUE" : "FRONT User 2FA FALSE");
 		if (user && is2FAEnabled === false && user.twoFactorEnabled === false) {
 		const response = await axios.get('http://localhost:8080/users/2FAInit', {
 		withCredentials: true },);

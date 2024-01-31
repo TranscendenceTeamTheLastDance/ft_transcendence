@@ -38,11 +38,11 @@ const TwoFactorMod: React.FC<Props> = ({
       >
         <div className="relative w-full max-w-lg max-h-full no-scrollbar">
           <div className="relative bg-white rounded-lg shadow dark:bg-white p-5 space-y-2 no-scrollbar">
-            <div className="flex items-center justify-between border-b rounded-t dark:border-gray-300 text-center">
-                <span className="text-black text-2xl font-bold mx-auto mt-2 text-center">{title}</span> {/* Ajout de la classe font-bold */}
+            <div className="flex items-center justify-between text-center">
+                <span className="text-black text-2xl font-bold mx-auto mt-2 mb-6 text-center">{title}</span> {/* Ajout de la classe font-bold */}
               <button
                 type="button"
-                className="text-gray-600 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-500 dark:hover:text-white"
+                className="text-white bg-gray-500 hover:bg-transparent hover:text-gray-500 border border-gray-500 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-200 dark:hover:text-gray-900 mt-2 mb-6"
                 onClick={closeModal}
               >
                 X
@@ -50,12 +50,12 @@ const TwoFactorMod: React.FC<Props> = ({
               </button>
             </div>
             {qrCodeDataUrl && (
-              <div className="space-y-4 text-center"> {/* Ajout de la classe text-center */}
+              <div className="space-y-4 text-center "> {/* Ajout de la classe text-center */}
                 <p className="text-base leading-relaxed text-gray-500 dark:text-gray-700">
-                  Scan the QR code below with Google Authenticator to register the app
+                  Scan the QR code to register the app
                 </p>
                 <img src={qrCodeDataUrl} alt="QR Code" className="mx-auto" /> {/* Ajout de la classe mx-auto pour centrer l'image */}
-                <p className="text-base leading-relaxed text-gray-500 dark:text-gray-700">
+                <p className="text-base leading-relaxed text-gray-500 dark:text-gray-700 mb-9">
                   If you can't scan the QR code, type the following secret key in the app: {secret}
                 </p>
               </div>
