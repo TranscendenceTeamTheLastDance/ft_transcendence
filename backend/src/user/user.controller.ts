@@ -16,8 +16,12 @@ import { User } from '@prisma/client';
 import { GetUser } from '../auth/decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { EditUserDto } from './dto';
+import { TwoFactorCodeDto } from './dto/two-factor-code.dto';
 import { Response } from 'express';
 import { UserService } from './user.service';
+
+
+
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
@@ -60,4 +64,40 @@ export class UserController {
         res.status(403).send(error.message);
       });
   }
+
+  @UseGuards(JwtGuard)
+  @Get('2FAInit')
+  async twoFactorAuthInit(@GetUser() user: User) {
+    console.log('backend: 2FA init');
+    return this.userService.twoFactorAuthenticationInit(user);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post('2FAEnable')
+  async twoFactorAuthEnable(@GetUser() user: User, @Body() dto: TwoFactorCodeDto, @Res() res: Response) {
+    console.log('backend: 2FA ENABLE');
+    this.userService
+        .enableTwoFactorAuthentication(user, dto.code)
+        .then(() => {
+          res.send('2FA successfully enabled!');
+        })
+        .catch((error: UnauthorizedException) => {
+          res.status(401).send(error.message);
+        });
+  }
+
+  @UseGuards(JwtGuard)
+  @Post('2FADisable')
+  async twoFactorAuthDisable(@GetUser() user: User, @Body() dto: TwoFactorCodeDto, @Res() res: Response) {
+    console.log('backend: 2FA DISABLE');
+    this.userService
+        .disableTwoFactorAuthentication(user, dto.code)
+        .then(() => {
+          res.send('2FA successfully disabled!');
+        })
+        .catch((error: UnauthorizedException) => {
+          res.status(401).send(error.message);
+        });
+  }
+
 }
