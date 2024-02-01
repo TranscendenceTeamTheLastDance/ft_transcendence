@@ -145,26 +145,45 @@ export class AuthService {
     userId: number,
     email: string,
     username: string,
-    res: Response,
-  ) {
-    const accessToken = await this.signToken(userId, email, username);
+    res: Response,) {
+
+    const accessToken = await this.signToken(userId, email, username, true);
     res.cookie(
       this.config.get('JWT_ACCESS_TOKEN_COOKIE'),
       accessToken.JWTtoken,
       {
         httpOnly: false,
-        // secure: false,
-        // sameSite: 'strict',
-        // domain: 'localhost',
-        // path: '/',
+        secure: false,
+        sameSite: 'strict',
       },
     );
+
+    const refreshToken = await this.signToken(userId, email, username, false);
+    res.cookie(
+      this.config.get('JWT_REFRESH_TOKEN_COOKIE'),
+      refreshToken.JWTtoken,
+      {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'strict',
+      },
+    );
+    const hash = await argon.hash(refreshToken.JWTtoken);
+    await this.prismaService.user.update({
+      where: {
+        email: email,
+      },
+      data: {
+        hashedRefreshToken: hash,
+      },
+    });
   }
 
   async signToken(
     userId: number,
     email: string,
     username: string,
+    accessToken: boolean,
   ): Promise<{ JWTtoken: string }> {
     const payload = {
       // here payload is the data we want to store in the token
@@ -173,13 +192,21 @@ export class AuthService {
       username,
     };
     const secret = this.config.get('JWT_SECRET');
+    const refreshSecret = this.config.get('JWT_REFRESH_SECRET');
 
-    const token = await this.jwt.signAsync(payload, {
-      expiresIn: '15m',
-      secret: secret,
-    }); // the fonction signAsync is used to sign the token
-
-    return { JWTtoken: token };
+    if (accessToken) {
+        const token = await this.jwt.signAsync(payload, {
+          expiresIn: '15m',
+          secret: secret,
+        }); // the fonction signAsync is used to sign the token
+        return { JWTtoken: token };
+    } else {
+        const token = await this.jwt.signAsync(payload, {
+          expiresIn: '7d',
+          secret: refreshSecret,
+        }); // the fonction signAsync is used to sign the token
+        return { JWTtoken: token };
+    }
   }
 
   async Authenticate2FA(email: string, code: string, res: Response): Promise<User> {
@@ -214,5 +241,18 @@ export class AuthService {
         } catch (error) {
             throw error;
         }
+  }
+
+  async refresh(user: User, res: Response) {
+    const accessToken = await this.signToken(user.id, user.email, user.username, true);
+    res.cookie(
+      this.config.get('JWT_ACCESS_TOKEN_COOKIE'),
+      accessToken.JWTtoken,
+      {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'strict',
+      },
+    );
   }
 }
