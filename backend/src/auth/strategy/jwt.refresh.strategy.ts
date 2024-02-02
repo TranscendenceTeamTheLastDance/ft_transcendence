@@ -11,7 +11,7 @@ import * as argon from 'argon2';
 
 
 @Injectable() //  allow to inject the JwtStrategy class into other classes but also to inject other classes into the JwtStrategy class
-export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh',) // here we use 'jwt' as the name of the strategy
+export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh-token',) // here we use 'jwt' as the name of the strategy
 {
 	constructor(private config: ConfigService, private prisma: DatabaseService)
 	{

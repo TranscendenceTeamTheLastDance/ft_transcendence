@@ -6,6 +6,7 @@ import Particles from '../components/Home/Particles.tsx';
 import NotConnected from '../components/NotSignedIn.tsx';
 import axios from 'axios';
 import { useUserContext } from '../context/UserContext';
+import { useAuthAxios } from '../context/AuthAxiosContext';
 import UpdateModal from '../components/UpdateModal.tsx'
 import TwoFactorMod from '../components/LoginSignup/TwoFactorMod.tsx';
 import { ModalInputs } from '../components/LoginSignup/TwoFactorMod.tsx';
@@ -23,6 +24,8 @@ const User = () => {
 	const [error, setError] = useState<string | undefined>();
 	const [display2FAModal, setDisplay2FAModal] = useState(false);
 	const [display2FADisableModal, setDisplay2FADisableModal] = useState(false);
+
+	const authAxios = useAuthAxios();
 
 
 	useEffect(() => {
@@ -94,7 +97,7 @@ const User = () => {
 	///2FA
 	const manage2FAInit = async () => {
 		if (user && is2FAEnabled === false && user.twoFactorEnabled === false) {
-		const response = await axios.get('http://localhost:8080/users/2FAInit', {
+		const response = await authAxios.get('/users/2FAInit', {
 		withCredentials: true },);
 		setQrCodeDataUrl(response.data.qrCode);
 		setTwoFactorSecret(response.data.secret);
