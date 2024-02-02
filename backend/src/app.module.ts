@@ -11,20 +11,20 @@ import { DatabaseModule } from './database/database.module';
 
 @Module({
   imports: [
-	AuthModule, 
-	ChatModule, 
-	PrismaModule.forRoot({
-		isGlobal:true,
-	}),
-	GameModule,
-	NotifyModule, 
-	UserModule, 
-	DatabaseModule, 
-	ConfigModule.forRoot({
-		isGlobal:true,
-	}),
-	],
-	
+    AuthModule,
+    ChatModule,
+    PrismaModule.forRoot({
+      isGlobal: true,
+    }),
+    GameModule,
+    NotifyModule,
+    UserModule,
+    DatabaseModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+  ],
+
   controllers: [],
   providers: [],
 })

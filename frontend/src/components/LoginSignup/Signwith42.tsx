@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
+import TwoFactorFormMod from './TwoFactorForm.tsx';
+import Particles from '../Home/Particles';
 import axios from 'axios';
 
 
@@ -8,6 +10,9 @@ const Signwith42 = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const [error, setError] = useState('');
+
+	const [twoFactor, setTwoFactor] = useState(false);
+	const [userMail, setUserMail] = useState('')
 
 	
 	useEffect(() => {
@@ -22,8 +27,12 @@ const Signwith42 = () => {
 				const response = await axios.get('http://localhost:8080/auth/signin42', 
 					{ params: {code}, withCredentials: true });
 				if (response.data.user) {
+					if (response.data.user.twoFactorEnabled) {
+						setTwoFactor(true);
+						setUserMail(response.data.user.email);
+					} else {
 					console.log(response.data.user);
-					navigate('/home');
+					navigate('/home');}
 				}
 			} catch (error: any) {
 				setError(error.response?.message || 'An unknown error occurred');
@@ -44,6 +53,18 @@ const Signwith42 = () => {
         }
     }, [error, navigate]);
 
-	return <div>Sign with 42</div>;
+	return (
+		<div>
+			<Particles className="absolute inset-0 -z-10 animate-fade-in" quantity={1000} />
+			{twoFactor ? (
+                <TwoFactorFormMod
+                    title="Sign-In two-factor authentication"
+                    modalID={'Signin-2FA-form'}
+					mail={userMail}
+                    closeModal={() => setTwoFactor(false)}
+                />
+            ) : null}
+		</div>
+	)
 }
 export default Signwith42

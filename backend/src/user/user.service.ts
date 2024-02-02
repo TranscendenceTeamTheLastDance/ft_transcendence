@@ -3,6 +3,8 @@ import { DatabaseService } from '../database/database.service';
 import { EditUserDto } from './dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { User } from '@prisma/client';
+import {authenticator} from 'otplib';
+import { toDataURL } from 'qrcode';
 
 @Injectable()
 export class UserService {
@@ -57,5 +59,37 @@ export class UserService {
       }
       throw error;
     }
+  }
+
+  async twoFactorAuthenticationInit(user: User)
+  : Promise<{qrCode: string; secret: string}> {
+
+    const secret = authenticator.generateSecret();
+
+    const otpauthURL = authenticator.keyuri(user.email, '2FATranscendance', secret);
+
+    this.editUser(user.id, {twoFactorSecret: secret});
+    
+    const qrCode = await toDataURL(otpauthURL);
+    
+    return {qrCode, secret};
+  }
+
+  async enableTwoFactorAuthentication(user: User, code: string) {
+    const codeValide = authenticator.verify({
+      token: code, 
+      secret: user.twoFactorSecret});
+    if (!codeValide) 
+      throw new ForbiddenException('Invalid code');
+    this.editUser(user.id, {twoFactorEnabled: true});
+    }
+
+  async disableTwoFactorAuthentication(user: User, code: string) {
+    const codeValide = authenticator.verify({
+      token: code, 
+      secret: user.twoFactorSecret});
+    if (!codeValide) 
+      throw new ForbiddenException('Invalid code');
+    this.editUser(user.id, {twoFactorEnabled: false, twoFactorSecret: null});
   }
 }
