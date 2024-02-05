@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useUserContext } from '../../context/UserContext';
 import io from 'socket.io-client';
 import './Game.css';
 
@@ -62,8 +63,12 @@ const PongGame: React.FC = () => {
     const roomIdRef = useRef<string | null>(null);
     const playerLeftGame = useRef(false);
     
+    
+
+  
 
     const [showOptions, setShowOptions] = useState(true); // Nouvel état pour gérer l'affichage des options
+    const { user } = useUserContext();
 
     // ... useEffect et autres fonctions ...
 
@@ -87,7 +92,7 @@ const PongGame: React.FC = () => {
     socket.emit('join');
     
     // Initialisation de la raquette de l'utilisateur
-    const user: Paddle = {
+    const userGame: Paddle = {
         x: 0,
         y: (canvas.height - 100) / 2,
         width: 10,
@@ -141,9 +146,9 @@ const PongGame: React.FC = () => {
             com.y = gameState.padU2.y;
             ball.x = gameState.ball.x;
             ball.y = gameState.ball.y;
-            user.score = gameState.score.scoreU1;
+            userGame.score = gameState.score.scoreU1;
             com.score = gameState.score.scoreU2;
-            if ((user.score || com.score ) >= 10) {
+            if ((userGame.score || com.score ) >= 10) {
                 socket.emit('finish');
                 finish = true;
             }        
@@ -156,8 +161,8 @@ const PongGame: React.FC = () => {
             waitingForPlayerRef.current = false; // Commencer le jeu
             if (id.Nplayer === 2) {
                 const tmp = com.x;
-                com.x = user.x;
-                user.x = tmp;
+                com.x = userGame.x;
+                userGame.x = tmp;
                 mainPlayer = false;
             }
         });
@@ -169,27 +174,28 @@ const PongGame: React.FC = () => {
         const gameLoop = () => {
             if (waitingForPlayerRef.current) {
                 drawText(ctx, "Waiting for another player...", canvas.width / 2 - 100, canvas.height / 2);
+                console.log("CONSOLE LOG DU USER", user.username);
             }
             else if (finish) {
                 drawRect(ctx, 0, 0, canvas.width, canvas.height, "#000");
                 drawText(ctx, `Player 2: ${com.score}`, canvas.width - 150, 30);
-                drawText(ctx, `Player 1: ${user.score}`, 10, 30);
+                drawText(ctx, `Player 1: ${userGame.score}`, 10, 30);
                 drawText(ctx, "Game finished", canvas.width / 2 - 50, canvas.height / 2);
 
             }
             else if (playerLeftGame.current) {
                 drawRect(ctx, 0, 0, canvas.width, canvas.height, "#000");
                 drawText(ctx, `Player 2: ${com.score}`, canvas.width - 150, 30);
-                drawText(ctx, `Player 1: ${user.score}`, 10, 30);
+                drawText(ctx, `Player 1: ${userGame.score}`, 10, 30);
                 drawText(ctx, "the other player has left the game", canvas.width / 2 - 100, canvas.height / 2);
             }
             else {
                 drawRect(ctx, 0, 0, canvas.width, canvas.height, "#000");
-                drawRect(ctx, user.x, user.y, user.width, user.height, user.color);
+                drawRect(ctx, userGame.x, userGame.y, userGame.width, userGame.height, userGame.color);
                 drawRect(ctx, com.x, com.y, com.width, com.height, com.color);
                 drawArc(ctx, ball.x, ball.y, ball.radius, ball.color);
                 drawNet(ctx, net, canvas.height);
-                drawText(ctx, `Player 1: ${user.score}`, 10, 30);
+                drawText(ctx, `Player 1: ${userGame.score}`, 10, 30);
                 drawText(ctx, `Player 2: ${com.score}`, canvas.width - 150, 30);
             }
             animationFrameId = requestAnimationFrame(gameLoop);
@@ -207,13 +213,13 @@ const PongGame: React.FC = () => {
 
             // Mettre à jour la position Y de la raquette
             // On s'assure que la raquette ne sort pas du canvas en bas
-            user.y = Math.min(mouseY - user.height / 2, canvas.height - user.height);
+            userGame.y = Math.min(mouseY - userGame.height / 2, canvas.height - userGame.height);
 
             // Empêcher la raquette de sortir du canvas en haut
-            if (user.y < 0) {
-                user.y = 0;
+            if (userGame.y < 0) {
+                userGame.y = 0;
             }
-            socket.emit('user-paddle-move', { y: user.y , roomId: roomIdRef.current, x: user.x});
+            socket.emit('userGame-paddle-move', { y: userGame.y , roomId: roomIdRef.current, x: userGame.x});
         };
 
         canvas.addEventListener('mousemove', mouseMoveHandler);
