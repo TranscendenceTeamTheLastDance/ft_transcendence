@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { User } from '@prisma/client';
 import { create } from 'domain';
+import { authenticator } from 'otplib';
 
 @Injectable({})
 export class AuthService {
@@ -45,6 +46,10 @@ export class AuthService {
       const username = user42info.data['login'];
       const user = await this.createupdateUser(email, username);
       user.hash = undefined;
+      user.twoFactorSecret = undefined;
+      if (user.twoFactorEnabled) {
+        return user;
+    }
       await this.generateToken(user.id, user.email, user.username, res);
       return user;
     } catch (error) {
@@ -71,7 +76,12 @@ export class AuthService {
       console.log('password not found');
       throw new ForbiddenException('Credential Incorrect');
     }
-    // this.createupdateUser(user.email, user.username);
+    user.hash = undefined;
+    user.twoFactorSecret = undefined;
+    if (user.twoFactorEnabled) {
+        return user;
+    }
+    //this.createupdateUser(user.email, user.username);
     await this.generateToken(user.id, user.email, user.username, res);
     return user;
   }
@@ -170,5 +180,39 @@ export class AuthService {
     }); // the fonction signAsync is used to sign the token
 
     return { JWTtoken: token };
+  }
+
+  async Authenticate2FA(email: string, code: string, res: Response): Promise<User> {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        email,
+      },
+    });
+    if (!user) {
+      throw new ForbiddenException('Credential Incorrect');
+    }
+    const isCodeValid = authenticator.verify({
+      token: code,
+      secret: user.twoFactorSecret,
+    });
+
+    if (!isCodeValid) {
+      throw new ForbiddenException('Invalid code');
+    }
+
+    await this.generateToken(user.id, user.email, user.username, res);
+    return user;
+  }
+
+  async logout(res: Response) {
+    try {
+        res.clearCookie(this.config.get('JWT_ACCESS_TOKEN_COOKIE'), {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'strict',
+        });
+        } catch (error) {
+            throw error;
+        }
   }
 }

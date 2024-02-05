@@ -1,4 +1,4 @@
-import { IsEmail, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsOptional, IsString, IsBoolean } from 'class-validator';
 
 export class EditUserDto {
   @IsOptional()
@@ -16,4 +16,12 @@ export class EditUserDto {
   @IsString()
   @IsOptional()
   username?: string;
+
+  @IsString()
+  @IsOptional()
+  twoFactorSecret?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  twoFactorEnabled?: boolean;
 }

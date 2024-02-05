@@ -24,9 +24,6 @@ done
 echo "-----Database stuff-----"
 npx prisma generate
 
-echo "-----Migrating database-----"
-npx prisma migrate dev --name chat_model
-
 echo "-----Starting Prisma Studio on port 5555-----"
 npx prisma studio --port 5555 &
 

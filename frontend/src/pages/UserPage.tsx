@@ -7,6 +7,8 @@ import NotConnected from '../components/NotSignedIn.tsx';
 import axios from 'axios';
 import { useUserContext } from '../context/UserContext';
 import UpdateModal from '../components/UpdateModal.tsx'
+import TwoFactorMod from '../components/LoginSignup/TwoFactorMod.tsx';
+import { ModalInputs } from '../components/LoginSignup/TwoFactorMod.tsx';
 
 const User = () => {
 	const {user, updateUser, fetchUserData } = useUserContext();
@@ -14,7 +16,15 @@ const User = () => {
 	const [showUpdateModal, setShowUpdateModal] = useState(false);
 	const [updateModalMessage, setUpdateModalMessage] = useState('');
 	const [isUpdateSuccessful, setIsUpdateSuccessful] = useState(false);
-  
+
+	const [is2FAEnabled, setIs2FAEnabled] = useState(user ? user.twoFactorEnabled : false);
+	const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | undefined>();
+	const [twoFactorSecret, setTwoFactorSecret] = useState<string | undefined>();
+	const [error, setError] = useState<string | undefined>();
+	const [display2FAModal, setDisplay2FAModal] = useState(false);
+	const [display2FADisableModal, setDisplay2FADisableModal] = useState(false);
+
+
 	useEffect(() => {
 		fetchUserData();
 	  }, [fetchUserData]);
@@ -81,10 +91,68 @@ const User = () => {
 		}
 	};
 	
-	
+	///2FA
+	const manage2FAInit = async () => {
+		if (user && is2FAEnabled === false && user.twoFactorEnabled === false) {
+		const response = await axios.get('http://localhost:8080/users/2FAInit', {
+		withCredentials: true },);
+		setQrCodeDataUrl(response.data.qrCode);
+		setTwoFactorSecret(response.data.secret);
+		setDisplay2FAModal(true);
+		//updateUser({ twoFactorEnabled: true });
+		}
+	else if (user && user.twoFactorEnabled === true) {
+		setDisplay2FADisableModal(true);
+		//updateUser({ twoFactorEnabled: false });
+		}
+	};
+
 	const handle2FAToggle = () => {
-		const new2FAStatus = !user.twoFactorEnabled;
-		updateUser({ twoFactorEnabled: new2FAStatus });
+		try {
+			manage2FAInit();
+		} catch (error: any) {
+			console.error('frontend: error initializing 2FA:', error);
+		}
+	};
+
+	useEffect(() => {
+		console.log(is2FAEnabled ? "2FA ON" : "2FA OFF");
+	  }, [is2FAEnabled]);
+
+
+
+	const enableTwoFactor = async (data: ModalInputs) => {
+		try {
+			console.log('frontend: data2FA being pass to back:', data);
+			await axios.post('http://localhost:8080/users/2FAEnable', 
+				{code: data.validationCode }, 
+				{withCredentials: true});
+			setDisplay2FAModal(false);
+			setError(undefined);
+			updateUser({ twoFactorEnabled: true });
+			console.log('frontend: user information successfully updated!');
+			setIs2FAEnabled(true);
+			console.log('is2FAEnabled =====', is2FAEnabled)
+		} catch (error: any) {
+			console.error('frontend: error enabling 2FA:', error);
+			console.log('frontend: error enabling 2FA:', error.response.data.message);
+			setError(error.response.data.message);
+		}
+	};
+
+	const disableTwoFactor = async (data: ModalInputs) => {
+		try {
+			await axios.post('http://localhost:8080/users/2FADisable', 
+				{code: data.validationCode }, 
+				{withCredentials: true});
+			setDisplay2FADisableModal(false);
+			setError(undefined);
+			updateUser({ twoFactorEnabled: false });
+			setIs2FAEnabled(false);
+		} catch (error: any) {
+			console.error('frontend: error disabling 2FA:', error);
+			setError(error.response.data.message);
+		}
 	};
 
 
@@ -134,6 +202,26 @@ const User = () => {
 					gameStats={gameStats}/>
 
 		</div>
+		{display2FAModal ? (
+                <TwoFactorMod
+                    title="TWO-FACTOR AUTHENTICATION"
+                    qrCodeDataUrl={qrCodeDataUrl}
+                    secret={twoFactorSecret}
+                    modalId={'Enable-2fa-modal'}
+                    closeModal={() => setDisplay2FAModal(false)}
+                    onSubmit={enableTwoFactor}
+                    error={error}
+                />
+            ) : null}
+        {display2FADisableModal ? (
+                <TwoFactorMod
+                    title="TWO-FACTOR AUTHENTICATION"
+                    modalId={'Disable-2fa-modal'}
+                    closeModal={() => setDisplay2FADisableModal(false)}
+                    onSubmit={disableTwoFactor}
+                    error={error}
+                />
+            ) : null}
 	</div>
 	)
 	: (
