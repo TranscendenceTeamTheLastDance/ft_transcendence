@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import './LoginSignup.css'
-import Particles from '../Home/Particles';
-import Hyperspace from '../assets/hyperspace.mp4'
+import './LoginSignup.css';
+import Hyperspace from '../assets/hyperspace.mp4';
 
 import user_icon from '../assets/person.png';
 import email_icon from '../assets/email.png';
@@ -124,30 +123,36 @@ const LoginSignup = () => {
 			</div>
 		</div>
 		<div className='submit-container'>
-			<div 
-				className={action==="Login"?"bg-gray-500 text-white py-2 px-4 rounded-lg text-lg font-bold mx-2":"bg-gray-100 py-2 px-4 rounded-lg text-lg font-bold mx-2"} 
-				onClick={(e) =>{setAction("Sign Up");}}
-				>Sign Up</div>
-			
-			<div 
-				className={action==="Sign Up"?"bg-gray-500 text-white py-2 px-4 rounded-lg text-lg font-bold mx-2":"bg-gray-100 py-2 px-4 rounded-lg text-lg font-bold mx-2"} 
-				onClick={(e)=>{setAction("Login");}}
-				>Login</div>	
-		</div>
-		<div className='submit-button'>
-			<button
+			{action==="Login" ? <div></div>:
+			<button 
 				className="bg-gray-500 text-white py-2 px-4 rounded-lg text-lg font-bold mx-2"
-				onClick={(e) => {
-					if (action === "Sign Up") {
-					handleSignUp(e);
-					} else {
-					handleSignIn(e);
-					}
-				}}
-				>
-				Submit
-			</button>
+				onClick={(e) =>{handleSignUp(e);}}
+				>Sign Up</button> }
+			{action==="Sign Up" ? <div></div>:
+			<button 
+				className="bg-gray-500 text-white py-2 px-4 rounded-lg text-lg font-bold mx-2"
+				onClick={(e)=>{handleSignIn(e);}}
+				>Login</button>}
 		</div>
+		<div className='switch-button'>
+    	{action === 'Login' ? (
+    	  <div>
+    	    <p>You don't have any account yet?{' '}
+    	      <span className='signInLink' onClick={(e) => {setAction('Sign Up');}}>
+    	        Sign Up
+    	      </span>
+    	    </p>
+    	  </div>) : (
+    	  <div>
+    	    <p>
+    	      You already have an account?{' '}
+    	      <span className='signInLink' onClick={(e) => {setAction('Login');}}>
+    	        Sign In
+    	      </span>
+    	    </p>
+    	  </div>
+    	)}
+  		</div>
 		<div className='42button'>
 			<button 
 				className="42buttonsubmit" onClick={handleRedir42}

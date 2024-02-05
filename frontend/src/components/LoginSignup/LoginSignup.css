@@ -86,8 +86,9 @@
 
 .submit-container{
 	display:flex;
-	gap: 30px;
 	margin: 30px auto;
+	align-items: center;
+	justify-content: center;
 }
 
 .submit {
@@ -123,7 +124,33 @@
 	cursor: pointer;
 }
 
-	.grey{
+.grey {
 	background: #eaeaea;
 	color: #676767;
-	}
+}
+
+.signInLink {
+	color: #3498db;
+	text-decoration: none;
+	cursor: pointer;
+  }
+  
+.signInLink:hover {
+	text-decoration: underline;
+  }
+
+.switch-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.bg-gray-500.text-white {
+	background-color: gray; /* Initial background color */
+	color: white; /* Initial text color */
+  }
+  
+  .bg-gray-500.text-white:hover {
+	background-color: lightgray; /* Background color on hover */
+	color: black; /* Text color on hover */
+  }
