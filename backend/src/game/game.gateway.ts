@@ -36,13 +36,14 @@ export class GameGateway {
           // Informer l'autre joueur de la déconnexion
           gameRoom.notifyPlayerOfDisconnect(client);
           // Supprimer la salle de jeu
+          gameRoom.stopGameLoop();
           this.gameRooms.delete(roomId);
         }
       }
     }
 
     @SubscribeMessage('client-disconnect')
-    handleClientDisconnect(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+    handleClientDisconnect(@ConnectedSocket() client: Socket) {
       this.handleDisconnect(client);
     }
   
@@ -81,5 +82,25 @@ export class GameGateway {
         gameRoom.updatePaddlePosition(data.y, data.x);
       }
     }
-
+    
+    @SubscribeMessage('finish')
+    handleFinish(@ConnectedSocket() client: Socket) {
+      let roomId: string | null = null;
+      this.deleteplayerInWaitList(client);
+      this.gameRooms.forEach((room, id) => {
+        if (room.includesPlayer(client)) {
+          roomId = id;
+        }
+      });
+  
+      if (roomId) {
+        const gameRoom = this.gameRooms.get(roomId);
+        if (gameRoom) {
+          //peut etre notifie les deux joueur que la partie est terminer????
+          // Supprimer la salle de jeu
+          gameRoom.stopGameLoop();
+          this.gameRooms.delete(roomId);
+        }
+      }
+    }
 }

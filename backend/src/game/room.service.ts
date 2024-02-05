@@ -27,7 +27,7 @@ export class GameRoom {
     }, this.updateInterval);
   }
 
-  public stopGameLoop(): void {
+  stopGameLoop(): void {
     if (this.gameLoopInterval) {
       clearInterval(this.gameLoopInterval);
       this.gameLoopInterval = null;

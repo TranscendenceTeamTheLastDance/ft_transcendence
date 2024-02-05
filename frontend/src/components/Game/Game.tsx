@@ -81,6 +81,8 @@ const PongGame: React.FC = () => {
         return;
     
     let animationFrameId: number;
+    let finish: boolean = false;
+    let mainPlayer: boolean = true;//ca va etre utile
     
     socket.emit('join');
     
@@ -140,7 +142,11 @@ const PongGame: React.FC = () => {
             ball.x = gameState.ball.x;
             ball.y = gameState.ball.y;
             user.score = gameState.score.scoreU1;
-            com.score = gameState.score.scoreU2;           
+            com.score = gameState.score.scoreU2;
+            if ((user.score || com.score ) >= 10) {
+                socket.emit('finish');
+                finish = true;
+            }        
         });
 
         // creation des formes
@@ -152,6 +158,7 @@ const PongGame: React.FC = () => {
                 const tmp = com.x;
                 com.x = user.x;
                 user.x = tmp;
+                mainPlayer = false;
             }
         });
 
@@ -162,6 +169,13 @@ const PongGame: React.FC = () => {
         const gameLoop = () => {
             if (waitingForPlayerRef.current) {
                 drawText(ctx, "Waiting for another player...", canvas.width / 2 - 100, canvas.height / 2);
+            }
+            else if (finish) {
+                drawRect(ctx, 0, 0, canvas.width, canvas.height, "#000");
+                drawText(ctx, `Player 2: ${com.score}`, canvas.width - 150, 30);
+                drawText(ctx, `Player 1: ${user.score}`, 10, 30);
+                drawText(ctx, "Game finished", canvas.width / 2 - 50, canvas.height / 2);
+
             }
             else if (playerLeftGame.current) {
                 drawRect(ctx, 0, 0, canvas.width, canvas.height, "#000");
@@ -214,15 +228,6 @@ const PongGame: React.FC = () => {
 
     return (
         <div className='game-container'>
-                {showOptions && (
-                <div className="options-container">
-                    {/* Ici, vous pouvez ajouter vos options de jeu */}
-                    <h2>Game Options</h2>
-                    {/* Exemple d'options */}
-                    {/* ... */}
-                    <button onClick={startGame}>Start Game</button>
-                </div>
-            )}
             <canvas ref={canvasRef} width="800" height="400" className='canvas'/>
         </div>
     );
