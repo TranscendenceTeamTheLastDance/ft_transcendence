@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import './LoginSignup.css'
 import Particles from '../Home/Particles';
+import Hyperspace from '../assets/hyperspace.mp4'
 
 import user_icon from '../assets/person.png';
 import email_icon from '../assets/email.png';
@@ -78,7 +79,8 @@ const LoginSignup = () => {
 
 	return (
 	<div className ='container'>
-		<Particles className="absolute inset-0 -z-10 animate-fade-in" quantity={1000} />
+		{/* <Particles className="absolute inset-0 -z-10 animate-fade-in" quantity={1000} /> */}
+		<video src= {Hyperspace} autoPlay loop muted className='video'></video>
 		<div className='header'>
 			<div className='text'>{action}</div>
 			<div className='underline'></div>

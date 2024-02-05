@@ -4,7 +4,6 @@ import UserGameStats from '../components/User/UserGameStats.tsx';
 import FriendsList from '../components/User/UserFriendsList.tsx';
 import Particles from '../components/Home/Particles.tsx';
 import NotConnected from '../components/NotSignedIn.tsx';
-import axios from 'axios';
 import { useUserContext } from '../context/UserContext';
 import { useAuthAxios } from '../context/AuthAxiosContext';
 import UpdateModal from '../components/UpdateModal.tsx'
@@ -59,7 +58,7 @@ const User = () => {
 		  };
 		  console.log("frontend: data being passed to back:", userData);
 		  try {
-			const response = await axios.patch('http://localhost:8080/users', userData, {
+			const response = await authAxios.patch('/users', userData, {
 			  withCredentials: true,
 			});
 				console.log('frontend: user information successfully updated!', response.data);
@@ -78,7 +77,7 @@ const User = () => {
 			console.log("frontend: image being sent :", formData);
 
 			try {
-				const response = await axios.post('http://localhost:8080/users/upload-profile-picture', formData, {
+				const response = await authAxios.post('/users/upload-profile-picture', formData, {
 					withCredentials: true,
 				});
 				console.log('frontend: new profile pic successfully uploaded!', response.data);
@@ -127,7 +126,7 @@ const User = () => {
 	const enableTwoFactor = async (data: ModalInputs) => {
 		try {
 			console.log('frontend: data2FA being pass to back:', data);
-			await axios.post('http://localhost:8080/users/2FAEnable', 
+			await authAxios.post('/users/2FAEnable', 
 				{code: data.validationCode }, 
 				{withCredentials: true});
 			setDisplay2FAModal(false);
@@ -145,7 +144,7 @@ const User = () => {
 
 	const disableTwoFactor = async (data: ModalInputs) => {
 		try {
-			await axios.post('http://localhost:8080/users/2FADisable', 
+			await authAxios.post('/users/2FADisable', 
 				{code: data.validationCode }, 
 				{withCredentials: true});
 			setDisplay2FADisableModal(false);
