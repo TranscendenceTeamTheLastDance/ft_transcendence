@@ -1,4 +1,10 @@
-import { Logger, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Logger,
+  UseFilters,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
   ConnectedSocket,
@@ -30,13 +36,13 @@ import { ConfigService } from '@nestjs/config';
   },
   namespace: 'chat', // spécification pour éviter les conflits
 })
-
 @UseFilters(BadRequestTransformationFilter)
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
   @WebSocketServer()
   private io: Server;
   private logger: Logger = new Logger(ChatGateway.name);
   config: any;
+  private socketsID = new Map<string, Socket[]>(); // Map pour stocker les sockets des utilisateurs
 
   constructor(
     private jwtService: JwtService,
@@ -49,20 +55,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
   afterInit(server: Server) {
     this.logger.log('Initialized!');
 
-    this.io.on('connection', (socket) => {
-      this.logger.log('Client connected: ' + socket.id);
-    });
-
     // setInterval(() => this.io.emit('message', 'hello'), 2000);
   }
-
 
   handleConnection(client: Socket, ...args: any[]) {
     this.logger.log(`Client connected: ${client.id}`);
     const cookieName = this.configService.get('JWT_ACCESS_TOKEN_COOKIE'); // Récupérez le nom du cookie JWT à partir de la configuration
     const token = client.handshake.headers.cookie.split(`${cookieName}=`)[1]; // Récupérez le token JWT du cookie
-    this.logger.log('Token: ' + token);
-  
+
     if (token) {
       this.logger.log('Token: ' + token);
       const user = this.jwtService.decode(token); // Décoder le token
@@ -74,14 +74,16 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     }
   }
 
-  
   @SubscribeMessage(ChatEvent.Create)
   async onCreateChannel(
     @MessageBody() channel: CreateChannelDTO,
     @ConnectedSocket() client: Socket,
   ) {
     try {
-      const createdChannel = await this.channelsService.createChannel(channel, client.data.user);
+      const createdChannel = await this.channelsService.createChannel(
+        channel,
+        client.data.user,
+      );
       // Envoyer une réponse au client pour indiquer que le canal a été créé avec succès
       return { event: ChatEvent.Create, data: createdChannel };
     } catch (error) {
@@ -90,11 +92,19 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     }
   }
 
-  // @SubscribeMessage(ChatEvent.Join)
-  // async onJoinChannel(@MessageBody() channel: JoinChannelDTO, @ConnectedSocket() client: Socket) {
-  //   await this.channelsService.joinChannel(channel, client.data.user);
-  //   //client.join(channel.channel);
-  // }
+  @SubscribeMessage(ChatEvent.Join)
+  async onJoinChannel(
+    @MessageBody() channel: JoinChannelDTO,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const data = await this.channelsService.joinChannel(
+      channel,
+      client.data.user,
+    );
+    this.io.to(channel.name).emit(ChatEvent.Join, data.toChannel);
+    client.join(channel.name);
+    return { event: 'youJoined', data: data.toClient };
+  }
 
   @SubscribeMessage(ChatEvent.Message)
   onMessage(@MessageBody() message: string): WsResponse<string> {

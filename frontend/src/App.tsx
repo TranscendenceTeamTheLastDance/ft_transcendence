@@ -5,7 +5,7 @@ import Signwith42 from './components/LoginSignup/Signwith42';
 import Home from './components/Home/Home';
 import User from './pages/UserPage';
 import { UserProvider } from './context/UserContext';
-import Chat from './pages/ChatPage';
+import ChatPage from './pages/ChatPage';
 
 
 function App() {
@@ -16,7 +16,7 @@ function App() {
 			<Route path="/signwith42" element={<Signwith42 />} />
 			<Route path="/home" element={<Home />} />
 			<Route path="/user" element={<User />} />
-			<Route path="/chat" element={<Chat />} />
+			<Route path="/chat" element={<ChatPage />} />
 		</Routes>
 	</UserProvider>
   );
