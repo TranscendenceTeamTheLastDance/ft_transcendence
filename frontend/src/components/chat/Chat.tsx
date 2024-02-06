@@ -17,7 +17,7 @@ import CreateChannel from "./CreateChannel";
 // import DmConversation from './DmConversation';
 // import DmCreate from './DmCreate';
 // import DmList from './DmList';
-// import JoinChannel from './JoinChannel';
+import JoinChannel from './JoinChannel';
 
 import { useUserContext } from "../../context/UserContext";
 import './index.css';
@@ -71,7 +71,6 @@ const Chat = () => {
   const { user, fetchUserData } = useUserContext();
   const [showCreateChannelModal, setShowCreateChannelModal] =
     useState<boolean>(false);
-    // eslint-disable-next-line
   const [showJoinChannelModal, setShowJoinChannelModal] =
     useState<boolean>(false);
     // eslint-disable-next-line
@@ -138,6 +137,15 @@ const Chat = () => {
           <CreateChannel
             setShowModal={setShowCreateChannelModal}
             socket={socket}
+          />
+        </ChatModal>
+      )}
+      {showJoinChannelModal && (
+        <ChatModal>
+          <JoinChannel
+            setShowModal={setShowJoinChannelModal}
+            socket={socket}
+            joinedChannels={joinedChannels}
           />
         </ChatModal>
       )}
