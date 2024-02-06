@@ -1,7 +1,8 @@
 {
   "devDependencies": {
     "@types/node": "^20.10.7",
-    "pnpm": "^8.14.0"
+    "pnpm": "^8.14.0",
+    "sonner": "^1.4.0"
   },
   "dependencies": {
     "qrcode": "^1.5.3"
