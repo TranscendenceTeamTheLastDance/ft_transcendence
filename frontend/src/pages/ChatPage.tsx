@@ -17,7 +17,8 @@ const Chat: React.FC = () => {
 
   // Effect pour initialiser la connexion socket
   useEffect(() => {
-    const newSocket = io.connect("http://localhost:8080/chat"); // Utilisez io.connect pour clarifier l'intention de connexion
+    const newSocket = io("http://localhost:8080/chat", { withCredentials: true }); // Utilisez io() pour clarifier l'intention de connexion
+
     setSocket(newSocket);
 
     // Nettoyez la connexion socket lors du démontage du composant

@@ -40,3 +40,4 @@ async function bootstrap(): Promise<string>{
   }
 })();
 
+// Le cookie n'est pas envoyé avec les demandes WebSocket. Par défaut, les navigateurs n'envoient pas les cookies avec les demandes WebSocket. Vous devrez peut-être configurer explicitement le client pour envoyer le cookie.

@@ -21,7 +21,7 @@ export class ChannelsService {
           password: createChatDto.password,
           users: {
             connect: {
-              id: createChatDto.ownerId,
+              id: user.id,
             },
           },
         },

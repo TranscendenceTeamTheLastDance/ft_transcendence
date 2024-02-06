@@ -49,6 +49,12 @@ const CreateChannel: React.FC = () => {
 		socket.on('create', (data: any) => {
 			console.log('create', data);
 
+			if (data.error) {
+				alert(data.error);
+			} else {
+				alert('Canal créé avec succès !');
+			}
+
 		});
 
 	};
