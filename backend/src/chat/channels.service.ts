@@ -9,16 +9,15 @@ import { CreateChannelDTO, JoinChannelDTO } from './chat.dto';
 export class ChannelsService {
   constructor(private prisma: PrismaService) {}
 
-  async createChannel(createChatDto: CreateChannelDTO, user: User) {
+  async createChannel(createChatDto: CreateChannelDTO, user: User): Promise<void>  {
     let createdChannel: any;
     try {
-      console.log('createCHATDTO:', createChatDto);
       createdChannel = await this.prisma.channel.create({
         data: {
           name: createChatDto.name,
           type: createChatDto.type,
-          ownerId: createChatDto.ownerId,
           password: createChatDto.password,
+          isDM: false,
           users: {
             create: [
               {

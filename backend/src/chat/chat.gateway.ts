@@ -79,13 +79,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     @MessageBody() channel: CreateChannelDTO,
     @ConnectedSocket() client: Socket,
   ) {
+    this.logger.log('Create channel: ' + JSON.stringify(channel));
+    this.logger.log('User: ' + JSON.stringify(client.data.user));
     try {
-      const createdChannel = await this.channelsService.createChannel(
+      const data = await this.channelsService.createChannel(
         channel,
         client.data.user,
       );
-      // Envoyer une réponse au client pour indiquer que le canal a été créé avec succès
-      return { event: ChatEvent.Create, data: createdChannel };
+      client.join(channel.name);
+      return { event: 'youJoined', data: data };
     } catch (error) {
       // Gérer les erreurs et renvoyer une réponse appropriée au client
       throw new WsException('Failed to create channel');
