@@ -58,16 +58,17 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     // setInterval(() => this.io.emit('message', 'hello'), 2000);
   }
 
-  handleConnection(client: Socket, ...args: any[]) {
+  async handleConnection(client: Socket, ...args: any[]) {
     this.logger.log(`Client connected: ${client.id}`);
     const cookieName = this.configService.get('JWT_ACCESS_TOKEN_COOKIE'); // Récupérez le nom du cookie JWT à partir de la configuration
     const token = client.handshake.headers.cookie.split(`${cookieName}=`)[1]; // Récupérez le token JWT du cookie
 
     if (token) {
       this.logger.log('Token: ' + token);
-      const user = this.jwtService.decode(token); // Décoder le token
-      client.data = { user }; // Attribuez l'utilisateur récupéré à partir du token
-      this.logger.log('User data: ' + JSON.stringify(client.data.user));
+      const payload = this.jwtService.decode(token); // Décoder le token\
+	  this.logger.log("Payload: " + JSON.stringify(payload));
+	  client.data.user = await this.userService.getUnique(payload.sub); // Récupérez l'utilisateur à partir de la base de données
+	  this.logger.log("User attache au socket " + client.data.user.id);
     } else {
       this.logger.error('No token found in cookies.');
       // Gérez le cas où aucun token n'est trouvé dans les cookies
