@@ -196,7 +196,7 @@ export class AuthService {
 
     if (accessToken) {
         const token = await this.jwt.signAsync(payload, {
-          expiresIn: '15s',
+          expiresIn: '15m',
           secret: secret,
         }); // the fonction signAsync is used to sign the token
         return { JWTtoken: token };
