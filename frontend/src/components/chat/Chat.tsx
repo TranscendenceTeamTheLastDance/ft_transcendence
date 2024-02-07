@@ -39,7 +39,7 @@ export interface ChannelType {
 
 export interface userDto {
   id: number;
-  login: string;
+  username: string;
   first_name: string;
   last_name: string;
   email: string;
@@ -52,27 +52,11 @@ export interface userDto {
   status: string;
 }
 
-export const dummyUserDto: userDto = {
-  id: 621458,
-  login: "nibenoit",
-  first_name: "nicolas",
-  last_name: "benoit",
-  email: "lorem@ipsum.fr",
-  imagePath: "image",
-  displayName: "NoobMaster",
-  description: "",
-  intraImageURL: "",
-  bannerPath: "",
-  status: "",
-};
-
 const Chat = () => {
 
   const { user } = useUserContext();
-  const [showCreateChannelModal, setShowCreateChannelModal] =
-    useState<boolean>(false);
-  const [showJoinChannelModal, setShowJoinChannelModal] =
-    useState<boolean>(false);
+  const [showCreateChannelModal, setShowCreateChannelModal] = useState<boolean>(false);
+  const [showJoinChannelModal, setShowJoinChannelModal] = useState<boolean>(false);
     // eslint-disable-next-line
   const [showDmSomeoneModal, setShowDmSomeoneModal] = useState<boolean>(false);
   const [socket, setSocket] = useState<Socket>();
