@@ -7,10 +7,10 @@ import chat_channel from '../assets/chat/Chat.svg';
 import chat_plus from '../assets/chat/chat_plus.svg';
 import chat_DM from '../assets/chat/comment.svg';
 // import find_someone from '@/assets/chat/find_someone.png';
-// import chat_join from '@/assets/chat/join-channel.svg';
+import chat_join from '../assets/chat/join-channel.svg';
 // import { useApi } from "@/hooks/useApi";
 
-// import ChatList from './ChatList';
+import ChatList from './ChatList';
 import ChatModal from "./ChatModal";
 // import Conversation from './Conversation';
 import CreateChannel from "./CreateChannel";
@@ -21,6 +21,7 @@ import JoinChannel from './JoinChannel';
 
 import { useUserContext } from "../../context/UserContext";
 import './index.css';
+// import axios from 'axios';
 
 export interface Channel {
   name: string;
@@ -65,10 +66,9 @@ export const dummyUserDto: userDto = {
   status: "",
 };
 
-// eslint-disable-next-line
 const Chat = () => {
 
-  const { user, fetchUserData } = useUserContext();
+  const { user } = useUserContext();
   const [showCreateChannelModal, setShowCreateChannelModal] =
     useState<boolean>(false);
   const [showJoinChannelModal, setShowJoinChannelModal] =
@@ -77,20 +77,12 @@ const Chat = () => {
   const [showDmSomeoneModal, setShowDmSomeoneModal] = useState<boolean>(false);
   const [socket, setSocket] = useState<Socket>();
   const [loading, setLoading] = useState<boolean>(true);
-  // eslint-disable-next-line
   const [joinedChannels, setJoinedChannels] = useState<ChannelType[]>([]);
-  // eslint-disable-next-line
   const [currentChannel, setCurrentChannel] = useState<ChannelType | null>(
     null
   );
   const [showChannels, setShowChannels] = useState<boolean>(true);
-  
   let me: userDto | undefined;
-
-  useEffect(() => {
-	fetchUserData();
-  }, [fetchUserData]);
-
 
 
   useEffect(() => {
@@ -102,9 +94,31 @@ const Chat = () => {
       setLoading(false);
       console.log("connected");
 
-      tmpSocket.on("exception", (data) => {
+	  tmpSocket.emit('joinedChannels', (data: ChannelType[]) => {
+        setJoinedChannels(data);
+		console.log("joinedChannels", data);
+      });
+
+      tmpSocket.on('youJoined', (data: ChannelType) => {
+        setCurrentChannel(data);
+        setJoinedChannels((prev) => [...prev, data]);
+		console.log("youJoined", data);
+      });
+
+      tmpSocket.on('dm', (data) => {
+        setCurrentChannel(data.channel);
+        setJoinedChannels((prev) => {
+          if (!prev.some((c) => c.name === data.channel.name)) {
+            return [...prev, data.channel];
+          }
+          return prev;
+        });
+        setShowChannels(false);
+      });
+
+      tmpSocket.on('exception', (data) => {
         if (Array.isArray(data.message)) {
-          alert(data.message.join("\n"));
+          alert(data.message.join('\n'));
         } else {
           alert(data.message);
         }
@@ -117,7 +131,6 @@ const Chat = () => {
       socket?.off("dm");
       socket?.disconnect();
     };
-    // eslint-disable-next-line
   }, []);
 
   if (loading) return <div>loading</div>;
@@ -165,7 +178,9 @@ const Chat = () => {
                 className="rounded-full p-1 hover:bg-white-3"
                 title="Join a channel"
                 onClick={() => setShowJoinChannelModal(true)}
-              ></button>
+              >
+				<img className="w-5 md:w-6" src={chat_join} alt="join channel" />
+			  </button>
               <button
                 title="Create a channel"
                 onClick={() => setShowCreateChannelModal(true)}
@@ -175,6 +190,11 @@ const Chat = () => {
               </button>
             </div>
           </div>
+		  <ChatList
+            joinedChannels={joinedChannels.filter((c) => c.isDM === false)}
+            setCurrentChannel={setCurrentChannel}
+            currentChannel={currentChannel}
+          />
         </div>
       ) : (
         <div className="flex w-[35%] flex-col md:w-auto">
