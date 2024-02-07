@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom';
 import './LoginSignup.css';
 import Hyperspace from '../assets/hyperspace.mp4';
+import animationData from '../assets/animation.json';
 
 import user_icon from '../assets/person.png';
 import email_icon from '../assets/email.png';
@@ -9,6 +10,7 @@ import password_icon from '../assets/password.png';
 
 import TwoFactorFormMod from './TwoFactorForm.tsx';
 import { Toaster, toast } from 'sonner';
+import Lottie, {LottieRefCurrentProps}from 'lottie-react';
 
 
 const LoginSignup = () => {
@@ -16,6 +18,7 @@ const LoginSignup = () => {
 	const [formData, setFormData] = useState({ username: '', email: '', password: '' });
 	const [twoFactor, setTwoFactor] = useState(false);
 	const [userMail, setUserMail] = useState('');
+	const phoneRef = useRef<LottieRefCurrentProps>(null);
 
 	const handleChange = (e) => {
 		const newFormData = ({ ...formData, [e.target.name]: e.target.value });
@@ -158,11 +161,9 @@ const LoginSignup = () => {
     		  </div>
     		)}
   			</div>
-			<div className='42button'>
-				<button 
-					className="42buttonsubmit" onClick={handleRedir42}
-					> login with 42
-				</button>
+			<div className="button42" onClick={handleRedir42}>
+				<Lottie className='animation42' onMouseOver={() => {phoneRef.current?.play()}} lottieRef={phoneRef} animationData={animationData} style={{width: '50px', height: '50px'}} />
+				<button className="buttonsubmit42"> Login with 42</button>
 			</div>
 			{twoFactor ? (
     	            <TwoFactorFormMod

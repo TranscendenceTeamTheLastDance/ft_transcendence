@@ -20,7 +20,9 @@
     "styled-components": "^6.1.6",
     "tailwindcss-debug-screens": "^2.2.1",
     "web-vitals": "^2.1.4",
-    "sonner": "^1.4.0"
+    "sonner": "^1.4.0",
+    "lottie-react": "^2.4.0",
+    "@lottiefiles/lottie-interactivity": "^1.6.2"
   },
   "scripts": {
     "start": "react-scripts start",

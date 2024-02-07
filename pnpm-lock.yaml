@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@lottiefiles/lottie-interactivity':
+    specifier: ^1.6.2
+    version: 1.6.2
   qrcode:
     specifier: ^1.5.3
     version: 1.5.3
@@ -13,6 +16,9 @@ devDependencies:
   '@types/node':
     specifier: ^20.10.7
     version: 20.11.5
+  lottie-react:
+    specifier: ^2.4.0
+    version: 2.4.0(react-dom@18.2.0)(react@18.2.0)
   pnpm:
     specifier: ^8.14.0
     version: 8.14.1
@@ -21,6 +27,12 @@ devDependencies:
     version: 1.4.0(react-dom@18.2.0)(react@18.2.0)
 
 packages:
+
+  /@lottiefiles/lottie-interactivity@1.6.2:
+    resolution: {integrity: sha512-psmG/frpi4IIJjBa+Mj0ivKtfNRkasUnvU6sBrVfm7nSwBpEoyMop16uIEYg5PYdpboFbQQhibmwC006KGZhsA==}
+    dependencies:
+      core-js: 3.35.1
+    dev: false
 
   /@types/node@20.11.5:
     resolution: {integrity: sha512-g557vgQjUUfN76MZAN/dt1z3dzcUsimuysco0KeluHgrPdJXkP/XdAURgyO2W9fZWHRtRBiVKzKn8vyOAwlG+w==}
@@ -62,6 +74,11 @@ packages:
 
   /color-name@1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
+    dev: false
+
+  /core-js@3.35.1:
+    resolution: {integrity: sha512-IgdsbxNyMskrTFxa9lWHyMwAJU5gXOPP+1yO+K59d50VLVAIDAbs7gIv705KzALModfK3ZrSZTPNpC0PQgIZuw==}
+    requiresBuild: true
     dev: false
 
   /decamelize@1.2.0:
@@ -115,6 +132,21 @@ packages:
     hasBin: true
     dependencies:
       js-tokens: 4.0.0
+    dev: true
+
+  /lottie-react@2.4.0(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-pDJGj+AQlnlyHvOHFK7vLdsDcvbuqvwPZdMlJ360wrzGFurXeKPr8SiRCjLf3LrNYKANQtSsh5dz9UYQHuqx4w==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      lottie-web: 5.12.2
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: true
+
+  /lottie-web@5.12.2:
+    resolution: {integrity: sha512-uvhvYPC8kGPjXT3MyKMrL3JitEAmDMp30lVkuq/590Mw9ok6pWcFCwXJveo0t5uqYw1UREQHofD+jVpdjBv8wg==}
     dev: true
 
   /p-limit@2.3.0:
