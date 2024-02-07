@@ -46,7 +46,7 @@ export class ChannelsService {
         name: channelDTO.name,
       },
       include: { users: true },
-    });
+    }); 
 
     if (!channel) {
       throw new WsException(`Channel ${channelDTO.name} not found`);
@@ -96,5 +96,42 @@ export class ChannelsService {
         isDM: channel.isDM,
       },
     };
+  }
+
+  async getChannelList() {
+    const channels: any = await this.prisma.channel.findMany({
+      where: {
+        type: {
+          not: ChannelType.PRIVATE,
+        },
+        isDM: {
+          not: true,
+        },
+      },
+      // exclude password and isDM field
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        type: true,
+        name: true,
+        messages: {
+          orderBy: {
+            id: 'desc',
+          },
+          take: 1,
+        },
+      },
+    });
+
+    channels.forEach((channel: any) => {
+      if (channel.type === ChannelType.PUBLIC) {
+        channel.lastMessage = channel.messages[0];
+      }
+
+      delete channel.messages;
+    });
+
+    return channels;
   }
 }

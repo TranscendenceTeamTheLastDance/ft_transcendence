@@ -68,7 +68,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
       const payload = this.jwtService.decode(token); // Décoder le token\
 	  this.logger.log("Payload: " + JSON.stringify(payload));
 	  client.data.user = await this.userService.getUnique(payload.sub); // Récupérez l'utilisateur à partir de la base de données
-	  this.logger.log("User attache au socket " + client.data.user.id);
+	//   this.logger.log("User attache au socket " + client.data.user.id);
     } else {
       this.logger.error('No token found in cookies.');
       // Gérez le cas où aucun token n'est trouvé dans les cookies
@@ -104,9 +104,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
       channel,
       client.data.user,
     );
-    this.io.to(channel.name).emit(ChatEvent.Join, data.toChannel);
-    client.join(channel.name);
+    this.io.to(channel.name).emit(ChatEvent.Join, data.toChannel); // Envoyer un message à tous les utilisateurs du canal
+    client.join(channel.name); // Ajouter l'utilisateur au canal
+	this.logger.log("User " + client.data.user.username + " joined channel " + channel.name);
     return { event: 'youJoined', data: data.toClient };
+  }
+
+  @SubscribeMessage(ChatEvent.ChannelList)
+  async onChannelList() {
+    return await this.channelsService.getChannelList();
   }
 
   @SubscribeMessage(ChatEvent.Message)
