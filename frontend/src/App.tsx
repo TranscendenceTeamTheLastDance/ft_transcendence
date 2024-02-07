@@ -3,7 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import LoginSignup from './components/LoginSignup/LoginSignup';
 import Signwith42 from './components/LoginSignup/Signwith42';
 import Home from './components/Home/Home';
-import PongGame from './components/Game/Game';
+import PongGame from './components/Game/HomeGame';
 import User from './pages/UserPage';
 import { UserProvider } from './context/UserContext';
 import Chat from './pages/ChatPage';

@@ -13,11 +13,11 @@ export class GameGateway {
     @WebSocketServer()
     server: Server;
 
-    private waitingPlayers: Socket[] = [];
+    private waitingPlayers: { client: Socket, username: string }[] = [];
     private gameRooms: Map<string, GameRoom> = new Map();
 
     deleteplayerInWaitList(client: Socket) {
-      this.waitingPlayers = this.waitingPlayers.filter(player => player.id !== client.id);
+      this.waitingPlayers = this.waitingPlayers.filter(player => player.client.id !== client.id);
     }
   
     handleDisconnect(@ConnectedSocket() client: Socket) {
@@ -48,25 +48,31 @@ export class GameGateway {
     }
   
     @SubscribeMessage('join')
-    handleJoin(@ConnectedSocket() client: Socket) {
-      this.waitingPlayers.push(client);
+    handleJoin(@ConnectedSocket() client: Socket, 
+    @MessageBody() data: { username: string}) {
+      this.waitingPlayers.push({ client, username: data.username });
   
       if (this.waitingPlayers.length >= 2) {
         const player1 = this.waitingPlayers.shift();
         const player2 = this.waitingPlayers.shift();
   
         if (player1 && player2) {
-          const roomID = this.createRoomID(player1, player2);
-          const gameRoom = new GameRoom(player1, player2);
+          const roomID = this.createRoomID(player1.client, player2.client);
+          const gameRoom = new GameRoom(player1.client, player2.client);
           this.gameRooms.set(roomID, gameRoom);
   
           // Informer les joueurs de l'ID de la salle
-          player1.emit('room-id', {roomID : roomID, Nplayer : 1});
-          player2.emit('room-id', {roomID : roomID, Nplayer : 2});
+          // username indefini donc peut etre definir la classe player avec un socket et un username
+          console.log("username palyer1: ", player1.username);
+          console.log("username palyer2: ", player2.username);
+          player1.client.emit('room-id', {roomID : roomID, NumPlayer : 1, playerName1: player1.username, playerName2: player2.username});
+          player2.client.emit('room-id', {roomID : roomID, NumPlayer : 2, playerName1: player1.username, playerName2: player2.username});
+          console.log("startloop");
+          gameRoom.startGameLoop();
         }
       }
     }
-  
+
     private createRoomID(player1: Socket, player2: Socket): string {
       return `room-${Date.now()}-${player1.id}-${player2.id}`;
     }
