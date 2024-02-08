@@ -62,17 +62,32 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     try {
       this.logger.log(`Client connected: ${client.id}`);
       const cookieName = this.configService.get('JWT_ACCESS_TOKEN_COOKIE'); // Récupérez le nom du cookie JWT à partir de la configuration
-      const token = client.handshake.headers.cookie.split(`${cookieName}=`)[1]; // Récupérez le token JWT du cookie
+      const cookieHeaderValue = client.handshake.headers.cookie;
+      
+      if (!cookieHeaderValue) {
+        this.logger.error('No cookies found in the request headers.');
+        client.disconnect(); // Déconnecter proprement le client
+        return;
+      }
+      
+      const token = cookieHeaderValue.split(`${cookieName}=`)[1]; // Récupérez le token JWT du cookie
 
-      if (token) {
-        this.logger.log('Token: ' + token);
-        const payload = this.jwtService.decode(token); // Décoder le token\
-        this.logger.log("Payload: " + JSON.stringify(payload));
-        client.data.user = await this.userService.getUnique(payload.sub); // Récupérez l'utilisateur à partir de la base de données
-        //   this.logger.log("User attache au socket " + client.data.user.id);
-      } else {
-        this.logger.error('No token found in cookies.');
-        // Gérez le cas où aucun token n'est trouvé dans les cookies
+      if (!token) {
+        this.logger.error('No JWT token found in cookies.');
+        client.disconnect(); // Déconnecter proprement le client
+        return;
+      }
+
+      this.logger.log('Token: ' + token);
+      const payload = this.jwtService.decode(token); // Décoder le token
+      this.logger.log("Payload: " + JSON.stringify(payload));
+      client.data.user = await this.userService.getUnique(payload.sub); // Récupérez l'utilisateur à partir de la base de données
+
+      if (!client.data.user) {
+        // Gérez la situation où l'utilisateur n'est pas correctement identifié
+        this.logger.error('User not authenticated');
+        client.disconnect(); // Déconnecter proprement le client
+        return;
       }
 
       const username = client.data.user.username;
@@ -85,9 +100,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
       client.join(channelsName);
     } catch (error) {
       // Gérer les erreurs et renvoyer une réponse appropriée au client
-      throw new WsException('Failed to handle connection');
+      this.logger.error('Failed to handle connection: ' + error.message);
+      client.disconnect(); // Déconnecter proprement le client en cas d'erreur
     }
   }
+
 
   handleDisconnect(client: Socket) {
     this.logger.log('Client disconnected: ' + client.id);
