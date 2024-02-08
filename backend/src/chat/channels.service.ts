@@ -3,11 +3,28 @@ import { WsException } from '@nestjs/websockets';
 import { ChannelRole, ChannelType, Prisma, User } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 
-import { CreateChannelDTO, JoinChannelDTO } from './chat.dto';
+import { CreateChannelDTO, JoinChannelDTO, SendMessageDTO } from './chat.dto';
+
+type ChannelWithUsers = Prisma.ChannelGetPayload<{ include: { users: true } }>;
 
 @Injectable()
 export class ChannelsService {
   constructor(private prisma: PrismaService) {}
+
+  async getChannel(channelName: string): Promise<ChannelWithUsers> {
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: channelName,
+      },
+      include: { users: true },
+    });
+
+    if (!channel) {
+      throw new WsException(`Channel ${channelName} not found`);
+    }
+
+    return channel;
+  }
 
   async createChannel(createChatDto: CreateChannelDTO, user: User): Promise<void>  {
     let createdChannel: any;
@@ -164,5 +181,39 @@ export class ChannelsService {
       const { password, ...channelWithoutPassword } = cu.channel;
       return channelWithoutPassword;
     });
+  }
+
+  async sendMessage(message: SendMessageDTO, user: User) {
+    const channel = await this.getChannel(message.channel);
+
+    const channelUser = channel.users.find((u) => u.userId === user.id);
+    if (!channelUser) {
+      throw new WsException('You are not in this channel');
+    }
+
+    // if (this.muted.has(user.id)) {
+    //   throw new WsException('You are muted in this channel');
+    // }
+
+    const created = await this.prisma.message.create({
+      data: {
+        content: message.content,
+        author: { connect: { id: user.id } },
+        channel: { connect: { name: channel.name } },
+      },
+      include: {
+        author: true,
+      },
+    });
+
+    return {
+      createdAt: created.createdAt,
+      content: created.content,
+      channel: channel.name,
+      user: {
+        ...created.author,
+        role: channelUser.role,
+      },
+    };
   }
 }

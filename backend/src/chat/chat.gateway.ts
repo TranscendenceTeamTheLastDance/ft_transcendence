@@ -22,7 +22,11 @@ import { Server, Socket } from 'socket.io';
 import { BadRequestTransformationFilter } from '../utils/bad-request-exception.filter';
 
 import { ChannelsService } from './channels.service';
-import { CreateChannelDTO, JoinChannelDTO } from './chat.dto';
+import { 
+  CreateChannelDTO,
+  JoinChannelDTO,
+  SendMessageDTO 
+} from './chat.dto';
 import { ChatEvent } from './chat.state';
 import { UserService } from 'src/user/user.service';
 import { JwtStrategy } from 'src/auth/strategy';
@@ -167,7 +171,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
   }
 
   @SubscribeMessage(ChatEvent.Message)
-  onMessage(@MessageBody() message: string): WsResponse<string> {
-    return { event: ChatEvent.Message, data: 'You sent: ' + message };
+  async onMessage(@MessageBody() messageDTO: SendMessageDTO, @ConnectedSocket() client: Socket) {
+    const message = await this.channelsService.sendMessage(messageDTO, client.data.user);
+    this.io.to(messageDTO.channel).emit(ChatEvent.Message, message);
   }
 }
