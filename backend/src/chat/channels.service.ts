@@ -134,4 +134,35 @@ export class ChannelsService {
 
     return channels;
   }
+
+  async getJoinedChannels(user: User) {
+    const channelUsers = await this.prisma.channelUser.findMany({
+      where: {
+        user: user,
+      },
+      include: {
+        channel: {
+          include: {
+            messages: {
+              orderBy: {
+                id: 'desc',
+              },
+              take: 1,
+            },
+          },
+        },
+      },
+    });
+
+    // return the channel list without the password field
+    // and with last message
+    return channelUsers.map((cu: any) => {
+      cu.channel.lastMessage = cu.channel.messages[0];
+      delete cu.channel.messages;
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...channelWithoutPassword } = cu.channel;
+      return channelWithoutPassword;
+    });
+  }
 }

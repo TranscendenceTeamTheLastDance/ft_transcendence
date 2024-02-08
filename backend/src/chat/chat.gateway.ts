@@ -73,6 +73,31 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
       this.logger.error('No token found in cookies.');
       // Gérez le cas où aucun token n'est trouvé dans les cookies
     }
+
+	const username = client.data.user.username;
+    const existingSockets = this.socketsID.get(username) || [];
+    existingSockets.push(client);
+    this.socketsID.set(username, existingSockets);
+
+
+	const channels = await this.channelsService.getJoinedChannels(client.data.user);
+    const channelsName = channels.map((c) => c.name);
+    client.join(channelsName);
+  }
+
+  handleDisconnect(client: Socket) {
+    this.logger.log('Client disconnected: ' + client.id);
+
+    const username = client.data.user.username;
+    const existingSockets = this.socketsID.get(username) || [];
+    const updatedSockets = existingSockets.filter((s) => s.id !== client.id);
+
+    if (updatedSockets.length > 0) {
+      this.socketsID.set(username, updatedSockets);
+    } else {
+      // If there are no more sockets for the user, remove the entry from the map
+      this.socketsID.delete(username);
+    }
   }
 
   @SubscribeMessage(ChatEvent.Create)
@@ -113,6 +138,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
   @SubscribeMessage(ChatEvent.ChannelList)
   async onChannelList() {
     return await this.channelsService.getChannelList();
+  }
+
+  @SubscribeMessage(ChatEvent.JoinedChannels)
+  async onGetJoinedChannels(@ConnectedSocket() client: Socket) {
+    return await this.channelsService.getJoinedChannels(client.data.user);
   }
 
   @SubscribeMessage(ChatEvent.Message)

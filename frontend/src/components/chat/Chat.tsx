@@ -117,6 +117,20 @@ const Chat = () => {
     };
   }, []);
 
+  useEffect(() => {
+    socket?.on('youLeft', (data: any) => {
+      setCurrentChannel(null);
+      setJoinedChannels(joinedChannels.filter((c) => c.name !== data.channel));
+      if (!data.reason.includes('disconnected')) {
+        alert(`You left ${data.channel}, ${data.reason}`);
+      }
+    });
+
+    return () => {
+      socket?.off('youLeft');
+    };
+  }, [joinedChannels]);
+
   if (loading) return <div>loading</div>;
   if (!socket) return <div>socket not initialized</div>;
 // eslint-disable-next-line
