@@ -59,30 +59,34 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
   }
 
   async handleConnection(client: Socket, ...args: any[]) {
-    this.logger.log(`Client connected: ${client.id}`);
-    const cookieName = this.configService.get('JWT_ACCESS_TOKEN_COOKIE'); // Récupérez le nom du cookie JWT à partir de la configuration
-    const token = client.handshake.headers.cookie.split(`${cookieName}=`)[1]; // Récupérez le token JWT du cookie
+    try {
+      this.logger.log(`Client connected: ${client.id}`);
+      const cookieName = this.configService.get('JWT_ACCESS_TOKEN_COOKIE'); // Récupérez le nom du cookie JWT à partir de la configuration
+      const token = client.handshake.headers.cookie.split(`${cookieName}=`)[1]; // Récupérez le token JWT du cookie
 
-    if (token) {
-      this.logger.log('Token: ' + token);
-      const payload = this.jwtService.decode(token); // Décoder le token\
-	  this.logger.log("Payload: " + JSON.stringify(payload));
-	  client.data.user = await this.userService.getUnique(payload.sub); // Récupérez l'utilisateur à partir de la base de données
-	//   this.logger.log("User attache au socket " + client.data.user.id);
-    } else {
-      this.logger.error('No token found in cookies.');
-      // Gérez le cas où aucun token n'est trouvé dans les cookies
+      if (token) {
+        this.logger.log('Token: ' + token);
+        const payload = this.jwtService.decode(token); // Décoder le token\
+        this.logger.log("Payload: " + JSON.stringify(payload));
+        client.data.user = await this.userService.getUnique(payload.sub); // Récupérez l'utilisateur à partir de la base de données
+        //   this.logger.log("User attache au socket " + client.data.user.id);
+      } else {
+        this.logger.error('No token found in cookies.');
+        // Gérez le cas où aucun token n'est trouvé dans les cookies
+      }
+
+      const username = client.data.user.username;
+      const existingSockets = this.socketsID.get(username) || [];
+      existingSockets.push(client);
+      this.socketsID.set(username, existingSockets);
+
+      const channels = await this.channelsService.getJoinedChannels(client.data.user);
+      const channelsName = channels.map((c) => c.name);
+      client.join(channelsName);
+    } catch (error) {
+      // Gérer les erreurs et renvoyer une réponse appropriée au client
+      throw new WsException('Failed to handle connection');
     }
-
-	const username = client.data.user.username;
-    const existingSockets = this.socketsID.get(username) || [];
-    existingSockets.push(client);
-    this.socketsID.set(username, existingSockets);
-
-
-	const channels = await this.channelsService.getJoinedChannels(client.data.user);
-    const channelsName = channels.map((c) => c.name);
-    client.join(channelsName);
   }
 
   handleDisconnect(client: Socket) {
