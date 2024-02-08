@@ -181,8 +181,8 @@ const CanvasGame: React.FC<{ infoGame: InfoGame }>= ({ infoGame }) => {
         return () => {
             canvas.removeEventListener('mousemove', mouseMoveHandler);
             cancelAnimationFrame(animationFrameId);
-            socket.emit('client-disconnect');
             socket.off('game-state');
+            // socket.emit('client-disconnect');
         };
     }, [socket, numPlayer]);
 

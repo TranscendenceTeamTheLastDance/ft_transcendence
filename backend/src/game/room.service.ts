@@ -16,6 +16,7 @@ export class GameRoom {
   }
 
   startGameLoop(): void {
+    console.log("startloop");
     this.gameLoopInterval = setInterval(() => {
       this.gameService.updateGameState();
       const gameState1 = this.gameService.broadcastGameState(1);
@@ -24,15 +25,18 @@ export class GameRoom {
       if (gameState1.score.scoreU1 >= 11 || gameState1.score.scoreU2 >= 11) {
         this.player1.emit('game-finish', gameState1);
         this.player2.emit('game-finish', gameState2);
+        clearInterval(this.gameLoopInterval);
       }
       else {
         this.player1.emit('game-state', gameState1);
         this.player2.emit('game-state', gameState2);
       }
     }, this.updateInterval);
+    //envoi les donne de fin de parti a user
   }
 
   stopGameLoop(): void {
+    console.log("endloop");
     if (this.gameLoopInterval) {
       clearInterval(this.gameLoopInterval);
       this.gameLoopInterval = null;
