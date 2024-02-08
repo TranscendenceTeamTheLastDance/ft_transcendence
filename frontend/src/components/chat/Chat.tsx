@@ -136,6 +136,8 @@ const Chat = () => {
 // eslint-disable-next-line
   me = user;
 
+  console.log("me", me);
+
   const handleShowChannels = (boolean: boolean) => {
     setCurrentChannel(null);
     setShowChannels(boolean);
