@@ -113,17 +113,19 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
   handleDisconnect(client: Socket) {
     this.logger.log('Client disconnected: ' + client.id);
 
-    const username = client.data.user.username;
-    const existingSockets = this.socketsID.get(username) || [];
-    const updatedSockets = existingSockets.filter((s) => s.id !== client.id);
+    if (client.data.user && client.data.user.username) {
+        const username = client.data.user.username;
+        const existingSockets = this.socketsID.get(username) || [];
+        const updatedSockets = existingSockets.filter((s) => s.id !== client.id);
 
-    if (updatedSockets.length > 0) {
-      this.socketsID.set(username, updatedSockets);
-    } else {
-      // If there are no more sockets for the user, remove the entry from the map
-      this.socketsID.delete(username);
+        if (updatedSockets.length > 0) {
+            this.socketsID.set(username, updatedSockets);
+        } else {
+            // If there are no more sockets for the user, remove the entry from the map
+            this.socketsID.delete(username);
+        }
     }
-  }
+}
 
   @SubscribeMessage(ChatEvent.Create)
   async onCreateChannel(

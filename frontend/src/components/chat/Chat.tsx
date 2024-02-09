@@ -12,7 +12,7 @@ import chat_join from '../assets/chat/join-channel.svg';
 
 import ChatList from './ChatList';
 import ChatModal from "./ChatModal";
-// import Conversation from './Conversation';
+import Conversation from './Conversation';
 import CreateChannel from "./CreateChannel";
 // import DmConversation from './DmConversation';
 // import DmCreate from './DmCreate';
@@ -88,31 +88,10 @@ const Chat = () => {
         setJoinedChannels((prev) => [...prev, data]);
 		console.log("youJoined", data);
       });
-
-      tmpSocket.on('dm', (data) => {
-        setCurrentChannel(data.channel);
-        setJoinedChannels((prev) => {
-          if (!prev.some((c) => c.name === data.channel.name)) {
-            return [...prev, data.channel];
-          }
-          return prev;
-        });
-        setShowChannels(false);
-      });
-
-      tmpSocket.on('exception', (data) => {
-        if (Array.isArray(data.message)) {
-          alert(data.message.join('\n'));
-        } else {
-          alert(data.message);
-        }
-      });
     });
 
     return () => {
       socket?.off("youJoined");
-      socket?.off("exception");
-      socket?.off("dm");
       socket?.disconnect();
     };
   }, []);
@@ -217,6 +196,7 @@ const Chat = () => {
           </div>
         </div>
       )}
+      {currentChannel && <Conversation socket={socket} channel={currentChannel} />}
     </div>
   );
 };
