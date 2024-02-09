@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { UseQueryResult } from 'react-query';
+// import { UseQueryResult } from 'react-query';
 import { Socket } from 'socket.io-client';
 
 import info_icon from '../assets/chat/info.svg';
 import send_icon from '../assets/chat/send.svg';
-import { userDto } from '../dto/userDto';
+// import { userDto } from '../dto/userDto';
 
 import { ChannelType } from './Chat';
 import ChatInfos from './ChatInfos';

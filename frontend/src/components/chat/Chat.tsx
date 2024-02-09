@@ -54,7 +54,7 @@ export interface userDto {
 
 const Chat = () => {
 
-  const { user } = useUserContext();
+  const { user, fetchUserData } = useUserContext();
   const [showCreateChannelModal, setShowCreateChannelModal] = useState<boolean>(false);
   const [showJoinChannelModal, setShowJoinChannelModal] = useState<boolean>(false);
     // eslint-disable-next-line
@@ -68,6 +68,9 @@ const Chat = () => {
   const [showChannels, setShowChannels] = useState<boolean>(true);
   let me: userDto | undefined;
 
+  useEffect(() => {
+		fetchUserData();
+	  }, [fetchUserData]);
 
   useEffect(() => {
     setLoading(true);
