@@ -133,12 +133,12 @@ const LoginSignup = () => {
 			<div className='submit-container'>
 				{action==="Login" ? <div></div>:
 				<button 
-					className="bg-gray-500 text-white py-2 px-4 rounded-lg text-lg font-bold mx-2"
+					className="logsbutton"
 					onClick={(e) =>{handleSignUp(e);}}
 					>Sign Up</button> }
 				{action==="Sign Up" ? <div></div>:
 				<button 
-					className="bg-gray-500 text-white py-2 px-4 rounded-lg text-lg font-bold mx-2"
+					className="logsbutton"
 					onClick={(e)=>{handleSignIn(e);}}
 					>Login</button>}
 			</div>
