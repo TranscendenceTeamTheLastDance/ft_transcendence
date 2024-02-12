@@ -33,7 +33,7 @@ import { UserService } from 'src/user/user.service';
 import { JwtStrategy } from 'src/auth/strategy';
 import { ConfigService } from '@nestjs/config';
 
-// @UsePipes(new ValidationPipe())
+@UsePipes(new ValidationPipe())
 @WebSocketGateway({
 	cors: {
 		origin: 'http://localhost:3000', // Autoriser l'origine du message pour établir la connexion
