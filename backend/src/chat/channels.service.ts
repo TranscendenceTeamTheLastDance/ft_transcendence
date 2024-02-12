@@ -43,7 +43,6 @@ export class ChannelsService {
         user: true,
       },
     });
-
     return channelUsers.map((chanUser) => chanUser.user);
   }
 

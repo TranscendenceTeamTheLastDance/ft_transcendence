@@ -22,11 +22,17 @@ import { Server, Socket } from 'socket.io';
 import { BadRequestTransformationFilter } from '../utils/bad-request-exception.filter';
 
 import { ChannelsService } from './channels.service';
-import { CreateChannelDTO, JoinChannelDTO, SendMessageDTO } from './chat.dto';
+import {
+  CreateChannelDTO,
+  JoinChannelDTO,
+  SendMessageDTO,
+  UserListInChannelDTO,
+} from './chat.dto';
 import { ChatEvent } from './chat.state';
 import { UserService } from 'src/user/user.service';
 import { JwtStrategy } from 'src/auth/strategy';
 import { ConfigService } from '@nestjs/config';
+import { User } from '@prisma/client';
 
 // @UsePipes(new ValidationPipe())
 @WebSocketGateway({
@@ -183,28 +189,25 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     this.io.to(messageDTO.channel).emit(ChatEvent.Message, message);
   }
 
-  // @SubscribeMessage(ChatEvent.UserList)
-  // async handleUserList(
-  //   @ConnectedSocket() client: Socket,
-  //   payload: { channel: string },
-  //   // Promise<any> ? If the structure is not critical
-  // ): Promise<void> {
-  //   try {
-  //     const channelMembers = await this.channelsService.getChannelMembers(
-  //       payload.channel,
-  //     );
+  @SubscribeMessage(ChatEvent.UserList)
+  async handleUserList(
+    @MessageBody() UserListDTO: UserListInChannelDTO,
+    @ConnectedSocket() client: Socket,
+    // Promise<any> ? If the structure is not critical
+  ): Promise<any> {
+    try {
+      const channelMembers = await this.channelsService.getChannelMembers(
+        UserListDTO.channel,
+      );
 
-  //     client.emit('userList', {
-  //       channel: payload.channel,
-  //       users: channelMembers,
-  //     });
-  //     // return {
-  //     //   channel: payload.channel,
-  //     //   users: channelMembers,
-  //     // };
-  //   } catch (error) {
-  //     console.error('Error fetching channel members:', error);
-  //     throw new WsException('Failed to fetch channel members');
-  //   }
-  // }
+      console.log('======PAYLOAD CHANNEL======', channelMembers);
+      return {
+        channel: UserListDTO.channel,
+        users: channelMembers,
+      };
+    } catch (error) {
+      console.error('Error fetching channel members:', error);
+      throw new WsException('Failed to fetch channel members');
+    }
+  }
 }
