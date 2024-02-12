@@ -22,11 +22,7 @@ import { Server, Socket } from 'socket.io';
 import { BadRequestTransformationFilter } from '../utils/bad-request-exception.filter';
 
 import { ChannelsService } from './channels.service';
-import { 
-  CreateChannelDTO,
-  JoinChannelDTO,
-  SendMessageDTO 
-} from './chat.dto';
+import { CreateChannelDTO, JoinChannelDTO, SendMessageDTO } from './chat.dto';
 import { ChatEvent } from './chat.state';
 import { UserService } from 'src/user/user.service';
 import { JwtStrategy } from 'src/auth/strategy';
@@ -67,13 +63,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
       this.logger.log(`Client connected: ${client.id}`);
       const cookieName = this.configService.get('JWT_ACCESS_TOKEN_COOKIE'); // Récupérez le nom du cookie JWT à partir de la configuration
       const cookieHeaderValue = client.handshake.headers.cookie;
-      
+
       if (!cookieHeaderValue) {
         this.logger.error('No cookies found in the request headers.');
         client.disconnect(); // Déconnecter proprement le client
         return;
       }
-      
+
       const token = cookieHeaderValue.split(`${cookieName}=`)[1]; // Récupérez le token JWT du cookie
 
       if (!token) {
@@ -84,7 +80,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
 
       this.logger.log('Token: ' + token);
       const payload = this.jwtService.decode(token); // Décoder le token
-      this.logger.log("Payload: " + JSON.stringify(payload));
+      this.logger.log('Payload: ' + JSON.stringify(payload));
       client.data.user = await this.userService.getUnique(payload.sub); // Récupérez l'utilisateur à partir de la base de données
 
       if (!client.data.user) {
@@ -99,7 +95,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
       existingSockets.push(client);
       this.socketsID.set(username, existingSockets);
 
-      const channels = await this.channelsService.getJoinedChannels(client.data.user);
+      const channels = await this.channelsService.getJoinedChannels(
+        client.data.user,
+      );
       const channelsName = channels.map((c) => c.name);
       client.join(channelsName);
     } catch (error) {
@@ -109,23 +107,22 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     }
   }
 
-
   handleDisconnect(client: Socket) {
     this.logger.log('Client disconnected: ' + client.id);
 
     if (client.data.user && client.data.user.username) {
-        const username = client.data.user.username;
-        const existingSockets = this.socketsID.get(username) || [];
-        const updatedSockets = existingSockets.filter((s) => s.id !== client.id);
+      const username = client.data.user.username;
+      const existingSockets = this.socketsID.get(username) || [];
+      const updatedSockets = existingSockets.filter((s) => s.id !== client.id);
 
-        if (updatedSockets.length > 0) {
-            this.socketsID.set(username, updatedSockets);
-        } else {
-            // If there are no more sockets for the user, remove the entry from the map
-            this.socketsID.delete(username);
-        }
+      if (updatedSockets.length > 0) {
+        this.socketsID.set(username, updatedSockets);
+      } else {
+        // If there are no more sockets for the user, remove the entry from the map
+        this.socketsID.delete(username);
+      }
     }
-}
+  }
 
   @SubscribeMessage(ChatEvent.Create)
   async onCreateChannel(
@@ -158,7 +155,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
     );
     this.io.to(channel.name).emit(ChatEvent.Join, data.toChannel); // Envoyer un message à tous les utilisateurs du canal
     client.join(channel.name); // Ajouter l'utilisateur au canal
-	this.logger.log("User " + client.data.user.username + " joined channel " + channel.name);
+    this.logger.log(
+      'User ' + client.data.user.username + ' joined channel ' + channel.name,
+    );
     return { event: 'youJoined', data: data.toClient };
   }
 
@@ -173,8 +172,39 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
   }
 
   @SubscribeMessage(ChatEvent.Message)
-  async onMessage(@MessageBody() messageDTO: SendMessageDTO, @ConnectedSocket() client: Socket) {
-    const message = await this.channelsService.sendMessage(messageDTO, client.data.user);
+  async onMessage(
+    @MessageBody() messageDTO: SendMessageDTO,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const message = await this.channelsService.sendMessage(
+      messageDTO,
+      client.data.user,
+    );
     this.io.to(messageDTO.channel).emit(ChatEvent.Message, message);
   }
+
+  // @SubscribeMessage(ChatEvent.UserList)
+  // async handleUserList(
+  //   @ConnectedSocket() client: Socket,
+  //   payload: { channel: string },
+  //   // Promise<any> ? If the structure is not critical
+  // ): Promise<void> {
+  //   try {
+  //     const channelMembers = await this.channelsService.getChannelMembers(
+  //       payload.channel,
+  //     );
+
+  //     client.emit('userList', {
+  //       channel: payload.channel,
+  //       users: channelMembers,
+  //     });
+  //     // return {
+  //     //   channel: payload.channel,
+  //     //   users: channelMembers,
+  //     // };
+  //   } catch (error) {
+  //     console.error('Error fetching channel members:', error);
+  //     throw new WsException('Failed to fetch channel members');
+  //   }
+  // }
 }
