@@ -1,49 +1,51 @@
-// eslint-disable-next-line
-import React, { useEffect, useRef, useState } from "react";
-import io, { Socket } from "socket.io-client";
-import MessageInput from "./MessageInput";
-import Messages from "./Messages";
+import React, { useState, useEffect } from "react";
+import { io, Socket } from "socket.io-client";
+import {
+  User,
+  Message as MessageType,
+} from "../../../shared/interfaces/chat.interface";
 
-// Définition du composant Chat
-const Chat: React.FC = () => {
-  const [socket, setSocket] = useState<Socket>(); // Déclaration de l'état socket
-  const [messages, setMessages] = useState<string[]>([]); // Déclaration de l'état messages
+const socket: Socket = io();
 
-  // Fonction pour envoyer un message
-  const send = (value: string) => {
-    socket?.emit("message", value);
-  };
+const chatPage: React.FC = () => {
+  const [isConnected, setIsConnected] = useState(socket.connected);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [user, setUser] = useState<User>();
 
-  // Effect pour initialiser la connexion socket
   useEffect(() => {
-    const newSocket = io("http://localhost:8080/chat");
-    setSocket(newSocket);
-  }, [setSocket]);
+    const fetchData = async () => {
+      try {
+        await authenticate();
+        const userData = await response.json();
 
-  // Fonction pour écouter les messages reçus
-  const messageListener = (message: string) => {
-    setMessages([...messages, message]);
-  };
-
-  // Effect pour écouter les messages reçus et nettoyer les listeners
-  useEffect(() => {
-    socket?.on("message", messageListener);
-    return () => {
-      socket?.off("message", messageListener);
+        if (response.ok) {
+          setUser(userData);
+        } else {
+          console.error("Error fetching user data:", userData.error);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
     };
-	// eslint-disable-next-line
-  }, [messageListener]);
 
-  // Rendu du composant Chat
-  return (
-    <>
-      {" "}
-      <MessageInput send={send} />{" "}
-      {/* Composant pour saisir et envoyer un message */}
-      <Messages messages={messages} />{" "}
-      {/* Composant pour afficher les messages */}
-    </>
-  );
+    fetchData();
+
+    socket.on("connect", () => {
+      setIsConnected(true);
+    });
+
+    socket.on("disconnect", () => {
+      setIsConnected(false);
+    });
+
+    socket.on("chat", (e) => {
+      setMessages((messages) => [e, ...messages]);
+    });
+
+    return () => {
+      socket.off("connect");
+      socket.off("disconnect");
+      socket.off("chat");
+    };
+  });
 };
-
-export default Chat;

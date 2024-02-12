@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from 'nestjs-prisma';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
@@ -13,8 +15,8 @@ import { DatabaseModule } from './database/database.module';
   imports: [
     AuthModule,
     ChatModule,
-    PrismaModule.forRoot({
-      isGlobal: true,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '..', '..', 'dist', 'client'),
     }),
     GameModule,
     NotifyModule,
