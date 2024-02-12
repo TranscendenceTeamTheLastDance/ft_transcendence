@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import CanvasGame from './Game';
 import io, { Socket } from 'socket.io-client';
 import './Game.css';
-// import { useUserContext } from '../../context/UserContext';
+import { useUserContext } from '../../context/UserContext';
 
 
 interface InfoGame {
@@ -12,6 +12,21 @@ interface InfoGame {
     playerName2: string;
     socket: Socket;
 }
+
+interface userDto {
+    id: number;
+    username: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    imagePath: string;
+    JWTtoken?: string;
+    displayName: string;
+    description: string;
+    bannerPath: string;
+    intraImageURL: string;
+    status: string;
+  }
 
 const PongGame: React.FC = () => {
     // const {user} = useUserContext();
@@ -24,14 +39,23 @@ const PongGame: React.FC = () => {
     const [winningStatus, setWinningStatus] = useState("Undefined");
     const [scorePlayer1, setScorePlayer1] = useState(0);
     const [scorePlayer2, setScorePlayer2] = useState(0);
+    const {user, fetchUserData} = useUserContext();
 
+    useEffect(()=> {
+        fetchUserData();
+    }, [fetchUserData]);
+    
+    let clienInfoCookie: userDto | undefined;
+    clienInfoCookie = user;
+    console.log("me", clienInfoCookie);
+    
     // console.log(user.username);
     useEffect(() => {
         const socket = socketRef?.current;
         if (!socket)
             return;
 
-        socket.emit('join', { data: "user.username"});
+        socket.emit('join', { username: clienInfoCookie?.username});
 
         socket.on('room-id', (id) => {
             identifiandPlayer.current = id.NumPlayer;
@@ -43,6 +67,7 @@ const PongGame: React.FC = () => {
                 socket: socket,
             });
         });
+
 
         socket.on('player-left-game', () => {
             setPlayerLeftGame(true);
@@ -77,7 +102,7 @@ const PongGame: React.FC = () => {
             socket.off('finish');
 
         };
-    }, []);
+    }, [clienInfoCookie?.username]);
 
 
     return (

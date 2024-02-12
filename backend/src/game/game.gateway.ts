@@ -83,6 +83,7 @@ export class GameGateway {
     @SubscribeMessage('join')
     handleJoin(@ConnectedSocket() client: Socket, 
     @MessageBody() data: { username: string}) {
+      console.log("username:", data.username);
       this.waitingPlayers.push({ client, username: data.username });
   
       if (this.waitingPlayers.length >= 2) {
@@ -94,10 +95,10 @@ export class GameGateway {
           const gameRoom = new GameRoom(player1.client, player2.client);
           this.gameRooms.set(roomID, gameRoom);
   
+          console.log("username1:", player1.username);
+          console.log("username2:", player2.username);
           // Informer les joueurs de l'ID de la salle
           // username indefini donc peut etre definir la classe player avec un socket et un username
-          console.log("username palyer1: ", player1.username);
-          console.log("username palyer2: ", player2.username);
           player1.client.emit('room-id', {roomID : roomID, NumPlayer : 1, playerName1: player1.username, playerName2: player2.username});
           player2.client.emit('room-id', {roomID : roomID, NumPlayer : 2, playerName1: player1.username, playerName2: player2.username});
           gameRoom.startGameLoop();

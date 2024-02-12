@@ -68,6 +68,8 @@ const CanvasGame: React.FC<{ infoGame: InfoGame }>= ({ infoGame }) => {
     const roomIdRef = useRef(infoGame.roomID);
     const socket = infoGame.socket;
     const numPlayer = infoGame.NumPalyer;
+    const playerName1 = infoGame.playerName1;
+    const playerName2 = infoGame.playerName2;
     
     // Initialisation du jeu
     useEffect(() => {
@@ -149,8 +151,8 @@ const CanvasGame: React.FC<{ infoGame: InfoGame }>= ({ infoGame }) => {
             drawRect(ctx, player2.x, player2.y, player2.width, player2.height, player2.color);
             drawArc(ctx, ball.x, ball.y, ball.radius, ball.color);
             drawNet(ctx, net, canvas.height);
-            drawText(ctx, `Player 1: ${player1.score}`, 10, 30);
-            drawText(ctx, `Player 2: ${player2.score}`, canvas.width - 150, 30);
+            drawText(ctx, `${playerName1}: ${player1.score}`, 10, 30);
+            drawText(ctx, `${playerName2}: ${player2.score}`, canvas.width - 150, 30);
             animationFrameId = requestAnimationFrame(gameLoop);
         };
 
@@ -184,7 +186,7 @@ const CanvasGame: React.FC<{ infoGame: InfoGame }>= ({ infoGame }) => {
             socket.off('game-state');
             // socket.emit('client-disconnect');
         };
-    }, [socket, numPlayer]);
+    }, [socket, numPlayer, playerName1, playerName2]);
 
     return (
         <div>
