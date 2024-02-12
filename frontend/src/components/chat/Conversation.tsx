@@ -119,8 +119,8 @@ const Conversation = ({ channel, socket }: ConversationProps) => {
             <Message
               key={m.id}
               text={m.content}
-              send_by_user={m.author.login === infos?.username}
-              sender={m.author.login}
+              send_by_user={m.author.username === infos?.username}
+              sender={m.author.username}
             />
           );
         })}

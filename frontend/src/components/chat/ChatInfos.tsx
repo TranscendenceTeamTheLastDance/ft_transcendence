@@ -33,7 +33,9 @@ const ChatInfos = ({
       "userList",
       { channel: channelName },
       (res: UserListResponse) => {
-        setUsers(res.users.filter((user) => user.login !== currentUserLogin));
+        setUsers(
+          res.users.filter((user) => user.username !== currentUserLogin)
+        );
         // const user = res.users.find((user) => user.login === currentUserLogin) || null;
         // if (user && (user.role === 'ADMIN' || user.role === 'OWNER')) setIsAdmin(true);
       }
