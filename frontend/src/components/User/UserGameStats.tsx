@@ -4,7 +4,7 @@ import CircularProgress from '../CircularProgress.tsx';
 import LogOutButton from '../LogoutButton.tsx';
 import { useNavigate } from 'react-router-dom';
 import NotConnected from '../NotSignedIn.tsx';
-import axios from 'axios';
+import { useAuthAxios } from '../../context/AuthAxiosContext.tsx';
 
 const UserGameStats = ({ gameStats}) => {
 
@@ -13,6 +13,7 @@ const UserGameStats = ({ gameStats}) => {
 
     const [error, setError] = useState(false);
     const navigate = useNavigate();
+	const authAxios = useAuthAxios();
 
 	useEffect(() => {
 		if (gameStats.totalGamesPlayed > 0) {
@@ -27,7 +28,7 @@ const UserGameStats = ({ gameStats}) => {
 	const handleLogOut = async () => {
 		console.log('frontend: logging out...');
 		try {
-			const response = await axios.get('http://localhost:8080/auth/logout', {
+			const response = await authAxios.get('/auth/logout', {
 				withCredentials: true,
 			});
 			console.log(response.data);

@@ -1,9 +1,12 @@
 {
   "devDependencies": {
     "@types/node": "^20.10.7",
-    "pnpm": "^8.14.0"
+    "lottie-react": "^2.4.0",
+    "pnpm": "^8.14.0",
+    "sonner": "^1.4.0"
   },
   "dependencies": {
+    "@lottiefiles/lottie-interactivity": "^1.6.2",
     "qrcode": "^1.5.3"
   }
 }

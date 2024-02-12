@@ -1,8 +1,12 @@
-import { Body, Res, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Res, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { SignupDto, SigninDto } from './dto';
 import { TwoFactorCodeDto } from '../user/dto/two-factor-code.dto';
+import { JwtGuard, JwtRefreshGuard } from '../auth/guard';
+import { GetUser } from '../auth/decorator';
+import { User } from '@prisma/client';
+import { use } from 'passport';
 
 
 @Controller('auth')
@@ -32,7 +36,7 @@ export class AuthController {
 				}
 				})
 			.catch((err) => {
-				res.status(401).json({ message: 'wrong credentials' });
+				res.status(401).json({  message: err.message  });
 			});
 	}
 
@@ -50,7 +54,7 @@ export class AuthController {
 					user});
 			})
 			.catch((err) => {
-				res.status(401).json({ message: 'signup rate' });
+				res.status(401).json({  message: err.message  });
 			});
 	}
 
@@ -74,7 +78,7 @@ export class AuthController {
 				}
 				})
 			.catch((err) => {
-				res.status(401).json({ message: 'wrong credentials' });
+				res.status(401).json({  message: err.message });
 			});
 	}
 
@@ -89,10 +93,11 @@ export class AuthController {
 					user});
 				})
 			.catch((err) => {
-				res.status(401).json({ message: 'wrong credentials' });
+				res.status(401).json({ message: err.message});
 			});
 	}
 
+	@UseGuards(JwtGuard)
 	@Get('logout')
 	logout(@Res() res:Response){
 		this.authService
@@ -101,7 +106,22 @@ export class AuthController {
                 res.send('Successfully logued out!');
             })
 			.catch((err) => {
-				res.status(500).json({ message: 'Internal server error' });
+				res.status(500).json({ message: err.message });
+			});
+	}
+
+	@UseGuards(JwtRefreshGuard)
+	@Get('refresh')
+	refresh(@GetUser() user: User, @Res() res: Response) {
+		this.authService
+			.refresh(user, res)
+			.then((user) => {
+				res.status(200).json({
+					message: 'refresh token success',
+					user});
+			})
+			.catch((error) => {
+				res.status(401).json({ message: 'wrong credentials' });
 			});
 	}
 }

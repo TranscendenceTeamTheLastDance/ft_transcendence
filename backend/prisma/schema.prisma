@@ -39,8 +39,10 @@ model User {
   blocked             User[]        @relation("blocked")
   blockedBy           User[]        @relation("blocked")
   bannedOf            Channel[]
-  channelUser         ChannelUser[]
   messages            Message[] // Not in ChannelUser for message persistence
+  hashedRefreshToken String?
+
+  channels ChannelUser[]
 
   @@map("Users")
 }
