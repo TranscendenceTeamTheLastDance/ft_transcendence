@@ -26,8 +26,8 @@ const ChatInfos = ({ setShowModal, socket, channelName, currentUserLogin }: Chat
   useEffect(() => {
     socket.emit('userList', { channel: channelName }, (res: UserListResponse) => {
       setUsers(res.users.filter((user) => user.login !== currentUserLogin));
-      const user = res.users.find((user) => user.login === currentUserLogin) || null;
-      if (user && (user.role === 'ADMIN' || user.role === 'OWNER')) setIsAdmin(true);
+      // const user = res.users.find((user) => user.login === currentUserLogin) || null;
+      // if (user && (user.role === 'ADMIN' || user.role === 'OWNER')) setIsAdmin(true);
     });
   }, []);
 

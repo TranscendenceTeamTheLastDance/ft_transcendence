@@ -3,24 +3,24 @@ import React, { useEffect, useState } from "react";
 // import { UseQueryResult } from "react-query";
 import { io, Socket } from "socket.io-client";
 
-import chat_channel from '../assets/chat/Chat.svg';
-import chat_plus from '../assets/chat/chat_plus.svg';
-import chat_DM from '../assets/chat/comment.svg';
+import chat_channel from "../assets/chat/Chat.svg";
+import chat_plus from "../assets/chat/chat_plus.svg";
+import chat_DM from "../assets/chat/comment.svg";
 // import find_someone from '@/assets/chat/find_someone.png';
-import chat_join from '../assets/chat/join-channel.svg';
+import chat_join from "../assets/chat/join-channel.svg";
 // import { useApi } from "@/hooks/useApi";
 
-import ChatList from './ChatList';
+import ChatList from "./ChatList";
 import ChatModal from "./ChatModal";
-import Conversation from './Conversation';
+import Conversation from "./Conversation";
 import CreateChannel from "./CreateChannel";
 // import DmConversation from './DmConversation';
 // import DmCreate from './DmCreate';
 // import DmList from './DmList';
-import JoinChannel from './JoinChannel';
+import JoinChannel from "./JoinChannel";
 
 import { useUserContext } from "../../context/UserContext";
-import './index.css';
+import "./index.css";
 // import axios from 'axios';
 
 export interface Channel {
@@ -53,11 +53,12 @@ export interface userDto {
 }
 
 const Chat = () => {
-
   const { user, fetchUserData } = useUserContext();
-  const [showCreateChannelModal, setShowCreateChannelModal] = useState<boolean>(false);
-  const [showJoinChannelModal, setShowJoinChannelModal] = useState<boolean>(false);
-    // eslint-disable-next-line
+  const [showCreateChannelModal, setShowCreateChannelModal] =
+    useState<boolean>(false);
+  const [showJoinChannelModal, setShowJoinChannelModal] =
+    useState<boolean>(false);
+  // eslint-disable-next-line
   const [showDmSomeoneModal, setShowDmSomeoneModal] = useState<boolean>(false);
   const [socket, setSocket] = useState<Socket>();
   const [loading, setLoading] = useState<boolean>(true);
@@ -69,27 +70,29 @@ const Chat = () => {
   let me: userDto | undefined;
 
   useEffect(() => {
-		fetchUserData();
-	  }, [fetchUserData]);
+    fetchUserData();
+  }, [fetchUserData]);
 
   useEffect(() => {
     setLoading(true);
-    const tmpSocket = io("http://localhost:8080/chat", { withCredentials: true });
+    const tmpSocket = io("http://localhost:8080/chat", {
+      withCredentials: true,
+    });
     console.log("connecting");
     tmpSocket.on("connect", () => {
       setSocket(tmpSocket);
       setLoading(false);
       console.log("connected");
 
-	  tmpSocket.emit('joinedChannels', (data: ChannelType[]) => {
+      tmpSocket.emit("joinedChannels", (data: ChannelType[]) => {
         setJoinedChannels(data);
-		console.log("joinedChannels", data);
+        console.log("joinedChannels", data);
       });
 
-      tmpSocket.on('youJoined', (data: ChannelType) => {
+      tmpSocket.on("youJoined", (data: ChannelType) => {
         setCurrentChannel(data);
         setJoinedChannels((prev) => [...prev, data]);
-		console.log("youJoined", data);
+        console.log("youJoined", data);
       });
     });
 
@@ -100,22 +103,22 @@ const Chat = () => {
   }, []);
 
   useEffect(() => {
-    socket?.on('youLeft', (data: any) => {
+    socket?.on("youLeft", (data: any) => {
       setCurrentChannel(null);
       setJoinedChannels(joinedChannels.filter((c) => c.name !== data.channel));
-      if (!data.reason.includes('disconnected')) {
+      if (!data.reason.includes("disconnected")) {
         alert(`You left ${data.channel}, ${data.reason}`);
       }
     });
 
     return () => {
-      socket?.off('youLeft');
+      socket?.off("youLeft");
     };
   }, [joinedChannels]);
 
   if (loading) return <div>loading</div>;
   if (!socket) return <div>socket not initialized</div>;
-// eslint-disable-next-line
+  // eslint-disable-next-line
   me = user;
 
   console.log("me", me);
@@ -154,25 +157,37 @@ const Chat = () => {
                 title="Go to direct messages"
                 onClick={() => handleShowChannels(false)}
               >
-              <img className="w-5 md:w-6" src={chat_channel} alt="Direct messages" />
+                <img
+                  className="w-5 md:w-6"
+                  src={chat_channel}
+                  alt="Direct messages"
+                />
               </button>
               <button
                 className="rounded-full p-1 hover:bg-white-3"
                 title="Join a channel"
                 onClick={() => setShowJoinChannelModal(true)}
               >
-				<img className="w-5 md:w-6" src={chat_join} alt="join channel" />
-			  </button>
+                <img
+                  className="w-5 md:w-6"
+                  src={chat_join}
+                  alt="join channel"
+                />
+              </button>
               <button
                 title="Create a channel"
                 onClick={() => setShowCreateChannelModal(true)}
                 className="rounded-full p-1 hover:bg-white-3"
               >
-                <img className="w-5 md:w-6" src={chat_plus} alt="create channel" />
+                <img
+                  className="w-5 md:w-6"
+                  src={chat_plus}
+                  alt="create channel"
+                />
               </button>
             </div>
           </div>
-		  <ChatList
+          <ChatList
             joinedChannels={joinedChannels.filter((c) => c.isDM === false)}
             setCurrentChannel={setCurrentChannel}
             currentChannel={currentChannel}
@@ -199,7 +214,9 @@ const Chat = () => {
           </div>
         </div>
       )}
-      {currentChannel && <Conversation socket={socket} channel={currentChannel} />}
+      {currentChannel && (
+        <Conversation socket={socket} channel={currentChannel} />
+      )}
     </div>
   );
 };
