@@ -21,7 +21,7 @@ interface UserListResponse {
 
 const ChatInfos = ({ setShowModal, socket, channelName, currentUserLogin }: ChatInfosProps) => {
   const [users, setUsers] = useState<UserType[]>([]);
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  // const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   useEffect(() => {
     socket.emit('userList', { channel: channelName }, (res: UserListResponse) => {
@@ -29,6 +29,7 @@ const ChatInfos = ({ setShowModal, socket, channelName, currentUserLogin }: Chat
       // const user = res.users.find((user) => user.login === currentUserLogin) || null;
       // if (user && (user.role === 'ADMIN' || user.role === 'OWNER')) setIsAdmin(true);
     });
+    // eslint-disable-next-line
   }, []);
 
 //   const promoteUser = (user: UserType) => {

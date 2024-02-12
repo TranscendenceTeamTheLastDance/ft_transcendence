@@ -66,7 +66,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	async handleConnection(client: Socket, ...args: any[]) {
 		try {
 			// Vérification de l'authentification du client à l'aide de JWT
-			const cookieName = this.configService.get('JWT_ACCESS_TOKEN_COOKIE');
+			const cookieName = this.configService.get('JWT_REFRESH_TOKEN_COOKIE');
 			const cookieHeaderValue = client.handshake.headers.cookie;
 			
 			if (!cookieHeaderValue) {
@@ -75,10 +75,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 				return;
 			}
 			
-			const token = cookieHeaderValue.split(`${cookieName}=`)[1];
+			const token = cookieHeaderValue.split(';').find((c) => c.trim().startsWith(cookieName + '=')).split('=')[1];
 			// Validation du token JWT et récupération des données utilisateur
 			const payload = this.jwtService.decode(token);
-			client.data.user = await this.userService.getUnique(payload.sub);
+			client.data.user = await this.userService.getUnique(payload.email);
 
 			if (!client.data.user) {
 				this.logger.error('User not authenticated');

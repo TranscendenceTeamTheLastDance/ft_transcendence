@@ -26,7 +26,10 @@ export class ChannelsService {
     return channel;
   }
 
-  async createChannel(createChatDto: CreateChannelDTO, user: User): Promise<void>  {
+  async createChannel(
+    createChatDto: CreateChannelDTO,
+    user: User,
+  ): Promise<void> {
     let createdChannel: any;
     try {
       createdChannel = await this.prisma.channel.create({
@@ -63,7 +66,7 @@ export class ChannelsService {
         name: channelDTO.name,
       },
       include: { users: true },
-    }); 
+    });
 
     if (!channel) {
       throw new WsException(`Channel ${channelDTO.name} not found`);

@@ -17,6 +17,7 @@ CREATE TABLE "Users" (
     "twoFactorEnabled" BOOLEAN DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "hashedRefreshToken" TEXT,
 
     CONSTRAINT "Users_pkey" PRIMARY KEY ("id")
 );
