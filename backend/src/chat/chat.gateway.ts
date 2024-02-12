@@ -33,6 +33,8 @@ import { UserService } from 'src/user/user.service';
 import { JwtStrategy } from 'src/auth/strategy';
 import { ConfigService } from '@nestjs/config';
 import { User } from '@prisma/client';
+import { channel } from 'diagnostics_channel';
+import { userType } from 'src/common/userType.interface';
 
 // @UsePipes(new ValidationPipe())
 @WebSocketGateway({
@@ -193,18 +195,26 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection {
   async handleUserList(
     @MessageBody() UserListDTO: UserListInChannelDTO,
     @ConnectedSocket() client: Socket,
-    // Promise<any> ? If the structure is not critical
-  ): Promise<any> {
+  ): Promise<{ channel: string; users: userType[] }> {
     try {
       const channelMembers = await this.channelsService.getChannelMembers(
         UserListDTO.channel,
       );
 
-      console.log('======PAYLOAD CHANNEL======', channelMembers);
-      return {
+      // Extract only the desired fields from UserListDTO (frontend: userType)
+      const extractedUserList = channelMembers.map((member) => ({
+        id: member.id,
+        username: member.username,
+        profilePic: member.profilePic,
+      }));
+
+      const userTypeList = {
         channel: UserListDTO.channel,
-        users: channelMembers,
+        users: extractedUserList,
       };
+
+      console.log(userTypeList);
+      return userTypeList;
     } catch (error) {
       console.error('Error fetching channel members:', error);
       throw new WsException('Failed to fetch channel members');

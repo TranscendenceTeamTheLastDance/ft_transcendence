@@ -79,10 +79,10 @@ const ChatInfos = ({
               <div className="flex items-center gap-2">
                 <img
                   className="w-8 rounded-full"
-                  src={user.intraImageURL}
+                  src={user.profilePic}
                   alt="user"
                 />
-                <h3 className="text-lg">{user.login}</h3>
+                <h3 className="text-lg">{user.username}</h3>
               </div>
               <div className="flex gap-2">
                 <button
