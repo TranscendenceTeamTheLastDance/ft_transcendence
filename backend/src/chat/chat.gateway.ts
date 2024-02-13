@@ -29,7 +29,7 @@ import {
 	SendMessageDTO 
 } from './chat.dto';
 import { ChatEvent } from './chat.state';
-import { UserService } from '../user/user.service';
+import { UserService } from '@/user/user.service';
 import { ConfigService } from '@nestjs/config';
 
 @UsePipes(new ValidationPipe())
