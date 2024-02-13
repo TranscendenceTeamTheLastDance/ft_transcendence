@@ -1,4 +1,1 @@
-Probleme de se connecter avec l api 42 a tester a l ecole
-
-Erreur User.Context verifier si ca vient du componement Chat.tsx lors de la recup de user.
-Peut etre que je dois utiliser axios.GET
+Fix erreur quand on recupere par le user, renvoyer vers la page avec le bouton Signin et renvoyer vers la page d auth

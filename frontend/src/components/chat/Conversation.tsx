@@ -4,7 +4,6 @@ import { Socket } from 'socket.io-client';
 
 import info_icon from '../assets/chat/info.svg';
 import send_icon from '../assets/chat/send.svg';
-// import { userDto } from '../dto/userDto';
 
 import { ChannelType } from './Chat';
 import ChatInfos from './ChatInfos';
@@ -12,17 +11,19 @@ import ChatModal from './ChatModal';
 import Message from './Message';
 
 import { useUserContext } from "../../context/UserContext";
+import { userDto } from "./dto/userDto";
 
 interface ConversationProps {
   channel: ChannelType;
+  me: userDto | undefined;
   socket: Socket;
 }
 
 export interface UserType {
   id: number;
-  login: string;
+  username: string;
   status: string;
-  intraImageURL: string;
+  imagePath: string;
   role: string;
 }
 
@@ -30,27 +31,10 @@ export interface MessageType {
   id: number;
   creadtedAt: string;
   content: string;
-  channelId: number;
-  authorId: number;
-  author: UserType;
+  user: UserType;
 }
 
-export interface userDto {
-  id: number;
-  username: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  imagePath: string;
-  JWTtoken?: string;
-  displayName: string;
-  description: string;
-  bannerPath: string;
-  intraImageURL: string;
-  status: string;
-}
-
-const Conversation = ({ channel, socket }: ConversationProps) => {
+const Conversation = ({ channel, socket, me }: ConversationProps) => {
   const { user } = useUserContext();
   const [showModal, setShowModal] = React.useState<boolean>(false);
   const [messages, setMessages] = useState<MessageType[]>([]);
@@ -63,16 +47,14 @@ const Conversation = ({ channel, socket }: ConversationProps) => {
 
   useEffect(() => {
     socket.on('message', (data: MessageType) => {
-      // TODO fix wrong MessageType from server
-      // if (messages.length > 0 && messages[messages.length - 1].id === data.id) return;
       console.log(data);
-      // setMessages((messages) => [...messages, data]);
+      setMessages((messages) => [...messages, data]);
     });
     socket.emit(
       'history',
       { channel: channel.name, offset: 0, limit: 100 },
-      (res: MessageType[]) => {
-        setMessages(res);
+      (message: MessageType[]) => {
+        setMessages(message);
       },
     );
     return () => {
@@ -83,6 +65,7 @@ const Conversation = ({ channel, socket }: ConversationProps) => {
 
   const sendMessage = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!message) return;
     socket.emit('message', { channel: channel.name, content: message });
     setMessage('');
   };
@@ -111,15 +94,18 @@ const Conversation = ({ channel, socket }: ConversationProps) => {
           </button>
         </div>
       </div>
-      <div className="flex h-full flex-col justify-end gap-1 p-3">
-        {messages.map((m) => {
+      <div
+        className="flex h-full flex-col gap-1 overflow-y-auto p-3"
+        style={{ maxHeight: '600px' }}
+      >
+        {messages.map((m, idx) => {
           return (
             <Message
-              key={m.id}
-              text={m.content}
-              send_by_user={m.author.login === infos?.username}
-              sender={m.author.login}
-            />
+            key={idx}
+            text={m.content}
+            send_by_user={m.user.username === me?.username}
+            sender={m.user}
+          />
           );
         })}
       </div>

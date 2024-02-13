@@ -25,7 +25,7 @@ const ChatInfos = ({ setShowModal, socket, channelName, currentUserLogin }: Chat
 
   useEffect(() => {
     socket.emit('userList', { channel: channelName }, (res: UserListResponse) => {
-      setUsers(res.users.filter((user) => user.login !== currentUserLogin));
+      setUsers(res.users.filter((user) => user.username !== currentUserLogin));
       // const user = res.users.find((user) => user.login === currentUserLogin) || null;
       // if (user && (user.role === 'ADMIN' || user.role === 'OWNER')) setIsAdmin(true);
     });
@@ -66,8 +66,8 @@ const ChatInfos = ({ setShowModal, socket, channelName, currentUserLogin }: Chat
           return (
             <div key={user.id} className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-2">
-                <img className="w-8 rounded-full" src={user.intraImageURL} alt="user" />
-                <h3 className="text-lg">{user.login}</h3>
+                <img className="w-8 rounded-full" src={user.imagePath} alt="user" />
+                <h3 className="text-lg">{user.username}</h3>
               </div>
               <div className="flex gap-2">
                 <button className="rounded-full p-1 hover:bg-green-1" title="Start a game">

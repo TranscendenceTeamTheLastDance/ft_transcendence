@@ -20,6 +20,7 @@ import CreateChannel from "./CreateChannel";
 import JoinChannel from "./JoinChannel";
 
 import { useUserContext } from "../../context/UserContext";
+import { userDto } from "./dto/userDto";
 import "./index.css";
 // import axios from 'axios';
 
@@ -37,20 +38,6 @@ export interface ChannelType {
   isDM: boolean;
 }
 
-export interface userDto {
-  id: number;
-  username: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  imagePath: string;
-  JWTtoken?: string;
-  displayName: string;
-  description: string;
-  bannerPath: string;
-  intraImageURL: string;
-  status: string;
-}
 
 const Chat = () => {
   const { user, fetchUserData } = useUserContext();
@@ -78,12 +65,10 @@ const Chat = () => {
     const tmpSocket = io("http://localhost:8080/chat", {
       withCredentials: true,
     });
-    console.log("connecting");
     tmpSocket.on("connect", () => {
       setSocket(tmpSocket);
       setLoading(false);
-      console.log("connected");
-
+      console.log("connecting to chat namespace");
       tmpSocket.emit("joinedChannels", (data: ChannelType[]) => {
         setJoinedChannels(data);
         console.log("joinedChannels", data);

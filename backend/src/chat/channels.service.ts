@@ -3,7 +3,7 @@ import { WsException } from '@nestjs/websockets';
 import { ChannelRole, ChannelType, Prisma, User } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 
-import { CreateChannelDTO, JoinChannelDTO, SendMessageDTO } from './chat.dto';
+import { CreateChannelDTO, JoinChannelDTO, SendMessageDTO, MessageHistoryDTO } from './chat.dto';
 
 type ChannelWithUsers = Prisma.ChannelGetPayload<{ include: { users: true } }>;
 
@@ -218,5 +218,48 @@ export class ChannelsService {
         role: channelUser.role,
       },
     };
+  }
+
+  async getMessageHistory(dto: MessageHistoryDTO, user: User) {
+    const channel = await this.getChannel(dto.channel);
+    const channelUser = channel.users.find((u) => u.userId === user.id);
+
+    if (!channelUser) {
+      throw new WsException(`You are not in channel ${channel.name}`);
+    }
+
+    if (!dto.offset) {
+      dto.offset = 0;
+    }
+
+    const messages = await this.prisma.message.findMany({
+      where: {
+        channel: { name: dto.channel },
+      },
+      include: {
+        author: true,
+      },
+      orderBy: {
+        id: 'desc',
+      },
+      skip: dto.offset,
+      take: dto.limit,
+    });
+
+    return messages
+      .map((msg) => {
+        const channelUser = channel.users.find((u) => u.userId === msg.authorId);
+
+        return {
+          createdAt: msg.createdAt,
+          content: msg.content,
+          channel: channel.name,
+          user: {
+            ...msg.author,
+            role: channelUser ? channelUser.role : ChannelRole.USER,
+          },
+        };
+      })
+      .reverse();
   }
 }
