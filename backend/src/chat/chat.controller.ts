@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ChannelsService } from './channels.service';
-import { JwtGuard } from '@/auth/guard/jwt.guard';
+import { JwtGuard } from '../auth/guard/jwt.guard';
 
 @Controller('chat')
 @UseGuards(JwtGuard)

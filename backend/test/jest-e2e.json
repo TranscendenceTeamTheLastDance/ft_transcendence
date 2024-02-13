@@ -5,12 +5,5 @@
   "testRegex": ".e2e-spec.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
-  },
-  "collectCoverageFrom": ["src/**/*.ts"],
-  "coverageDirectory": "coverage",
-  "coverageReporters": ["json", "lcov", "text", "clover"],
-  "moduleDirectories": ["node_modules", "src"],
-  "moduleNameMapper": {
-    "@app/(.*)": "<rootDir>/src/$1"
   }
 }
