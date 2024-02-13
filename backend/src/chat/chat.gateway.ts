@@ -30,7 +30,6 @@ import {
 } from './chat.dto';
 import { ChatEvent } from './chat.state';
 import { UserService } from 'src/user/user.service';
-import { JwtStrategy } from 'src/auth/strategy';
 import { ConfigService } from '@nestjs/config';
 
 @UsePipes(new ValidationPipe())
@@ -53,7 +52,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		private jwtService: JwtService,
 		private channelsService: ChannelsService,
 		private userService: UserService,
-		private jwtStrategy: JwtStrategy,
 		private configService: ConfigService,
 	) {}
 
