@@ -26,7 +26,7 @@ const ChatInfos = ({
   currentUserLogin,
 }: ChatInfosProps) => {
   const [users, setUsers] = useState<UserType[]>([]);
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  // const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   useEffect(() => {
     socket.emit(
@@ -40,6 +40,7 @@ const ChatInfos = ({
         // if (user && (user.role === 'ADMIN' || user.role === 'OWNER')) setIsAdmin(true);
       }
     );
+    // eslint-disable-next-line
   }, []);
 
   //   const promoteUser = (user: UserType) => {

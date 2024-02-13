@@ -1,13 +1,16 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom';
-import './LoginSignup.css'
-import Particles from '../Home/Particles';
+import './LoginSignup.css';
+import Hyperspace from '../assets/hyperspace.mp4';
+import animationData from '../assets/animation.json';
 
 import user_icon from '../assets/person.png';
 import email_icon from '../assets/email.png';
 import password_icon from '../assets/password.png';
 
 import TwoFactorFormMod from './TwoFactorForm.tsx';
+import { Toaster, toast } from 'sonner';
+import Lottie, {LottieRefCurrentProps}from 'lottie-react';
 
 
 const LoginSignup = () => {
@@ -15,6 +18,7 @@ const LoginSignup = () => {
 	const [formData, setFormData] = useState({ username: '', email: '', password: '' });
 	const [twoFactor, setTwoFactor] = useState(false);
 	const [userMail, setUserMail] = useState('');
+	const phoneRef = useRef<LottieRefCurrentProps>(null);
 
 	const handleChange = (e) => {
 		const newFormData = ({ ...formData, [e.target.name]: e.target.value });
@@ -33,10 +37,11 @@ const LoginSignup = () => {
 			},
 			body: JSON.stringify(formData),
 		});
+		const data = await response.json();
 		if (!response.ok) {
+			toast.error(`Signup failed: ${data.message}`);
 			throw new Error('Signup failed');
 		}
-		const data = await response.json();
 		navigate('/home');
 		console.log('Signup successful:', data); }
 	catch (error) {
@@ -54,10 +59,11 @@ const LoginSignup = () => {
 			},
 			body: JSON.stringify(formData),
 		});
+		const data = await response.json();
 		if (!response.ok) {
+			toast.error(`Login failed: ${data.message}`);
 			throw new Error('Signin failed encule');
 		}
-		const data = await response.json();
 		if (data.user.twoFactorEnabled) {
 			setUserMail(data.user.email);
 			setTwoFactor(true);
@@ -77,89 +83,97 @@ const LoginSignup = () => {
     };
 
 	return (
-	<div className ='container'>
-		<Particles className="absolute inset-0 -z-10 animate-fade-in" quantity={1000} />
-		<div className='header'>
-			<div className='text'>{action}</div>
-			<div className='underline'></div>
-		</div>
-		
-		<div className='inputs'>
-			{/* USERNAME */}
-			{action==="Login" ? <div></div>:
-			<div className='input'>
-				<img src={user_icon} alt='' />
-				<input 
-					type= "text" 
-					name ="username"
-					placeholder="username"
-					value={formData.username}
-					onChange={handleChange}
-				/>
-			</div>}
-			{/* EMAIL INPUT */}
-			<div className='input'>
-				<img src={email_icon} alt='' />
-				<input 
-					type= 'email'
-					name='email'
-					placeholder='email'
-					value={formData.email}
-					onChange={handleChange}
-				/>
+	<div>
+		<Toaster richColors/>
+		<div className ='container'>
+			{/* <Particles className="absolute inset-0 -z-10 animate-fade-in" quantity={1000} /> */}
+			<video src= {Hyperspace} autoPlay loop muted className='video'></video>
+			<div className='header'>
+				<div className='text'>{action}</div>
+				<div className='underline'></div>
 			</div>
-			{/* PASSWORD INPUT */}
-			<div className='input'>
-				<img src={password_icon} alt='' />
-				<input 
-					type= "password"
-					name='password'
-					placeholder='password'
-					value={formData.password}
-					onChange={handleChange}
-				/>
-			
+
+			<div className='inputs'>
+				{/* USERNAME */}
+				{action==="Login" ? <div></div>:
+				<div className='input'>
+					<img src={user_icon} alt='' />
+					<input 
+						type= "text" 
+						name ="username"
+						placeholder="username"
+						value={formData.username}
+						onChange={handleChange}
+					/>
+				</div>}
+				{/* EMAIL INPUT */}
+				<div className='input'>
+					<img src={email_icon} alt='' />
+					<input 
+						type= 'email'
+						name='email'
+						placeholder='email'
+						value={formData.email}
+						onChange={handleChange}
+					/>
+				</div>
+				{/* PASSWORD INPUT */}
+				<div className='input'>
+					<img src={password_icon} alt='' />
+					<input 
+						type= "password"
+						name='password'
+						placeholder='password'
+						value={formData.password}
+						onChange={handleChange}
+					/>
+
+				</div>
 			</div>
+			<div className='submit-container'>
+				{action==="Login" ? <div></div>:
+				<button 
+					className="logsbutton"
+					onClick={(e) =>{handleSignUp(e);}}
+					>Sign Up</button> }
+				{action==="Sign Up" ? <div></div>:
+				<button 
+					className="logsbutton"
+					onClick={(e)=>{handleSignIn(e);}}
+					>Login</button>}
+			</div>
+			<div className='switch-button'>
+    		{action === 'Login' ? (
+    		  <div>
+    		    <p>You don't have any account yet?{' '}
+    		      <span className='signInLink' onClick={(e) => {setAction('Sign Up');}}>
+    		        Sign Up
+    		      </span>
+    		    </p>
+    		  </div>) : (
+    		  <div>
+    		    <p>
+    		      You already have an account?{' '}
+    		      <span className='signInLink' onClick={(e) => {setAction('Login');}}>
+    		        Sign In
+    		      </span>
+    		    </p>
+    		  </div>
+    		)}
+  			</div>
+			<div className="button42" onClick={handleRedir42}>
+				<Lottie className='animation42' onMouseOver={() => {phoneRef.current?.play()}} lottieRef={phoneRef} animationData={animationData} style={{width: '50px', height: '50px'}} />
+				<button className="buttonsubmit42"> Login with 42</button>
+			</div>
+			{twoFactor ? (
+    	            <TwoFactorFormMod
+    	                title="Sign-In two-factor authentication"
+    	                modalID={'Signin-2FA-form'}
+						mail={userMail}
+    	                closeModal={() => setTwoFactor(false)}
+    	            />
+    	        ) : null}
 		</div>
-		<div className='submit-container'>
-			<div 
-				className={action==="Login"?"bg-gray-500 text-white py-2 px-4 rounded-lg text-lg font-bold mx-2":"bg-gray-100 py-2 px-4 rounded-lg text-lg font-bold mx-2"} 
-				onClick={(e) =>{setAction("Sign Up");}}
-				>Sign Up</div>
-			
-			<div 
-				className={action==="Sign Up"?"bg-gray-500 text-white py-2 px-4 rounded-lg text-lg font-bold mx-2":"bg-gray-100 py-2 px-4 rounded-lg text-lg font-bold mx-2"} 
-				onClick={(e)=>{setAction("Login");}}
-				>Login</div>	
-		</div>
-		<div className='submit-button'>
-			<button
-				className="bg-gray-500 text-white py-2 px-4 rounded-lg text-lg font-bold mx-2"
-				onClick={(e) => {
-					if (action === "Sign Up") {
-					handleSignUp(e);
-					} else {
-					handleSignIn(e);
-					}
-				}}
-				>
-				Submit
-			</button>
-		</div>
-		<div className='42button'>
-			<button 
-				className="42buttonsubmit" onClick={handleRedir42}
-				> login with 42
-			</button>
-		</div>
-		{twoFactor ? (
-                <TwoFactorFormMod
-                    title="Sign-In two-factor authentication"
-                    modalID={'Signin-2FA-form'}
-					mail={userMail}
-                    closeModal={() => setTwoFactor(false)}
-                />
-            ) : null}
 	</div>
   )
 }

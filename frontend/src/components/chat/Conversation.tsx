@@ -78,6 +78,7 @@ const Conversation = ({ channel, socket }: ConversationProps) => {
     return () => {
       socket.off("message");
     };
+    // eslint-disable-next-line
   }, [channel]);
 
   const sendMessage = (e: React.FormEvent<HTMLFormElement>) => {

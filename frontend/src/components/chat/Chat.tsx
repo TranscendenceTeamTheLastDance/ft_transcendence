@@ -100,6 +100,7 @@ const Chat = () => {
       socket?.off("youJoined");
       socket?.disconnect();
     };
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
@@ -114,6 +115,7 @@ const Chat = () => {
     return () => {
       socket?.off("youLeft");
     };
+    // eslint-disable-next-line
   }, [joinedChannels]);
 
   if (loading) return <div>loading</div>;
