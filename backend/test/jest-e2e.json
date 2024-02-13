@@ -8,7 +8,6 @@
   },
   "collectCoverageFrom": ["src/**/*.ts"],
   "coverageDirectory": "coverage",
-  "testResultsProcessor": "jest-sonar-reporter",
   "coverageReporters": ["json", "lcov", "text", "clover"],
   "moduleDirectories": ["node_modules", "src"],
   "moduleNameMapper": {
