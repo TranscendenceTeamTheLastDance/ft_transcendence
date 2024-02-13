@@ -21,7 +21,7 @@ const ChatListElem = ({
   return (
     <button
       onClick={() => handleClick(chatInfos)}
-      className={`flex w-full cursor-pointer p-3 enabled:hover:bg-white-2 ${
+      className={`flex w-full cursor-pointer p-3 enabled:hover:bg-white-2 rounded-lg ${
         currentChannel?.name === chatInfos.name && "bg-white-3"
       }`}
       disabled={currentChannel?.name === chatInfos.name}
