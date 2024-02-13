@@ -10,6 +10,17 @@ import { toDataURL } from 'qrcode';
 export class UserService {
   constructor(private prisma: DatabaseService) {}
 
+  async getUnique(email: string): Promise<User> {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { email: email },
+      });
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async uploadAvatar(userId: number, imageBase64: string) {
     try {
       const user = await this.prisma.user.update({

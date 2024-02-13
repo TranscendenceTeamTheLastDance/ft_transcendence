@@ -1,18 +1,14 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
-// import { JwtAuthGuard } from '../auth/guard/jwt.guard
-// import { ApiBearerAuth } from '@nestjs/swagger';
-
-import { ChannelsService } from './chat.service';
-import { CreateChannelDTO } from './chat.dto';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { ChannelsService } from './channels.service';
+import { JwtGuard } from '../auth/guard/jwt.guard';
 
 @Controller('chat')
-// @UseGuards(JwtAuthGuard)
-// @ApiBearerAuth()
+@UseGuards(JwtGuard)
 export class ChatController {
-  constructor(private channelsService: ChannelsService) {}
-
-  @Post('/createChannel')
-  async createChannel(@Body() channel: CreateChannelDTO) {
-    return this.channelsService.createChannel(channel);
+	constructor(private channelsService: ChannelsService) {}
+  
+	@Get('/channelList')
+	async getMyUser() {
+	  return await this.channelsService.getChannelList();
+	}
   }
-}

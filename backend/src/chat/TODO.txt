@@ -1,5 +1,4 @@
-Attention a bien implementer les GUARDS JWT
-Ne pas attendre que ca deviennt critique pour les comprendre
-et les appliquer et tester
+Probleme de se connecter avec l api 42 a tester a l ecole
 
-Letsgo for the show
+Erreur User.Context verifier si ca vient du componement Chat.tsx lors de la recup de user.
+Peut etre que je dois utiliser axios.GET
