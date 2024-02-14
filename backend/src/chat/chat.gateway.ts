@@ -1,22 +1,22 @@
 import {
-	Logger,
-	UseFilters,
-	UseGuards,
-	UsePipes,
-	ValidationPipe,
+  Logger,
+  UseFilters,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
-	ConnectedSocket,
-	MessageBody,
-	OnGatewayConnection,
-	OnGatewayDisconnect,
-	OnGatewayInit,
-	SubscribeMessage,
-	WebSocketGateway,
-	WebSocketServer,
-	WsException,
-	WsResponse,
+  ConnectedSocket,
+  MessageBody,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  OnGatewayInit,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+  WsException,
+  WsResponse,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
@@ -28,11 +28,13 @@ import {
 	JoinChannelDTO,
 	SendMessageDTO,
 	MessageHistoryDTO,
+  UserListInChannelDTO,
 } from './chat.dto';
 import { ChatEvent } from './chat.state';
 import { UserService } from '../user/user.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtGuard } from '../auth/guard';
+import { userType } from '@/common/userType.interface';
 
 @UsePipes(new ValidationPipe())
 @WebSocketGateway({
@@ -187,6 +189,36 @@ export class ChatGateway
       client.data.user,
     );
     this.io.to(messageDTO.channel).emit(ChatEvent.Message, message);
+  }
+
+  @SubscribeMessage(ChatEvent.UserList)
+  async handleUserList(
+    @MessageBody() UserListDTO: UserListInChannelDTO,
+    @ConnectedSocket() client: Socket,
+  ): Promise<{ channel: string; users: userType[] }> {
+    try {
+      const channelMembers = await this.channelsService.getChannelMembers(
+        UserListDTO.channel,
+      );
+
+      // Extract only the desired fields from UserListDTO (frontend: userType)
+      const extractedUserList = channelMembers.map((member) => ({
+        id: member.id,
+        username: member.username,
+        profilePic: member.profilePic,
+      }));
+
+      const userTypeList = {
+        channel: UserListDTO.channel,
+        users: extractedUserList,
+      };
+
+      console.log(userTypeList);
+      return userTypeList;
+    } catch (error) {
+      console.error('Error fetching channel members:', error);
+      throw new WsException('Failed to fetch channel members');
+    }
   }
 
   @SubscribeMessage(ChatEvent.MessageHistory)

@@ -5,6 +5,7 @@ import { PrismaService } from 'nestjs-prisma';
 
 import { CreateChannelDTO, JoinChannelDTO, SendMessageDTO, MessageHistoryDTO } from './chat.dto';
 
+// payload type that includes information about a channel and its users
 type ChannelWithUsers = Prisma.ChannelGetPayload<{ include: { users: true } }>;
 
 @Injectable()
@@ -24,6 +25,25 @@ export class ChannelsService {
     }
 
     return channel;
+  }
+
+  // retrieve the users from a specific channel
+  async getChannelMembers(channelName: string): Promise<User[]> {
+    const channel = await this.getChannel(channelName);
+
+    if (!channel) {
+      throw new WsException(`Channel ${channelName} not found`);
+    }
+
+    const channelUsers = await this.prisma.channelUser.findMany({
+      where: {
+        channelId: channel.id,
+      },
+      include: {
+        user: true,
+      },
+    });
+    return channelUsers.map((chanUser) => chanUser.user);
   }
 
   async createChannel(
