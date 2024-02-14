@@ -12,15 +12,15 @@ datasource db {
 }
 
 enum ChannelType {
-    PUBLIC
-    PROTECTED
-    PRIVATE
+	PUBLIC
+	PROTECTED
+	PRIVATE
 }
 
 enum ChannelRole {
-    USER
-    ADMIN
-    OWNER
+	USER
+	ADMIN
+	OWNER
 }
 
 model User {
@@ -36,6 +36,10 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  blocked             User[]        @relation("blocked")
+  blockedBy           User[]        @relation("blocked")
+  bannedOf            Channel[]
+  messages            Message[] // Not in ChannelUser for message persistence
   hashedRefreshToken String?
 
   channels ChannelUser[]
@@ -44,33 +48,35 @@ model User {
 }
 
 model ChannelUser {
-    id        Int         @id @default(autoincrement())
-    user      User        @relation(fields: [userId], references: [id])
-    userId    Int
-    channel   Channel     @relation(fields: [channelId], references: [id])
-    channelId Int
-    role      ChannelRole
-    Message   Message[]
+	id        Int         @id @default(autoincrement())
+	user      User        @relation(fields: [userId], references: [id])
+	userId    Int
+	channel   Channel     @relation(fields: [channelId], references: [id])
+	channelId Int
+	role      ChannelRole
+
+	@@unique([userId, channelId])
 }
 
 model Channel {
-    id        Int           @id @default(autoincrement())
-    createdAt DateTime      @default(now())
-    updatedAt DateTime      @updatedAt
-    name      String        @unique
-    type      ChannelType
-    password  String?
-    users     ChannelUser[]
-    messages  Message[]
-    isDM      Boolean       @default(false) // is Direct Message
+	id        Int           @id @default(autoincrement())
+	createdAt DateTime      @default(now())
+	updatedAt DateTime      @updatedAt
+	name      String        @unique
+	type      ChannelType
+	password  String?
+	users     ChannelUser[]
+	messages  Message[]
+	isDM      Boolean       @default(false) // is Direct Message
+	bans      User[]
 }
 
 model Message {
-    id        Int         @id @default(autoincrement())
-    createdAt DateTime    @default(now())
-    channel   Channel     @relation(fields: [channelId], references: [id])
-    channelId Int
-    author    ChannelUser @relation(fields: [authorId], references: [id])
-    authorId  Int
-    content   String
+	id        Int      @id @default(autoincrement())
+	createdAt DateTime @default(now())
+	channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+	channelId Int
+	author    User     @relation(fields: [authorId], references: [id])
+	authorId  Int
+	content   String
 }

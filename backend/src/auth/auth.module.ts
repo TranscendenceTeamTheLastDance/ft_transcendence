@@ -9,6 +9,7 @@ import { JwtRefreshStrategy } from './strategy/jwt.refresh.strategy';
 @Module({
 	imports:[JwtModule.register({})],
 	controllers: [AuthController],
-	providers: [AuthService, JwtStrategy, JwtRefreshStrategy]
+	providers: [AuthService, JwtStrategy, JwtRefreshStrategy],
+	exports: [AuthService, JwtModule, JwtStrategy]
 })
 export class AuthModule {}
