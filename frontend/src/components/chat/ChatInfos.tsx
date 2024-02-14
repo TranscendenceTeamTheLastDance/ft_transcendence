@@ -5,7 +5,8 @@ import { Socket } from "socket.io-client";
 import game_icon from "../assets/chat/boxing-glove.svg";
 // import promote_icon from '../assets/chat/crown.svg';
 
-import { UserType } from "./Conversation";
+import { UserType } from "@/common/userType.interface";
+// import { UserType } from "./Conversation";
 
 interface ChatInfosProps {
   setShowModal: (show: boolean) => void;
@@ -34,9 +35,10 @@ const ChatInfos = ({
       { channel: channelName },
       (res: UserListResponse) => {
         setUsers(
-          res.users.filter((user) => user.username !== currentUserLogin)
+          res.users.filter((user) => user.username) //!== currentUserLogin)
         );
-        // const user = res.users.find((user) => user.login === currentUserLogin) || null;
+        // const user =
+        // res.users.find((user) => user.login === currentUserLogin) || null;
         // if (user && (user.role === 'ADMIN' || user.role === 'OWNER')) setIsAdmin(true);
       }
     );
@@ -91,6 +93,12 @@ const ChatInfos = ({
                 <button
                   className="rounded-full p-1 hover:bg-green-1"
                   title="Start a game"
+                >
+                  <img className="w-6" src={game_icon} alt="close" />
+                </button>{" "}
+                <button
+                  className="rounded-full p-1 hover:bg-green-1"
+                  title="Send DM"
                 >
                   <img className="w-6" src={game_icon} alt="close" />
                 </button>

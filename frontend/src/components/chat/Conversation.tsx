@@ -12,19 +12,20 @@ import ChatModal from "./ChatModal";
 import Message from "./Message";
 
 import { useUserContext } from "../../context/UserContext";
+import { UserType } from "@/common/userType.interface";
 
 interface ConversationProps {
   channel: ChannelType;
   socket: Socket;
 }
 
-export interface UserType {
-  id: number;
-  username: string;
-  // status: string;
-  profilePic: string;
-  // role: string; // a ajouter dans le user-context
-}
+// export interface UserType {
+//   id: number;
+//   username: string;
+//   // status: string;
+//   profilePic: string;
+//   // role: string; // a ajouter dans le user-context
+// }
 
 export interface MessageType {
   id: number;
