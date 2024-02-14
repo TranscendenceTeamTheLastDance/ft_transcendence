@@ -29,6 +29,7 @@ import {
 	SendMessageDTO,
 	MessageHistoryDTO,
   UserListInChannelDTO,
+  SendDmDTO,
 } from './chat.dto';
 import { ChatEvent } from './chat.state';
 import { UserService } from '../user/user.service';
@@ -227,5 +228,17 @@ export class ChatGateway
     @ConnectedSocket() client: Socket,
   ) {
     return await this.channelsService.getMessageHistory(dto, client.data.user);
+  }
+
+  @SubscribeMessage(ChatEvent.DirectMessage)
+  async onDirectMessageUser(@MessageBody() dm: SendDmDTO, @ConnectedSocket() client: Socket) {
+    const data = await this.channelsService.sendDM(dm, client.data.user);
+
+    const sockets = this.socketsID.get(dm.username) || [];
+    for (const socket of sockets) {
+      this.io.to(socket.id).emit(ChatEvent.DirectMessage, data);
+    }
+
+    client.emit(ChatEvent.DirectMessage, data);
   }
 }

@@ -1,28 +1,29 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
-// import { UseQueryResult } from "react-query";
+import { UseQueryResult } from "react-query";
 import { io, Socket } from "socket.io-client";
+import axios from "axios";
+import "./index.css";
 
 import chat_channel from "../assets/chat/Chat.svg";
 import chat_plus from "../assets/chat/chat_plus.svg";
 import chat_DM from "../assets/chat/comment.svg";
-// import find_someone from '@/assets/chat/find_someone.png';
+import find_someone from "../assets/chat/find_someone.png";
 import chat_join from "../assets/chat/join-channel.svg";
 // import { useApi } from "@/hooks/useApi";
+
+import { useAuthAxios } from "../../context/AuthAxiosContext.tsx";
+import { useUserContext } from "../../context/UserContext";
 
 import ChatList from "./ChatList";
 import ChatModal from "./ChatModal";
 import Conversation from "./Conversation";
 import CreateChannel from "./CreateChannel";
-// import DmConversation from './DmConversation';
-// import DmCreate from './DmCreate';
-// import DmList from './DmList';
+import DmConversation from "./DmConversation";
+import DmCreate from './DmCreate.tsx';
+import DmList from './DmList';
 import JoinChannel from "./JoinChannel";
-
-import { useUserContext } from "../../context/UserContext";
 import { userDto } from "./dto/userDto";
-import "./index.css";
-// import axios from 'axios';
 
 export interface Channel {
   name: string;
@@ -38,24 +39,25 @@ export interface ChannelType {
   isDM: boolean;
 }
 
-
 const Chat = () => {
   const { user, fetchUserData } = useUserContext();
   const [showCreateChannelModal, setShowCreateChannelModal] =
-    useState<boolean>(false);
+  useState<boolean>(false);
   const [showJoinChannelModal, setShowJoinChannelModal] =
-    useState<boolean>(false);
-  // eslint-disable-next-line
+  useState<boolean>(false);
   const [showDmSomeoneModal, setShowDmSomeoneModal] = useState<boolean>(false);
   const [socket, setSocket] = useState<Socket>();
   const [loading, setLoading] = useState<boolean>(true);
   const [joinedChannels, setJoinedChannels] = useState<ChannelType[]>([]);
   const [currentChannel, setCurrentChannel] = useState<ChannelType | null>(
     null
-  );
+    );
   const [showChannels, setShowChannels] = useState<boolean>(true);
-  let me: userDto | undefined;
 
+  let me: userDto | undefined;
+  const users: userDto[] | undefined = [];
+  const authAxios = useAuthAxios();
+  
   useEffect(() => {
     fetchUserData();
   }, [fetchUserData]);
@@ -88,6 +90,34 @@ const Chat = () => {
     // eslint-disable-next-line
   }, []);
 
+  const fetchMe = async () => {
+    try {
+      me = user;
+      console.log("User main", me);
+    } catch (error) {
+      console.error("Error fetching me:", error);
+    }
+  };
+
+  const fetchData = async () => {
+    try {
+      const usersResponse = await authAxios.get("/chat/allUsers", {
+        withCredentials: true,
+      }) as unknown as UseQueryResult<userDto[], unknown>;
+
+      usersResponse.data?.forEach((user: userDto) => {
+        users?.push(user);
+      });
+
+      console.log("Users recup", users);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
+
+  fetchMe();
+  fetchData();
+
   useEffect(() => {
     socket?.on("youLeft", (data: any) => {
       setCurrentChannel(null);
@@ -105,10 +135,6 @@ const Chat = () => {
 
   if (loading) return <div>loading</div>;
   if (!socket) return <div>socket not initialized</div>;
-  // eslint-disable-next-line
-  me = user;
-
-  console.log("me", me);
 
   const handleShowChannels = (boolean: boolean) => {
     setCurrentChannel(null);
@@ -131,6 +157,16 @@ const Chat = () => {
             setShowModal={setShowJoinChannelModal}
             socket={socket}
             joinedChannels={joinedChannels}
+          />
+        </ChatModal>
+      )}
+      {showDmSomeoneModal && (
+        <ChatModal>
+          <DmCreate
+            setCurrentChannel={setCurrentChannel}
+            setShowModal={setShowDmSomeoneModal}
+            socket={socket}
+            users={users?.filter((user) => user.username !== me?.username)}
           />
         </ChatModal>
       )}
@@ -196,14 +232,38 @@ const Chat = () => {
                 className="rounded-full p-1 hover:bg-white-3"
                 title="Find someone"
                 onClick={() => setShowDmSomeoneModal(true)}
-              ></button>
+              >
+                <img
+                  className="w-5 md:w-6"
+                  src={find_someone}
+                  alt="Find someone"
+                />
+              </button>
             </div>
           </div>
+          <DmList
+            me={me}
+            allUsers={users?.filter((user) => user.username !== me?.username)}
+            joinedChannels={joinedChannels.filter((c) => c.isDM === true)}
+            setCurrentChannel={setCurrentChannel}
+            currentChannel={currentChannel}
+            socket={socket}
+            setJoinedChannels={setJoinedChannels}
+          />
         </div>
       )}
-      {currentChannel && (
-        <Conversation socket={socket} channel={currentChannel} />
-      )}
+      {showChannels
+        ? currentChannel && (
+            <Conversation me={me} socket={socket} channel={currentChannel} />
+          )
+        : currentChannel && (
+            <DmConversation
+              allUsers={users?.filter((user) => user.username !== me?.username)}
+              me={me}
+              socket={socket}
+              channel={currentChannel}
+            />
+          )}
     </div>
   );
 };

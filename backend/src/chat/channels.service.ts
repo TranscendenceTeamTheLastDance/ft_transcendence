@@ -2,15 +2,19 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
 import { ChannelRole, ChannelType, Prisma, User } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
+import { UserService } from '../user/user.service';
 
-import { CreateChannelDTO, JoinChannelDTO, SendMessageDTO, MessageHistoryDTO } from './chat.dto';
+import { CreateChannelDTO, JoinChannelDTO, SendMessageDTO, MessageHistoryDTO, SendDmDTO } from './chat.dto';
 
 // payload type that includes information about a channel and its users
 type ChannelWithUsers = Prisma.ChannelGetPayload<{ include: { users: true } }>;
 
 @Injectable()
 export class ChannelsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private userService: UserService,
+  ) {}
 
   async getChannel(channelName: string): Promise<ChannelWithUsers> {
     const channel = await this.prisma.channel.findUnique({
@@ -175,6 +179,10 @@ export class ChannelsService {
     return channels;
   }
 
+  async getAllUsers(): Promise<User[]> {
+    return await this.prisma.user.findMany();
+  }
+
   async getJoinedChannels(user: User) {
     const channelUsers = await this.prisma.channelUser.findMany({
       where: {
@@ -281,5 +289,66 @@ export class ChannelsService {
         };
       })
       .reverse();
+  }
+
+  // Generate the DM channel name between 2 users
+  getDmChannelName(login1: string, login2: string): string {
+    return `!${login1}!${login2}`;
+  }
+
+  async sendDM(dm: SendDmDTO, user: User) {
+    const otherUser = await this.userService.getUnique(dm.username);
+
+    if (otherUser.id === user.id) {
+      throw new WsException('You cannot send a direct message to yourself');
+    }
+
+    const channelName = this.getDmChannelName(user.username, dm.username);
+    let channel = await this.prisma.channel.findUnique({
+      where: { name: channelName },
+    });
+
+    if (!channel) {
+      channel = await this.prisma.channel.create({
+        data: {
+          name: channelName,
+          type: ChannelType.PRIVATE,
+          isDM: true,
+          users: {
+            create: [
+              {
+                user: { connect: { id: user.id } },
+                role: ChannelRole.USER,
+              },
+              {
+                user: { connect: { id: otherUser.id } },
+                role: ChannelRole.USER,
+              },
+            ],
+          },
+        },
+      });
+    }
+
+    const created = await this.prisma.message.create({
+      data: {
+        content: dm.content,
+        author: { connect: { id: user.id } },
+        channel: { connect: { name: channelName } },
+      },
+      include: {
+        author: true,
+      },
+    });
+
+    return {
+      createdAt: created.createdAt,
+      content: created.content,
+      channel: channel,
+      user: {
+        ...created.author,
+        role: ChannelRole.USER,
+      },
+    };
   }
 }

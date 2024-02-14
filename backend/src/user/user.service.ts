@@ -21,6 +21,17 @@ export class UserService {
     }
   }
 
+  async getUserByUsername(username: string): Promise<User> {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { username: username },
+      });
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async uploadAvatar(userId: number, imageBase64: string) {
     try {
       const user = await this.prisma.user.update({

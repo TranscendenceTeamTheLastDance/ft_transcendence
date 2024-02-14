@@ -11,4 +11,9 @@ export class ChatController {
   async getMyUser() {
     return await this.channelsService.getChannelList();
   }
+
+  @Get('/allUsers')
+  async getAllUsers() {
+    return await this.channelsService.getAllUsers();
+  }
 }
