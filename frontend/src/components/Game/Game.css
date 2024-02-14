@@ -4,9 +4,13 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: blue;
+    width: 100vw;
+    background-color: rgb(17, 5, 122);
+    color: #ffffff;
 }
 
 .canvas {
     border: 2px solid #ffffff; /* Bordure noire de 2 pixels */
+    width :80%;
+    height : auto ;
 }

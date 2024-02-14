@@ -47,7 +47,6 @@ const PongGame: React.FC = () => {
     
     let clienInfoCookie: userDto | undefined;
     clienInfoCookie = user;
-    console.log("me", clienInfoCookie);
     
     // console.log(user.username);
     useEffect(() => {
@@ -113,7 +112,6 @@ const PongGame: React.FC = () => {
                         <p>Finish</p>
                         <p>{winningStatus}</p>
                         <p>{infoGame.playerName1} {scorePlayer1}      {infoGame.playerName2} {scorePlayer2}</p>
-                        <button>retry</button>
                     </div>
                 ) : (
                     playerLeftGame ? (

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef} from 'react';
+import React, { useEffect, useRef, useState} from 'react';
 import { Socket } from 'socket.io-client';
 import './Game.css';
 
@@ -63,30 +63,52 @@ function drawText(ctx: CanvasRenderingContext2D, text: string, x: number, y: num
 }
 
 const CanvasGame: React.FC<{ infoGame: InfoGame }>= ({ infoGame }) => {
-    console.log(infoGame);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const roomIdRef = useRef(infoGame.roomID);
     const socket = infoGame.socket;
     const numPlayer = infoGame.NumPalyer;
     const playerName1 = infoGame.playerName1;
     const playerName2 = infoGame.playerName2;
+
     
+    const [canvasSize, setCanvasSize] = useState({ width: 800, height: 400 });
+
+    useEffect(() => {
+        const resizeCanvas = () => {
+            if (canvasRef.current) {
+                const canvas = canvasRef.current;
+                const parent = canvas.parentElement;
+                if (parent) {
+                    const rect = parent.getBoundingClientRect();
+                    setCanvasSize({ width: rect.width, height: rect.height });
+                }
+            }
+        };
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        return () => {
+            window.removeEventListener('resize', resizeCanvas);
+        };
+    }, []);
+
     // Initialisation du jeu
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas?.getContext('2d');
         if (!canvas || !ctx ) 
-        return;
+            return;
     
     let animationFrameId: number;
-    // console.log(numPlayer);
-    // Initialisation de la raquette de l'utilisateur
-    // mettre les width et height en fonction de canvas.height et canvas.width pour le cote responsive
+    
+    console.log(canvasSize.width, canvasSize.height);
+
     let player1: Paddle = {
         x: 0,
         y: (canvas.height - 100) / 2,
         width: 10,
-        height: 100,
+        height: canvas.height / 4,
         score: 0,
         color: "WHITE",
         top: 0,
@@ -99,7 +121,7 @@ const CanvasGame: React.FC<{ infoGame: InfoGame }>= ({ infoGame }) => {
         x: canvas.width - 10,
         y: (canvas.height - 100) / 2,
         width: 10,
-        height: 100,
+        height: canvas.height / 4,
         score: 0,
         color: "WHITE",
         top: 0,
@@ -134,11 +156,11 @@ const CanvasGame: React.FC<{ infoGame: InfoGame }>= ({ infoGame }) => {
 
         socket.on('game-state', (gameState) => {
             if (numPlayer === 1)
-                player2.y = gameState.padU2.y;
+                player2.y = (gameState.padU2.y / 400) * canvas.height;
             else
-                player1.y = gameState.padU2.y;
-            ball.x = gameState.ball.x;
-            ball.y = gameState.ball.y;
+                player1.y = (gameState.padU2.y / 400) * canvas.height;
+            ball.x = (gameState.ball.x / 800 )* canvas.width;
+            ball.y = (gameState.ball.y / 400) * canvas.height;
             player1.score = gameState.score.scoreU1;
             player2.score = gameState.score.scoreU2;      
         });
@@ -167,14 +189,14 @@ const CanvasGame: React.FC<{ infoGame: InfoGame }>= ({ infoGame }) => {
                 if (player1.y < 0) {
                     player1.y = 0;
                 }
-                socket.emit('user-paddle-move', { y: player1.y , roomId: roomIdRef.current, x: player1.x});
+                socket.emit('user-paddle-move', { y: player1.y / canvas.height, roomId: roomIdRef.current, x: player1.x});
             }
             else {
                 player2.y = Math.min(mouseY - player2.height / 2, canvas.height - player2.height);
                 if (player2.y < 0) {
                     player2.y = 0;
                 }
-                socket.emit('user-paddle-move', { y: player2.y , roomId: roomIdRef.current, x: player2.x});
+                socket.emit('user-paddle-move', { y: player2.y / canvas.height, roomId: roomIdRef.current, x: player2.x});
             }
         };
 
@@ -186,11 +208,11 @@ const CanvasGame: React.FC<{ infoGame: InfoGame }>= ({ infoGame }) => {
             socket.off('game-state');
             // socket.emit('client-disconnect');
         };
-    }, [socket, numPlayer, playerName1, playerName2]);
+    }, [socket, numPlayer, playerName1, playerName2, canvasSize]);
 
     return (
         <div>
-            <canvas ref={canvasRef} width="800" height="400" className='canvas'/>
+            <canvas ref={canvasRef} height="400" width="800" className='canvas'/>
         </div>
     );
 };

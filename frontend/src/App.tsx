@@ -20,6 +20,7 @@ function App() {
 				<Route path="/home" element={<Home />} />
 				<Route path="/user" element={<User />} />
 				<Route path="/chat" element={<Chat />} />
+				<Route path="/play" element={<PongGame />} />
 			</Routes>
 		</AuthAxiosProvider>
 	</UserProvider>

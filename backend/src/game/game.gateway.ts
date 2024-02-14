@@ -2,17 +2,6 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, ConnectedSocket, MessageBody } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { GameRoom } from './room.service';
-import { UserService } from 'src/user/user.service';
-import { JwtStrategy } from 'src/auth/strategy';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import {
-	Logger,
-	UseFilters,
-	UseGuards,
-	UsePipes,
-	ValidationPipe,
-} from '@nestjs/common';
 
 @WebSocketGateway({
     cors: {
@@ -27,46 +16,6 @@ export class GameGateway {
 
     private waitingPlayers: { client: Socket, username: string }[] = [];
     private gameRooms: Map<string, GameRoom> = new Map();
-    private logger: Logger = new Logger(GameGateway.name);
-    
-    constructor(
-      private jwtService: JwtService,
-      private userService: UserService,
-      private jwtStrategy: JwtStrategy,
-      private configService: ConfigService,
-    ) {}
-
-    async handleConnection(client: Socket, ...args: any[]) {
-      try {
-        this.logger.log(`Client connected: ${client.id}`);
-        const cookieName = this.configService.get('JWT_ACCESS_TOKEN_COOKIE'); // Récupérez le nom du cookie JWT à partir de la configuration
-        const token = client.handshake.headers.cookie.split(`${cookieName}=`)[1]; // Récupérez le token JWT du cookie
-  
-        if (token) {
-          this.logger.log('Token: ' + token);
-          const payload = this.jwtService.decode(token); // Décoder le token\
-          this.logger.log("Payload: " + JSON.stringify(payload));
-          client.data.user = await this.userService.getUnique(payload.sub); // Récupérez l'utilisateur à partir de la base de données
-          //   this.logger.log("User attache au socket " + client.data.user.id);
-        } else {
-          this.logger.error('No token found in cookies.');
-          // Gérez le cas où aucun token n'est trouvé dans les cookies
-        }
-  
-        const username = client.data.user.username;
-        const existingSockets = this.socketsID.get(username) || [];
-        existingSockets.push(client);
-        this.socketsID.set(username, existingSockets);
-  
-        const channels = await this.channelsService.getJoinedChannels(client.data.user);
-        const channelsName = channels.map((c) => c.name);
-        client.join(channelsName);
-      } catch (error) {
-        // Gérer les erreurs et renvoyer une réponse appropriée au client
-        throw new WsException('Failed to handle connection');
-      }
-    }
-  
 
     deleteplayerInWaitList(client: Socket) {
       this.waitingPlayers = this.waitingPlayers.filter(player => player.client.id !== client.id);
@@ -137,7 +86,7 @@ export class GameGateway {
       const gameRoom = this.gameRooms.get(roomId);
     
       if (gameRoom) {
-        gameRoom.updatePaddlePosition(data.y, data.x);
+        gameRoom.updatePaddlePosition(data.y * 400, data.x);
       }
     }
     
