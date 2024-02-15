@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef} from 'react';
 import { Socket } from 'socket.io-client';
 import './Game.css';
 
@@ -71,38 +71,54 @@ const CanvasGame: React.FC<{ infoGame: InfoGame }>= ({ infoGame }) => {
     const playerName2 = infoGame.playerName2;
 
     
-    const [canvasSize, setCanvasSize] = useState({ width: 800, height: 400 });
-
-    useEffect(() => {
-        const resizeCanvas = () => {
-            if (canvasRef.current) {
-                const canvas = canvasRef.current;
-                const parent = canvas.parentElement;
-                if (parent) {
-                    const rect = parent.getBoundingClientRect();
-                    setCanvasSize({ width: rect.width, height: rect.height });
-                }
-            }
-        };
-
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        return () => {
-            window.removeEventListener('resize', resizeCanvas);
-        };
-    }, []);
-
     // Initialisation du jeu
     useEffect(() => {
         const canvas = canvasRef.current;
+        if (!canvas)
+            return;
+        // const resizeCanvas = () => {
+        //     const rect = canvas.getBoundingClientRect();
+        //     canvas.width = rect.width;
+        //     canvas.height = rect.height;
+        //     // Redessiner le contenu du canvas
+        //     // Ici, vous devrez réécrire le code pour redessiner le jeu en fonction de la nouvelle taille du canvas
+        //     const player1InitialY = (canvas.height - 100) / 2;
+        //     const player2InitialY = (canvas.height - 100) / 2;
+
+        //     player1 = {
+        //         ...player1,
+        //         y: player1InitialY,
+        //         height: 100
+        //     };
+
+        //     player2 = {
+        //         ...player2,
+        //         x: canvas.width - 10,
+        //         y: player2InitialY,
+        //         height: 100
+        //     };
+
+        //     ball = {
+        //         ...ball,
+        //         x: canvas.width / 2,
+        //         y: canvas.height / 2
+        //     };
+
+        //     net = {
+        //         x: (canvas.width - 2) / 2,
+        //         y: 0,
+        //         width: 2,
+        //         height: 10,
+        //         color: "WHITE"
+        //     };
+        // };
         const ctx = canvas?.getContext('2d');
         if (!canvas || !ctx ) 
             return;
     
     let animationFrameId: number;
-    
-    console.log(canvasSize.width, canvasSize.height);
+    // console.log("canvas.width:", canvas.width);
+    // console.log("canvas.height:", canvas.height);
 
     let player1: Paddle = {
         x: 0,
@@ -146,7 +162,7 @@ const CanvasGame: React.FC<{ infoGame: InfoGame }>= ({ infoGame }) => {
     };
         
         // Initialisation du filet
-        const net = {
+        let net = {
             x: (canvas.width - 2) / 2,
             y: 0,
             width: 2,
@@ -158,7 +174,9 @@ const CanvasGame: React.FC<{ infoGame: InfoGame }>= ({ infoGame }) => {
             if (numPlayer === 1)
                 player2.y = (gameState.padU2.y / 400) * canvas.height;
             else
+            {
                 player1.y = (gameState.padU2.y / 400) * canvas.height;
+            }
             ball.x = (gameState.ball.x / 800 )* canvas.width;
             ball.y = (gameState.ball.y / 400) * canvas.height;
             player1.score = gameState.score.scoreU1;
@@ -184,35 +202,75 @@ const CanvasGame: React.FC<{ infoGame: InfoGame }>= ({ infoGame }) => {
         const mouseMoveHandler = (event: MouseEvent) => {
             const rect = canvas.getBoundingClientRect();
             const mouseY = event.clientY - rect.top;
+        
             if (numPlayer === 1) {
-                player1.y = Math.min(mouseY - player1.height / 2, canvas.height - player1.height);
+                player1.y = mouseY;
                 if (player1.y < 0) {
                     player1.y = 0;
+                } else if (player1.y + player1.height > canvas.height) { // Assurez-vous que le paddle ne dépasse pas le bas du canvas
+                    player1.y = canvas.height - player1.height;
                 }
-                socket.emit('user-paddle-move', { y: player1.y / canvas.height, roomId: roomIdRef.current, x: player1.x});
-            }
-            else {
-                player2.y = Math.min(mouseY - player2.height / 2, canvas.height - player2.height);
+                socket.emit('user-paddle-move', { y: player1.y / canvas.height, roomId: roomIdRef.current, x: player1.x });
+            } else {
+                player2.y = mouseY;
                 if (player2.y < 0) {
                     player2.y = 0;
+                } else if (player2.y + player2.height > canvas.height) { // Assurez-vous que le paddle ne dépasse pas le bas du canvas
+                    player2.y = canvas.height - player2.height;
                 }
-                socket.emit('user-paddle-move', { y: player2.y / canvas.height, roomId: roomIdRef.current, x: player2.x});
+                socket.emit('user-paddle-move', { y: player2.y / canvas.height, roomId: roomIdRef.current, x: player2.x });
             }
         };
 
-        canvas.addEventListener('mousemove', mouseMoveHandler);
+        // window.addEventListener('resize', resizeCanvas);
+
+        // const mouseMoveHandler = (event: MouseEvent) => {
+        //     const rect = canvas.getBoundingClientRect();
+        //     const mouseY = event.clientY - rect.top;
+        //     // console.log("rect.height:", height);
+        //     // console.log("event.clientY:", event.clientY);
+        //     console.log("mouseY:", mouseY);
+        //     // console.log("canvas.height:", canvas.height);
+        //     if (numPlayer === 1) {
+        //         // player1.y = Math.min(mouseY - player1.height / 2, canvas.height - player1.height);
+        //         // player1.y = mouseY - player1.height / 2;
+        //         player1.y = mouseY;
+        //         if (player1.y < 0) {
+        //             player1.y = 0;
+        //         }
+        //         else if (player1.y > rect.height) {
+        //             player1.y = canvas.height;
+        //         }
+        //         socket.emit('user-paddle-move', { y: player1.y / canvas.height, roomId: roomIdRef.current, x: player1.x});
+        //     }
+        //     else {
+        //         // player2.y = Math.min(mouseY - player2.height / 2, canvas.height - player2.height);
+        //         // player2.y = mouseY - player2.height / 2;
+        //         player2.y = mouseY;
+        //         if (player2.y < 0) {
+        //             player2.y = 0;
+        //         }
+        //         else if (player2.y > rect.height) {
+        //             player2.y = rect.height;
+        //         }
+        //         socket.emit('user-paddle-move', { y: player2.y / canvas.height, roomId: roomIdRef.current, x: player2.x});
+        //     }
+        // };
+
+        document.addEventListener('mousemove', mouseMoveHandler);
 
         return () => {
-            canvas.removeEventListener('mousemove', mouseMoveHandler);
+            // window.removeEventListener('resize', resizeCanvas);
+            document.removeEventListener('mousemove', mouseMoveHandler);
             cancelAnimationFrame(animationFrameId);
             socket.off('game-state');
             // socket.emit('client-disconnect');
         };
-    }, [socket, numPlayer, playerName1, playerName2, canvasSize]);
+    }, [socket, numPlayer, playerName1, playerName2]);
 
     return (
         <div>
-            <canvas ref={canvasRef} height="400" width="800" className='canvas'/>
+            <canvas ref={canvasRef} height="400" width="800"  className='canvas'/>
         </div>
     );
 };

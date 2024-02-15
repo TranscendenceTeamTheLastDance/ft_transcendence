@@ -22,7 +22,7 @@ export class GameRoom {
       const gameState1 = this.gameService.broadcastGameState(1);
       const gameState2 = this.gameService.broadcastGameState(2);
 
-      if (gameState1.score.scoreU1 >= 5 || gameState1.score.scoreU2 >= 5) {
+      if (gameState1.score.scoreU1 >= 11 || gameState1.score.scoreU2 >= 11) {
         this.player1.emit('game-finish', gameState1);
         this.player2.emit('game-finish', gameState2);
         // a faire envoie les donne de fin de partie a prisma pour le game history

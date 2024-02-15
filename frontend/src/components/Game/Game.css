@@ -11,6 +11,7 @@
 
 .canvas {
     border: 2px solid #ffffff; /* Bordure noire de 2 pixels */
-    width :80%;
-    height : auto ;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
 }
