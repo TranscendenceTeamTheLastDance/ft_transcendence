@@ -3,6 +3,10 @@ import { Socket } from "socket.io-client";
 
 // import kick_icon from '../assets/chat/ban.svg';
 import game_icon from "../assets/chat/boxing-glove.svg";
+import profilePic from "../assets/avatar.png";
+import addFriendIcon from "../assets/chat/Group_add_light.png";
+import chatIcon from "../assets/chat/Chat.svg";
+
 // import promote_icon from '../assets/chat/crown.svg';
 
 import { UserType } from "@/common/userType.interface";
@@ -84,25 +88,42 @@ const ChatInfos = ({
               <div className="flex items-center gap-2">
                 <img
                   className="w-8 rounded-full"
-                  src={user.profilePic}
+                  src={profilePic} // change to user.profilePic
                   alt="user"
                 />
                 <h3 className="text-lg">{user.username}</h3>
               </div>
-              <div className="flex gap-2">
-                <button
-                  className="rounded-full p-1 hover:bg-green-1"
-                  title="Start a game"
-                >
-                  <img className="w-6" src={game_icon} alt="close" />
-                </button>{" "}
-                <button
-                  className="rounded-full p-1 hover:bg-green-1"
-                  title="Send DM"
-                >
-                  <img className="w-6" src={game_icon} alt="close" />
-                </button>
-              </div>
+              {/* conditionally render the add friend button */}
+              {user.username !== currentUserLogin && (
+                <div className="flex gap-2">
+                  <button
+                    className="rounded-full p-1 hover:bg-green-1"
+                    title="Start a game"
+                  >
+                    <img
+                      className="w-6"
+                      src={game_icon}
+                      alt="start game icon"
+                    />
+                  </button>{" "}
+                  <button
+                    className="rounded-full p-1 hover:bg-green-1"
+                    title="Send DM"
+                  >
+                    <img className="w-6" src={chatIcon} alt="chat icon" />
+                  </button>
+                  <button
+                    className="rounded-full p-1 hover:bg-green-1"
+                    title="Add friend"
+                  >
+                    <img
+                      className="w-6"
+                      src={addFriendIcon}
+                      alt="add friend icon"
+                    />
+                  </button>
+                </div>
+              )}
             </div>
           );
         })}
