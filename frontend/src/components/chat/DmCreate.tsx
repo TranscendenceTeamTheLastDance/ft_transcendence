@@ -17,21 +17,21 @@ const DmCreate = ({ setShowModal, socket, users, setCurrentChannel }: DmChannelP
   const [userButtonSelected, setUserButtonSelected] = useState<HTMLButtonElement | null>(null);
   const [selectedLogin, setSelectedLogin] = useState<string>('');
 
-  const useSetLogin = (username: string) => {
-	setSelectedLogin(username);
-  };
+  console.log("All user in DmCreate ", users);
 
   const selectUser = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (e.currentTarget !== userButtonSelected) {
-      if (userButtonSelected) {
-        userButtonSelected.style.backgroundColor = '#FFFFFF';
-        userButtonSelected.style.color = '#000000';
-      }
-      e.currentTarget.style.backgroundColor = '#37626D';
-      e.currentTarget.style.color = '#FFFFFF';
-      setUserButtonSelected(e.currentTarget);
+    if (userButtonSelected) {
+      userButtonSelected.classList.remove('bg-darkBlue-2', 'text-white-1');
+      userButtonSelected.classList.add('bg-white-1');
     }
+    e.currentTarget.classList.remove('bg-white-1');
+    e.currentTarget.classList.add('bg-darkBlue-2', 'text-white-1');
+    setUserButtonSelected(e.currentTarget);
+    console.log(e.currentTarget.textContent);
+    setSelectedLogin(e.currentTarget.textContent || '');
   };
+
+
 
   const handleDirectMessage = () => {
     const message = document.querySelector<HTMLButtonElement>('#firstMessage')?.value;

@@ -1,15 +1,10 @@
 // import logo from '@/assets/logo.svg';
 
-import { Dispatch, SetStateAction, useEffect } from 'react';
-import { UseQueryResult } from 'react-query';
-import { Socket } from 'socket.io-client';
-import { useAuthAxios } from "../../context/AuthAxiosContext.tsx";
-
-
 import { userDto } from './dto/userDto';
-// import { useApi } from '@/hooks/useApi';
 
 import { ChannelType } from './Chat';
+import React from 'react';
+import { Socket } from 'socket.io-client';
 
 interface DmListElemProps {
   allUsers: userDto[] | undefined;
@@ -30,48 +25,18 @@ const DmListElem = ({
     if (currentChannel === null || channel.id !== currentChannel.id) setCurrentChannel(channel);
   };
 
-  const users: userDto[] | undefined = [];
-  const authAxios = useAuthAxios();
-
-  const fetchData = async () => {
-    try {
-      const usersResponse = await authAxios.get("/chat/allUsers", {
-        withCredentials: true,
-      }) as unknown as UseQueryResult<userDto[], unknown>;
-
-      usersResponse.data?.forEach((user: userDto) => {
-        users?.push(user);
-      });
-
-      console.log("Users recup", users);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    }
-  };
   let user;
 
-  function findUserInfos(chatName: string) {
-    if (!chatName) return '';
-
-    fetchData();
-
-    const names = chatName.substring(1).split('_');
+  const findUserInfos = (chatName: string) => {
+    chatName = chatName.substring(1);
+    const names = chatName.split('_');
     if (names[0] === me?.username) {
-      const user = users?.filter((user) => user.username === names[1]);
-      if (user?.length) {
-        return user[0].username;
-      } else {
-        return names[1];
-      }
+      user = names[1];
     } else {
-      const user = users?.filter((user) => user.username === names[0]);
-      if (user?.length) {
-        return user[0].username;
-      } else {
-        return names[0];
-      }
+      user = names[0];
     }
-  }
+    return user;
+  };
 
   return (
     <button
@@ -99,8 +64,6 @@ interface DmListProps {
   currentChannel: ChannelType | null;
   setCurrentChannel: (channel: ChannelType) => void;
   me: userDto | undefined;
-  socket: Socket;
-  setJoinedChannels: Dispatch<SetStateAction<ChannelType[]>>;
 }
 
 const DmList = ({
@@ -109,9 +72,9 @@ const DmList = ({
   setCurrentChannel,
   allUsers,
   me,
-  socket,
-  setJoinedChannels,
 }: DmListProps) => {
+
+  console.log("All Users in DmLIST", allUsers);
   return (
     <div className="h-full w-full overflow-y-auto" style={{ maxHeight: '600px' }}>
       {joinedChannels.map((chat) => (
@@ -122,6 +85,7 @@ const DmList = ({
           key={chat.id}
           chatInfos={chat}
           currentChannel={currentChannel}
+
         />
       ))}
     </div>

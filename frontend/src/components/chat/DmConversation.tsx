@@ -11,7 +11,7 @@ import { ChannelType } from './Chat';
 import ChatModal from './ChatModal';
 import DmInfos from './DmInfos';
 import Message from './Message';
-import axios, { all } from 'axios';
+import axios from 'axios'; // Remove unused import
 
 import { useAuthAxios } from "../../context/AuthAxiosContext.tsx";
 
@@ -45,6 +45,8 @@ const DmConversation = ({ channel, socket, me, allUsers }: ConversationProps) =>
 
   const users: userDto[] | undefined = [];
   const authAxios = useAuthAxios();
+
+  console.log("All users in DmConversation", allUsers);
 
   const fetchData = async () => {
     try {
@@ -93,7 +95,7 @@ const DmConversation = ({ channel, socket, me, allUsers }: ConversationProps) =>
     setMessage('');
   };
 
-  function findUserInfos(chatName: string) {
+  function findUserInfos1(chatName: string) {
     if (!chatName) return '';
 
     fetchData();
@@ -132,7 +134,7 @@ const DmConversation = ({ channel, socket, me, allUsers }: ConversationProps) =>
         </ChatModal>
       )}
       <div className="flex justify-between p-3">
-        <h3 className="text-xl">{findUserInfos(channel.name)}</h3>
+        <h3 className="text-xl">{findUserInfos1(channel.name)}</h3>
         <div className="flex gap-1">
           <button
             className="rounded-full p-1 hover:bg-white-3"

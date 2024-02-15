@@ -234,6 +234,8 @@ export class ChatGateway
   async onDirectMessageUser(@MessageBody() dm: SendDmDTO, @ConnectedSocket() client: Socket) {
     const data = await this.channelsService.sendDM(dm, client.data.user);
 
+    this.logger.log("Direct message sent to " + dm.username);
+
     const sockets = this.socketsID.get(dm.username) || [];
     for (const socket of sockets) {
       this.io.to(socket.id).emit(ChatEvent.DirectMessage, data);
@@ -241,4 +243,6 @@ export class ChatGateway
 
     client.emit(ChatEvent.DirectMessage, data);
   }
+
+
 }

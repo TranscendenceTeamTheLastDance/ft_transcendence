@@ -54,13 +54,54 @@ const Chat = () => {
     );
   const [showChannels, setShowChannels] = useState<boolean>(true);
 
-  let me: userDto | undefined;
-  const users: userDto[] | undefined = [];
+  // let me: userDto | undefined;
+  // const users = [] as userDto[];
   const authAxios = useAuthAxios();
-  
+
+  const [users, setUsers] = useState<userDto[]>([]);
+  let [me, setMe] = useState<userDto | undefined>(undefined);
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const usersResponse = await authAxios.get("/chat/allUsers", {
+          withCredentials: true,
+        }) as unknown as UseQueryResult<userDto[], unknown>;
+
+        const fetchedUsers = usersResponse.data || [];
+        const currentUser = user;
+
+        // Filtrer les utilisateurs pour exclure l'utilisateur actuel (me)
+        const filteredUsers = fetchedUsers.filter((user) => user.username !== currentUser?.username);
+
+        // Mettre à jour l'état des utilisateurs avec les utilisateurs filtrés
+        setUsers(filteredUsers);
+
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+
+    fetchMe();
+    fetchData();
+  }, [authAxios, user]);
+
+
   useEffect(() => {
     fetchUserData();
   }, [fetchUserData]);
+
+  const fetchMe = async () => {
+    try {
+      me = user;
+      setMe(me);
+      console.log("User main", me);
+    } catch (error) {
+      console.error("Error fetching me:", error);
+    }
+  };
+  
 
   useEffect(() => {
     setLoading(true);
@@ -88,35 +129,8 @@ const Chat = () => {
       socket?.disconnect();
     };
     // eslint-disable-next-line
-  }, []);
+  }, []);  
 
-  const fetchMe = async () => {
-    try {
-      me = user;
-      console.log("User main", me);
-    } catch (error) {
-      console.error("Error fetching me:", error);
-    }
-  };
-
-  const fetchData = async () => {
-    try {
-      const usersResponse = await authAxios.get("/chat/allUsers", {
-        withCredentials: true,
-      }) as unknown as UseQueryResult<userDto[], unknown>;
-
-      usersResponse.data?.forEach((user: userDto) => {
-        users?.push(user);
-      });
-
-      console.log("Users recup", users);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    }
-  };
-
-  fetchMe();
-  fetchData();
 
   useEffect(() => {
     socket?.on("youLeft", (data: any) => {
@@ -166,8 +180,9 @@ const Chat = () => {
             setCurrentChannel={setCurrentChannel}
             setShowModal={setShowDmSomeoneModal}
             socket={socket}
-            users={users?.filter((user) => user.username !== me?.username)}
-          />
+            // users={users }
+            users= { users?.filter((user) => user.username !== me?.username)}
+            />
         </ChatModal>
       )}
       {showChannels ? (
@@ -243,12 +258,10 @@ const Chat = () => {
           </div>
           <DmList
             me={me}
-            allUsers={users?.filter((user) => user.username !== me?.username)}
+            allUsers={users}
             joinedChannels={joinedChannels.filter((c) => c.isDM === true)}
             setCurrentChannel={setCurrentChannel}
             currentChannel={currentChannel}
-            socket={socket}
-            setJoinedChannels={setJoinedChannels}
           />
         </div>
       )}

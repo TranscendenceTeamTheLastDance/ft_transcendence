@@ -293,11 +293,15 @@ export class ChannelsService {
 
   // Generate the DM channel name between 2 users
   getDmChannelName(login1: string, login2: string): string {
-    return `!${login1}!${login2}`;
+    if (login1.localeCompare(login2) > 0) {
+      return `!${login2}_${login1}`;
+    } else {
+      return `!${login1}_${login2}`;
+    }
   }
 
   async sendDM(dm: SendDmDTO, user: User) {
-    const otherUser = await this.userService.getUnique(dm.username);
+    const otherUser = await this.userService.getUserByUsername(dm.username);
 
     if (otherUser.id === user.id) {
       throw new WsException('You cannot send a direct message to yourself');
