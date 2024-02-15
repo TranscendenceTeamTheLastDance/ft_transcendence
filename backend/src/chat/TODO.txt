@@ -1,1 +1,3 @@
 Fix erreur quand on recupere par le user, renvoyer vers la page avec le bouton Signin et renvoyer vers la page d auth
+
+Fix rechargement Dm Conversation
