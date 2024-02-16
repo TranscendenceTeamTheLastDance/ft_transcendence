@@ -36,6 +36,7 @@ const UserGameStats = ({ gameStats}) => {
 			});
 			console.log(response.data);
 			setUser(null); 
+			console.log('user info cleared.');
 			navigate('/');
 		} catch (error: any) {
 			setError(true);

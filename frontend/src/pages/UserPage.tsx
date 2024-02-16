@@ -63,11 +63,11 @@ const User = () => {
 			});
 				console.log('frontend: user information successfully updated!', response.data);
 				setUpdateModalMessage('User information successfully updated!');
-				triggerModal(true); // Trigger modal with success status
+				triggerModal(true); 
 			} catch (error) {
 				console.error('frontend: error updating user information:', error);
 				setUpdateModalMessage('Error updating user information.');
-				triggerModal(false); // Trigger modal with failure status
+				triggerModal(false); 
 			}
 		
 		// Check if there's a new avatar to upload
@@ -82,11 +82,11 @@ const User = () => {
 				});
 				console.log('frontend: new profile pic successfully uploaded!', response.data);
 				setUpdateModalMessage('new profile pic successfully uploaded!');
-				triggerModal(true); // Trigger modal with success status
+				triggerModal(true); 
 			} catch (error) {
 				console.error('frontend: error uploading a new profile pic:', error);
 				setUpdateModalMessage('error uploading a new profile pic!');
-				triggerModal(true); // Trigger modal with success status
+				triggerModal(false);
 			}
 		} else {
 			console.log('frontend: no new avatar to upload, no request made to back.');
