@@ -82,7 +82,7 @@ const Leaderboard = () => {
                     <div key={index} className="flex items-center justify-between py-2">
                         <span className="text-white">{index + 1}</span> {/* Rank */}
                         <span className="text-white flex-grow pl-4">{userList.username}</span> {/* Username */}
-                        {!friendIds.includes(userList.id) && (
+                        {!friendIds.includes(userList.id) && userId !== userList.id && (
                             <button onClick={() => addFriend(userId, userList.id)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded text-xs">
                                 Add Friend
                             </button> 
