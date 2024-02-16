@@ -44,7 +44,21 @@ model User {
 
   channels ChannelUser[]
 
+  friendships       Friendship[] @relation("UserFriends")
+  friendOf          Friendship[] @relation("FriendToUser")
+
   @@map("Users")
+}
+
+model Friendship {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  friendId  Int
+
+  user      User     @relation("UserFriends", fields: [userId], references: [id])
+  friend    User     @relation("FriendToUser", fields: [friendId], references: [id])
+
+  @@unique([userId, friendId])
 }
 
 model ChannelUser {
