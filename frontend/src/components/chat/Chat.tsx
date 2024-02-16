@@ -127,6 +127,7 @@ const Chat = () => {
     });
 
     return () => {
+      socket?.off('dm');
       socket?.off("youJoined");
       socket?.disconnect();
     };
