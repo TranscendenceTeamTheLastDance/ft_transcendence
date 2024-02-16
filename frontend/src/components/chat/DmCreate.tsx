@@ -17,8 +17,6 @@ const DmCreate = ({ setShowModal, socket, users, setCurrentChannel }: DmChannelP
   const [userButtonSelected, setUserButtonSelected] = useState<HTMLButtonElement | null>(null);
   const [selectedLogin, setSelectedLogin] = useState<string>('');
 
-  console.log("All user in DmCreate ", users);
-
   const selectUser = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (userButtonSelected) {
       userButtonSelected.classList.remove('bg-darkBlue-2', 'text-white-1');
@@ -27,7 +25,6 @@ const DmCreate = ({ setShowModal, socket, users, setCurrentChannel }: DmChannelP
     e.currentTarget.classList.remove('bg-white-1');
     e.currentTarget.classList.add('bg-darkBlue-2', 'text-white-1');
     setUserButtonSelected(e.currentTarget);
-    console.log(e.currentTarget.textContent);
     setSelectedLogin(e.currentTarget.textContent || '');
   };
 

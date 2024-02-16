@@ -74,7 +74,6 @@ const DmList = ({
   me,
 }: DmListProps) => {
 
-  console.log("All Users in DmLIST", allUsers);
   return (
     <div className="h-full w-full overflow-y-auto" style={{ maxHeight: '600px' }}>
       {joinedChannels.map((chat) => (

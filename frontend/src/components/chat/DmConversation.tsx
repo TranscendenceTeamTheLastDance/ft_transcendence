@@ -97,7 +97,6 @@ const DmConversation = ({ channel, socket, me, allUsers }: ConversationProps) =>
 
   const sendMessage = (e: React.FormEvent<HTMLFormElement>, channelName: string) => {
     e.preventDefault();
-    console.log("Message", message); 
     if (!message) return;
     const names = channelName.substring(1).split('_');
     const otherLogin = names[0] === me?.username ? names[1] : names[0];
@@ -108,9 +107,6 @@ const DmConversation = ({ channel, socket, me, allUsers }: ConversationProps) =>
   function findUserInfos1(chatName: string) {
     if (!chatName) return '';
 
-    // fetchData();
-
-    console.log("DmConversation Users recup", users);
     allUsers = users;
 
     const names = chatName.substring(1).split('_');

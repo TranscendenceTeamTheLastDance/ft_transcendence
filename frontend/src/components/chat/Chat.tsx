@@ -24,6 +24,8 @@ import DmCreate from './DmCreate.tsx';
 import DmList from './DmList';
 import JoinChannel from "./JoinChannel";
 import { userDto } from "./dto/userDto";
+import NotConnected from '../../components/NotSignedIn.tsx';
+
 
 export interface Channel {
   name: string;
@@ -53,9 +55,6 @@ const Chat = () => {
     null
     );
   const [showChannels, setShowChannels] = useState<boolean>(true);
-
-  // let me: userDto | undefined;
-  // const users = [] as userDto[];
   const authAxios = useAuthAxios();
 
   const [users, setUsers] = useState<userDto[]>([]);
@@ -83,7 +82,6 @@ const Chat = () => {
       }
     };
 
-    fetchMe();
     fetchData();
   }, [authAxios, user]);
 
@@ -92,15 +90,19 @@ const Chat = () => {
     fetchUserData();
   }, [fetchUserData]);
 
-  const fetchMe = async () => {
-    try {
-      me = user;
-      setMe(me);
-      console.log("User main", me);
-    } catch (error) {
-      console.error("Error fetching me:", error);
-    }
-  };
+  useEffect(() => {
+    const fetchMe = async () => {
+      try {
+        const currentUser = user;
+        setMe(currentUser);
+        console.log("User main", currentUser);
+      } catch (error) {
+        console.error("Error fetching me:", error);
+      }
+    };
+
+    fetchMe();
+  }, [user]);
   
 
   useEffect(() => {
@@ -155,7 +157,7 @@ const Chat = () => {
     setShowChannels(boolean);
   };
 
-  return (
+  return user ? (
     <div className="flex max-h-full min-h-[65%] w-full rounded-lg bg-white-1 md:w-auto">
       {showCreateChannelModal && (
         <ChatModal>
@@ -278,6 +280,8 @@ const Chat = () => {
             />
           )}
     </div>
+  ) : (
+    <NotConnected message="You need to log in to access your settings" />
   );
 };
 
