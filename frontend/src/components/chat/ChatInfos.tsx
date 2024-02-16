@@ -6,10 +6,12 @@ import game_icon from "../assets/chat/boxing-glove.svg";
 import profilePic from "../assets/avatar.png";
 import addFriendIcon from "../assets/chat/Group_add_light.png";
 import chatIcon from "../assets/chat/Chat.svg";
+import crown from "../assets/chat/crown.svg";
 
 // import promote_icon from '../assets/chat/crown.svg';
 
 import { UserType } from "@/common/userType.interface";
+import { channel } from "diagnostics_channel";
 // import { UserType } from "./Conversation";
 
 interface ChatInfosProps {
@@ -34,20 +36,30 @@ const ChatInfos = ({
   // const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   useEffect(() => {
+    // Initial user list
     socket.emit(
       "userList",
       { channel: channelName },
       (res: UserListResponse) => {
-        setUsers(
-          res.users.filter((user) => user.username) //!== currentUserLogin)
-        );
+        setUsers(res.users.filter((user) => user.username));
         // const user =
         // res.users.find((user) => user.login === currentUserLogin) || null;
         // if (user && (user.role === 'ADMIN' || user.role === 'OWNER')) setIsAdmin(true);
       }
     );
+
+    // Listen for updates to the user list
+    // check event userListUpdate in JoinChannel.tsx
+    socket.on("userListUpdate", (res: UserListResponse) => {
+      console.log("===== SOCKET EVENT RECIEVED =====");
+      setUsers(res.users.filter((user) => user.username));
+    });
+
+    return () => {
+      socket.off("userListUpdate");
+    };
     // eslint-disable-next-line
-  }, []);
+  }, [socket, channelName, currentUserLogin]);
 
   //   const promoteUser = (user: UserType) => {
   //     socket.emit('promote', { channel: channelName, user: user.login });
@@ -85,15 +97,27 @@ const ChatInfos = ({
               key={user.id}
               className="flex items-center justify-between gap-4"
             >
+              {user.role === "OWNER" && (
+                <button
+                  disabled
+                  className="rounded-full p-1 hover:bg-green-1"
+                  title="Channel owner"
+                >
+                  <img className="w-6" src={crown} alt="start game icon" />
+                </button>
+              )}
               <div className="flex items-center gap-2">
                 <img
                   className="w-8 rounded-full"
-                  src={profilePic} // change to user.profilePic
+                  src={user.profilePic || profilePic}
                   alt="user"
                 />
-                <h3 className="text-lg">{user.username}</h3>
+                <h3 className="text-lg">
+                  {user.username}
+                  {user.username === currentUserLogin ? " (you)" : ""}
+                </h3>
               </div>
-              {/* conditionally render the add friend button */}
+              {/* render the action buttons for other users only */}
               {user.username !== currentUserLogin && (
                 <div className="flex gap-2">
                   <button
@@ -105,7 +129,7 @@ const ChatInfos = ({
                       src={game_icon}
                       alt="start game icon"
                     />
-                  </button>{" "}
+                  </button>
                   <button
                     className="rounded-full p-1 hover:bg-green-1"
                     title="Send DM"

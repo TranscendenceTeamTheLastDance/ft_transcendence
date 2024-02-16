@@ -199,11 +199,11 @@ export class ChatGateway
         UserListDTO.channel,
       );
 
-      // Extract only the desired fields from UserListDTO (frontend: userType)
       const extractedUserList = channelMembers.map((member) => ({
         id: member.id,
         username: member.username,
         profilePic: member.profilePic,
+        role: member.role,
       }));
 
       const userTypeList = {

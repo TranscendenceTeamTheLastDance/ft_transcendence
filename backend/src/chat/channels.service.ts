@@ -4,6 +4,7 @@ import { ChannelRole, ChannelType, Prisma, User } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 
 import { CreateChannelDTO, JoinChannelDTO, SendMessageDTO } from './chat.dto';
+import { userType } from '@/common/userType.interface';
 
 // payload type that includes information about a channel and its users
 type ChannelWithUsers = Prisma.ChannelGetPayload<{ include: { users: true } }>;
@@ -28,7 +29,7 @@ export class ChannelsService {
   }
 
   // retrieve the users from a specific channel
-  async getChannelMembers(channelName: string): Promise<User[]> {
+  async getChannelMembers(channelName: string): Promise<userType[]> {
     const channel = await this.getChannel(channelName);
 
     if (!channel) {
@@ -43,7 +44,12 @@ export class ChannelsService {
         user: true,
       },
     });
-    return channelUsers.map((chanUser) => chanUser.user);
+    return channelUsers.map((chanUser) => ({
+      id: chanUser.user.id,
+      username: chanUser.user.username,
+      profilePic: chanUser.user.profilePic,
+      role: chanUser.role,
+    }));
   }
 
   async createChannel(
