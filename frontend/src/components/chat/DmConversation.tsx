@@ -45,24 +45,33 @@ const DmConversation = ({ channel, socket, me, allUsers }: ConversationProps) =>
 
   const users: userDto[] | undefined = [];
   const authAxios = useAuthAxios();
+  const setAllUsers = (users: userDto[]) => {
+    allUsers = users;
+  }
 
-  console.log("All users in DmConversation", allUsers);
-
-  const fetchData = async () => {
-    try {
-      const usersResponse = await authAxios.get("/chat/allUsers", {
-        withCredentials: true,
-      }) as unknown as UseQueryResult<userDto[], unknown>;
-
-      usersResponse.data?.forEach((user: userDto) => {
-        users?.push(user);
-      });
-
-      console.log("Users recup", users);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    }
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const usersResponse = await authAxios.get("/chat/allUsers", {
+          withCredentials: true,
+        }) as unknown as UseQueryResult<userDto[], unknown>;
+  
+        const fetchedUsers = usersResponse.data;
+        if (fetchedUsers) {
+          setAllUsers(fetchedUsers);
+        }
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+  
+    fetchData(); // Appel de fetchData une fois après le montage du composant
+  
+    // Nettoyage de l'écouteur d'événement lorsque le composant est démonté
+    return () => {
+      socket.off('dm');
+    };
+  }, []); // Le tableau de dépendances vide signifie que ce useEffect ne s'exécute qu'une seule fois après le montage initial du composant
 
   useEffect(() => {
     socket.on('dm', (data: MessageType) => {
@@ -88,17 +97,18 @@ const DmConversation = ({ channel, socket, me, allUsers }: ConversationProps) =>
 
   const sendMessage = (e: React.FormEvent<HTMLFormElement>, channelName: string) => {
     e.preventDefault();
+    console.log("Message", message); 
     if (!message) return;
     const names = channelName.substring(1).split('_');
     const otherLogin = names[0] === me?.username ? names[1] : names[0];
-    socket.emit('dm', { login: otherLogin, content: message });
+    socket.emit('dm', { username: otherLogin, content: message });
     setMessage('');
   };
 
   function findUserInfos1(chatName: string) {
     if (!chatName) return '';
 
-    fetchData();
+    // fetchData();
 
     console.log("DmConversation Users recup", users);
     allUsers = users;
