@@ -1,19 +1,36 @@
 import { Socket } from 'socket.io';
+import { PrismaService } from 'nestjs-prisma';
 import { GameService } from './game.service';
+import { ChannelRole, ChannelType, Prisma, User, Game } from '@prisma/client';
+
 
 export class GameRoom {
-  private player1: Socket;
-  private player2: Socket;
-  private gameService: GameService;
-  private gameLoopInterval: NodeJS.Timeout | null = null;
-  private updateInterval = 1000 / 50;
+    private player1: Socket;
+    private player2: Socket;
+    private gameService: GameService;
+    private gameLoopInterval: NodeJS.Timeout | null = null;
+    private updateInterval = 1000 / 50;
+    private prisma: PrismaService;
+  
+    constructor(player1: Socket, player2: Socket, prisma: PrismaService) {
+      this.player1 = player1;
+      this.player2 = player2;
+      this.gameService = new GameService();
+      this.gameService.resetGameState();
+      this.prisma = prisma; // Assign prisma here
+    }
 
-  constructor(player1: Socket, player2: Socket) {
-    this.player1 = player1;
-    this.player2 = player2;
-    this.gameService = new GameService();
-    this.gameService.resetGameState();
+  async createGame(IDwinner: number, IDloser: number, scoreWinner: number,  scoreLoser: number): Promise<void> {
+    await this.prisma.game.create({
+      data: {
+        winnerScore: scoreWinner,
+        loserScore: scoreLoser,
+        loserId: IDloser,
+        winnerId: IDwinner
+      },
+    });
   }
+
 
   startGameLoop(): void {
     console.log("startloop");
@@ -26,6 +43,7 @@ export class GameRoom {
         this.player1.emit('game-finish', gameState1);
         this.player2.emit('game-finish', gameState2);
         // a faire envoie les donne de fin de partie a prisma pour le game history
+        this.createGame(1, 2, gameState1.score.scoreU1, gameState1.score.scoreU2);
         clearInterval(this.gameLoopInterval);
       }
       else {
@@ -37,7 +55,7 @@ export class GameRoom {
 
   stopGameLoop(): void {
     console.log("endloop");
-    if (this.gameLoopInterval) {
+    if (this.gameLoopInterval) {81
       clearInterval(this.gameLoopInterval);
       this.gameLoopInterval = null;
     }

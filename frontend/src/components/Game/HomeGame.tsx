@@ -94,7 +94,7 @@ const PongGame: React.FC = () => {
 
         // Clean up
         return () => {
-            // console.log("je suis pas sense etre allll")
+            console.log("je suis pas sense etre allll")
             socket.emit('client-disconnect');
             socket.off('room-id');
             socket.off('player-left-game');

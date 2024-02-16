@@ -2,6 +2,7 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, ConnectedSocket, MessageBody } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { GameRoom } from './room.service';
+import { PrismaService } from 'nestjs-prisma'; // Import PrismaService
 
 @WebSocketGateway({
     cors: {
@@ -16,6 +17,8 @@ export class GameGateway {
 
     private waitingPlayers: { client: Socket, username: string }[] = [];
     private gameRooms: Map<string, GameRoom> = new Map();
+
+  constructor(private prisma: PrismaService) {}
 
     deleteplayerInWaitList(client: Socket) {
       this.waitingPlayers = this.waitingPlayers.filter(player => player.client.id !== client.id);
@@ -60,7 +63,7 @@ export class GameGateway {
   
         if (player1 && player2) {
           const roomID = this.createRoomID(player1.client, player2.client);
-          const gameRoom = new GameRoom(player1.client, player2.client);
+          const gameRoom = new GameRoom(player1.client, player2.client, this.prisma);
           this.gameRooms.set(roomID, gameRoom);
   
           console.log("username1:", player1.username);
