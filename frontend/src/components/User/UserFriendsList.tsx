@@ -1,23 +1,47 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+import axios from 'axios';
 import avatar_icon from '../assets/avatar.png';
 
-const FriendsList = ({ friends }) => {
+interface User {
+    id: number;
+    username: string; 
+	profilePic?: string;
+}
+
+
+const FriendsList = () => {
+	const [friends, setFriends] = useState<User[]>([]);
+
+	useEffect (() => {
+		const fetchFriends = async () => {
+		try {
+			const response = await axios.get('http://localhost:8080/users/friends', {
+				withCredentials: true,
+			});
+			console.log('response:', response.data)
+			setFriends(response.data);
+		} catch (error) {
+			console.error('Failed to fetch friends:', error);
+		}
+	}
+	fetchFriends();
+	} , []);
+
 	return (
 		<div className="bg-white w-[600px] mt-8 pb-[30px] rounded-lg z-10">
-			<h2 className="text-black text-xl font-bold mx-auto pt-4 text-center">FRIENDS</h2>
-			<div className="flex overflow-x-auto py-4 px-4">
-				{friends.map((friend, index) => (
-					<div key={index} className="flex flex-col items-center mr-10">
-						<img src={avatar_icon} alt="User Avatar"></img>{/* Replace with friend's image */}
-						<div className="flex items-center mt-2">
-							<p className="text-center font-bold mr-2">{friend.nickname}</p>
-							<span className={`h-3 w-3 rounded-full ${friend.online ? 'bg-green-500' : 'bg-red-500'}`}></span>
-						</div>
-					</div>
-				))}
+		  <h2 className="text-black text-xl font-bold mx-auto pt-4 text-center">FRIENDS</h2>
+		  <div className="flex justify-center overflow-x-auto py-4 px-4" style={{minHeight: '100px'}}>
+			<div className="flex flex-nowrap" style={{gap: '20px'}}>
+			  {friends.map((friend, index) => (
+				<div key={index} className="flex flex-col items-center" style={{minWidth: '100px'}}>
+				  <img src={friend.profilePic || avatar_icon} alt="User Avatar" style={{width: '70px', height: '70px', borderRadius: '20px'}} />
+				  <p className="text-center font-bold mt-2">{friend.username}</p>
+				</div>
+			  ))}
 			</div>
+		  </div>
 		</div>
-	);
-}
+	  );
+	}
 
 export default FriendsList;

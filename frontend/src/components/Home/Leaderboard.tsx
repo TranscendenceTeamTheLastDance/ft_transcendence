@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useUserContext } from '../context/UserContext';
 import axios from 'axios';
 
 interface User {
@@ -14,27 +13,24 @@ const Leaderboard = () => {
     const [friendIds, setFriendIds] = useState<number[]>([]); // List of friend IDs
 
     useEffect(() => {
-        // Function to fetch users
         const fetchUsersList = async () => {
             try {
-                // Adjust the URL to match your API endpoint
                 const response = await axios.get('http://localhost:8080/users/all', {
                     withCredentials: true,
                 });
                 console.log('response:', response.data)
-                setUsersList(response.data); // Assuming the API returns an array of users
+                setUsersList(response.data);
             } catch (error) {
                 console.error('Failed to fetch users:', error);
             }
         };
         const fetchFriends = async () => {
             try {
-                // Adjust the URL to match your API endpoint
                 const response = await axios.get('http://localhost:8080/users/friends', {
                     withCredentials: true,
                 });
                 console.log('response:', response.data)
-                setFriendIds(response.data.map(friend => friend.id)); // Assuming the API returns an array of friends
+                setFriendIds(response.data.map(friend => friend.id));
             } catch (error) {
                 console.error('Failed to fetch friends:', error);
             }
@@ -42,12 +38,12 @@ const Leaderboard = () => {
 
         const fetchUserId = async () => {
             try {
-                // Adjust the URL to match your API endpoint
+                // We could just use the user context here
                 const response = await axios.get('http://localhost:8080/users/my-id', {
                     withCredentials: true,
                 });
                 console.log('response:', response.data)
-                setUserId(response.data); // Assuming the API returns the current user
+                setUserId(response.data);
             } catch (error) {
                 console.error('Failed to fetch user:', error);
             }
@@ -56,7 +52,7 @@ const Leaderboard = () => {
         fetchUsersList();
         fetchFriends();
         fetchUserId();
-    }, []); // Empty dependency array means this effect runs once on mount
+    }, []); 
 
     const addFriend = async (userId: number, friendId: number) => {
         try {
@@ -87,6 +83,7 @@ const Leaderboard = () => {
                                 Add Friend
                             </button> 
                         )}
+                        {/* @@@TODO amend to online or not  */}
                         <span className={`h-3 w-3 bg-${index % 2 === 0 ? 'green' : 'red'}-500 rounded-full ml-4`}></span> {/* Online/Offline Dot */}
                     </div>
                 ))}

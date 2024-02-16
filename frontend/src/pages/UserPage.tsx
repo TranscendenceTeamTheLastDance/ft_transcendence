@@ -158,18 +158,6 @@ const User = () => {
 	};
 
 
-	//@@@TODO: Fetch data from backend 
-	const friends = [
-		{ nickname: 'Friend1', online: true },
-		{ nickname: 'Friend2', online: false },
-		{ nickname: 'Friend3', online: false },
-		{ nickname: 'Friend4', online: false },
-		{ nickname: 'Friend5', online: true },
-		{ nickname: 'Friend6', online: false },
-		{ nickname: 'Friend7', online: true },
-		{ nickname: 'Friend8', online: false },
-	];
-
 	const gameStats = {
 		totalGamesPlayed: 30,
 		totalWins: 20,
@@ -195,7 +183,7 @@ const User = () => {
 					/>
 	  
 				{/* Friends Box */}
-				<FriendsList friends={friends}/>
+				<FriendsList/>
 			</div>
 	  
 			{/* Right Section: Game Stats */}
