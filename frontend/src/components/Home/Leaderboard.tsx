@@ -83,8 +83,8 @@ const Leaderboard = () => {
                                 Add Friend
                             </button> 
                         )}
-                        {/* @@@TODO amend to online or not  */}
-                        <span className={`h-3 w-3 bg-${index % 2 === 0 ? 'green' : 'red'}-500 rounded-full ml-4`}></span> {/* Online/Offline Dot */}
+                        {/* // @@@TODO amend to online or not  */}
+                        {/* // <span className={`h-3 w-3 bg-${index % 2 === 0 ? 'green' : 'red'}-500 rounded-full ml-4`}></span> Online/Offline Dot */}
                     </div>
                 ))}
             </div>
