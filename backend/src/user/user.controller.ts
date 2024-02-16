@@ -30,6 +30,12 @@ export class UserController {
     return user;
   }
 
+  @UseGuards(JwtGuard)
+  @Get('my-id')
+  getMyId(@GetUser('id') userId: number) {
+    return userId;
+  }
+
   @Get('all')
   async getAllUsers() {
     return this.userService.getAllUsers();
