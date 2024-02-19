@@ -49,7 +49,7 @@ export class AuthService {
       user.twoFactorSecret = undefined;
       if (user.twoFactorEnabled) {
         return user;
-    }
+      }
       await this.generateToken(user.id, user.email, user.username, res);
       return user;
     } catch (error) {
@@ -79,7 +79,7 @@ export class AuthService {
     user.hash = undefined;
     user.twoFactorSecret = undefined;
     if (user.twoFactorEnabled) {
-        return user;
+      return user;
     }
     //this.createupdateUser(user.email, user.username);
     await this.generateToken(user.id, user.email, user.username, res);
@@ -145,8 +145,8 @@ export class AuthService {
     userId: number,
     email: string,
     username: string,
-    res: Response,) {
-
+    res: Response,
+  ) {
     const accessToken = await this.signToken(userId, email, username, true);
     res.cookie(
       this.config.get('JWT_ACCESS_TOKEN_COOKIE'),
@@ -163,7 +163,7 @@ export class AuthService {
       this.config.get('JWT_REFRESH_TOKEN_COOKIE'),
       refreshToken.JWTtoken,
       {
-        httpOnly: true,
+        httpOnly: false,
         secure: false,
         sameSite: 'strict',
       },
@@ -195,21 +195,25 @@ export class AuthService {
     const refreshSecret = this.config.get('JWT_REFRESH_SECRET');
 
     if (accessToken) {
-        const token = await this.jwt.signAsync(payload, {
-          expiresIn: '10m',
-          secret: secret,
-        }); // the fonction signAsync is used to sign the token
-        return { JWTtoken: token };
+      const token = await this.jwt.signAsync(payload, {
+        expiresIn: '10m',
+        secret: secret,
+      }); // the fonction signAsync is used to sign the token
+      return { JWTtoken: token };
     } else {
-        const token = await this.jwt.signAsync(payload, {
-          expiresIn: '7d',
-          secret: refreshSecret,
-        }); // the fonction signAsync is used to sign the token
-        return { JWTtoken: token };
+      const token = await this.jwt.signAsync(payload, {
+        expiresIn: '7d',
+        secret: refreshSecret,
+      }); // the fonction signAsync is used to sign the token
+      return { JWTtoken: token };
     }
   }
 
-  async Authenticate2FA(email: string, code: string, res: Response): Promise<User> {
+  async Authenticate2FA(
+    email: string,
+    code: string,
+    res: Response,
+  ): Promise<User> {
     const user = await this.prismaService.user.findUnique({
       where: {
         email,
@@ -233,23 +237,28 @@ export class AuthService {
 
   async logout(res: Response) {
     try {
-        res.clearCookie(this.config.get('JWT_ACCESS_TOKEN_COOKIE'), {
-            httpOnly: true,
-            secure: false,
-            sameSite: 'strict',
-        });
-        } catch (error) {
-            throw error;
-        }
+      res.clearCookie(this.config.get('JWT_ACCESS_TOKEN_COOKIE'), {
+        httpOnly: false,
+        secure: false,
+        sameSite: 'strict',
+      });
+    } catch (error) {
+      throw error;
+    }
   }
 
   async refresh(user: User, res: Response) {
-    const accessToken = await this.signToken(user.id, user.email, user.username, true);
+    const accessToken = await this.signToken(
+      user.id,
+      user.email,
+      user.username,
+      true,
+    );
     res.cookie(
       this.config.get('JWT_ACCESS_TOKEN_COOKIE'),
       accessToken.JWTtoken,
       {
-        httpOnly: true,
+        httpOnly: false,
         secure: false,
         sameSite: 'strict',
       },

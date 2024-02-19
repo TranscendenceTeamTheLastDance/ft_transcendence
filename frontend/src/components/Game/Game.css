@@ -1,0 +1,17 @@
+/* Game.css */
+.game-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background-color: rgb(17, 5, 122);
+    color: #ffffff;
+}
+
+.canvas {
+    border: 2px solid #ffffff; /* Bordure noire de 2 pixels */
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}

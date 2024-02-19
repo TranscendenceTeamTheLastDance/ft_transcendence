@@ -5,6 +5,13 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter as Router } from 'react-router-dom';
 
+function clearCookies() {
+  document.cookie = "access-token-cookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  document.cookie = "refresh-token-cookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+}
+
+clearCookies();
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );

@@ -44,7 +44,23 @@ model User {
 
   channels ChannelUser[]
 
+  gamesWon Game[] @relation("GameWinner")
+  gamesLose Game[] @relation("GameLoser")
+  friendships       Friendship[] @relation("UserFriends")
+  friendOf          Friendship[] @relation("FriendToUser")
+
   @@map("Users")
+}
+
+model Friendship {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  friendId  Int
+
+  user      User     @relation("UserFriends", fields: [userId], references: [id])
+  friend    User     @relation("FriendToUser", fields: [friendId], references: [id])
+
+  @@unique([userId, friendId])
 }
 
 model ChannelUser {
@@ -79,4 +95,15 @@ model Message {
 	author    User     @relation(fields: [authorId], references: [id])
 	authorId  Int
 	content   String
+}
+
+model Game {
+    id          Int      @id @default(autoincrement())
+    createdAt   DateTime @default(now())
+    winner      User   @relation("GameWinner", fields: [winnerId], references: [id])
+    winnerId    Int
+    loser       User    @relation("GameLoser", fields: [loserId], references: [id])
+    loserId     Int
+    winnerScore Int
+    loserScore  Int
 }
