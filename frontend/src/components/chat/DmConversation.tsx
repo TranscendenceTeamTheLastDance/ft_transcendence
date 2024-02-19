@@ -71,7 +71,7 @@ const DmConversation = ({ channel, socket, me, allUsers }: ConversationProps) =>
     return () => {
       socket.off('dm');
     };
-  }, []); // Le tableau de dépendances vide signifie que ce useEffect ne s'exécute qu'une seule fois après le montage initial du composant
+  }, [channel]); // Appel de fetchData lorsque le composant est monté
 
   useEffect(() => {
     socket.on('dm', (data: MessageType) => {
