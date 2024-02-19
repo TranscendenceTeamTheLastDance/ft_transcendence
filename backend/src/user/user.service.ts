@@ -14,6 +14,16 @@ import { toDataURL } from 'qrcode';
 export class UserService {
   constructor(private prisma: DatabaseService) {}
 
+  async getMe(userId: number) {
+    return this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        gamesWon: true,
+        gamesLose: true,
+      },
+    });
+  }
+
   async getUnique(email: string): Promise<User> {
     try {
       const user = await this.prisma.user.findUnique({
