@@ -18,12 +18,13 @@ const Leaderboard = () => {
                 const response = await axios.get('http://localhost:8080/users/all', {
                     withCredentials: true,
                 });
-                console.log('response:', response.data)
-                setUsersList(response.data);
+              const sortedUsers = response.data.sort((a, b) => b.totalPoints - a.totalPoints);
+              setUsersList(sortedUsers);
             } catch (error) {
-                console.error('Failed to fetch users:', error);
+              console.error('Failed to fetch users:', error);
             }
-        };
+          };
+          
         const fetchFriends = async () => {
             try {
                 const response = await axios.get('http://localhost:8080/users/friends', {
