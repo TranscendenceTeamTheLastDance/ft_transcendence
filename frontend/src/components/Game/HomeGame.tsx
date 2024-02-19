@@ -50,10 +50,17 @@ const PongGame: React.FC = () => {
     let clienInfoCookie: userDto | undefined;
     clienInfoCookie = user;
     
-    const handleJoinGame = () => {
+    const handleJoinNormalGame = () => {
         setJoinedGame(true);
         if (clienInfoCookie?.username !== undefined && clienInfoCookie?.id !== undefined ) {
             socketRef?.current.emit('join', { username: clienInfoCookie?.username, userId: clienInfoCookie?.id});
+        }
+    };
+
+    const handleJoinFreestyleGame = () => {
+        setJoinedGame(true);
+        if (clienInfoCookie?.username !== undefined && clienInfoCookie?.id !== undefined ) {
+            socketRef?.current.emit('join-freestyle', { username: clienInfoCookie?.username, userId: clienInfoCookie?.id});
         }
     };
     
@@ -118,7 +125,8 @@ const PongGame: React.FC = () => {
         <div className='game-container'>
             {!joinedGame ? (
                 <div>
-                    <button onClick={handleJoinGame}>Join Game</button>
+                    <button onClick={handleJoinNormalGame}>Join normal Game</button>
+                    <button onClick={handleJoinFreestyleGame}>Join freestyle Game</button>
                 </div>
             ) : (    
                 infoGame ? (

@@ -15,3 +15,8 @@
     height: auto;
     object-fit: contain;
 }
+
+.button {
+    border:#ffffff solid 2px;
+    border-radius: 5px;
+}

@@ -16,12 +16,14 @@ export class GameGateway {
     server: Server;
 
     private waitingPlayers: { client: Socket, username: string, userId: number }[] = [];
+    private waitingPlayersFreestyle: { client: Socket, username: string, userId: number }[] = [];
     private gameRooms: Map<string, GameRoom> = new Map();
 
   constructor(private prisma: PrismaService) {}
 
     deleteplayerInWaitList(client: Socket) {
       this.waitingPlayers = this.waitingPlayers.filter(player => player.client.id !== client.id);
+      this.waitingPlayersFreestyle = this.waitingPlayersFreestyle.filter(player => player.client.id !== client.id);
     }
   
     handleDisconnect(@ConnectedSocket() client: Socket) {
@@ -76,6 +78,35 @@ export class GameGateway {
           player1.client.emit('room-id', {roomID : roomID, NumPlayer : 1, playerName1: player1.username, playerName2: player2.username});
           player2.client.emit('room-id', {roomID : roomID, NumPlayer : 2, playerName1: player1.username, playerName2: player2.username});
           gameRoom.startGameLoop();
+        }
+      }
+    }
+
+    @SubscribeMessage('join-freestyle')
+    handleJoinFreestyle(@ConnectedSocket() client: Socket, 
+    @MessageBody() data: { username: string, userId: number }) {
+      // console.log("username:", data.username);
+      // console.log("userId:", data.userId);
+      this.waitingPlayersFreestyle.push({ client, username: data.username, userId: data.userId });
+  
+      if (this.waitingPlayersFreestyle.length >= 2) {
+        const player1 = this.waitingPlayersFreestyle.shift();
+        const player2 = this.waitingPlayersFreestyle.shift();
+  
+        if (player1 && player2) {
+          const roomID = this.createRoomID(player1.client, player2.client);
+          const gameRoom = new GameRoom(player1.client, player2.client, player1.userId, player2.userId, this.prisma);
+          this.gameRooms.set(roomID, gameRoom);
+  
+          console.log("username1:", player1.username);
+          console.log("userId1:", player1.userId);
+          console.log("username2:", player2.username);
+          console.log("userId2:", player2.userId);
+          // Informer les joueurs de l'ID de la salle
+          // username indefini donc peut etre definir la classe player avec un socket et un username
+          player1.client.emit('room-id', {roomID : roomID, NumPlayer : 1, playerName1: player1.username, playerName2: player2.username});
+          player2.client.emit('room-id', {roomID : roomID, NumPlayer : 2, playerName1: player1.username, playerName2: player2.username});
+          gameRoom.startGameLoopFreestyle();
         }
       }
     }
