@@ -54,7 +54,9 @@ const PongGame: React.FC = () => {
         if (!socket)
             return;
 
-        socket.emit('join', { username: clienInfoCookie?.username});
+        // console.log("username:", clienInfoCookie?.username);
+        // console.log("userId:", clienInfoCookie?.id);
+        socket.emit('join', { username: clienInfoCookie?.username, userId: clienInfoCookie?.id});
 
         socket.on('room-id', (id) => {
             identifiandPlayer.current = id.NumPlayer;
@@ -94,14 +96,15 @@ const PongGame: React.FC = () => {
 
         // Clean up
         return () => {
-            console.log("je suis pas sense etre allll")
+            // console.log("je suis pas sense etre allll")
             socket.emit('client-disconnect');
             socket.off('room-id');
             socket.off('player-left-game');
             socket.off('finish');
 
         };
-    }, [clienInfoCookie?.username]);
+        // eslint-disable-next-line
+    }, []);
 
 
     return (

@@ -15,7 +15,7 @@ export class GameGateway {
     @WebSocketServer()
     server: Server;
 
-    private waitingPlayers: { client: Socket, username: string }[] = [];
+    private waitingPlayers: { client: Socket, username: string, userId: number }[] = [];
     private gameRooms: Map<string, GameRoom> = new Map();
 
   constructor(private prisma: PrismaService) {}
@@ -53,9 +53,10 @@ export class GameGateway {
   
     @SubscribeMessage('join')
     handleJoin(@ConnectedSocket() client: Socket, 
-    @MessageBody() data: { username: string}) {
-      console.log("username:", data.username);
-      this.waitingPlayers.push({ client, username: data.username });
+    @MessageBody() data: { username: string, userId: number }) {
+      // console.log("username:", data.username);
+      // console.log("userId:", data.userId);
+      this.waitingPlayers.push({ client, username: data.username, userId: data.userId });
   
       if (this.waitingPlayers.length >= 2) {
         const player1 = this.waitingPlayers.shift();
@@ -63,11 +64,13 @@ export class GameGateway {
   
         if (player1 && player2) {
           const roomID = this.createRoomID(player1.client, player2.client);
-          const gameRoom = new GameRoom(player1.client, player2.client, this.prisma);
+          const gameRoom = new GameRoom(player1.client, player2.client, player1.userId, player2.userId, this.prisma);
           this.gameRooms.set(roomID, gameRoom);
   
-          console.log("username1:", player1.username);
-          console.log("username2:", player2.username);
+          // console.log("username1:", player1.username);
+          // console.log("userId1:", player1.userId);
+          // console.log("username2:", player2.username);
+          // console.log("userId2:", player2.userId);
           // Informer les joueurs de l'ID de la salle
           // username indefini donc peut etre definir la classe player avec un socket et un username
           player1.client.emit('room-id', {roomID : roomID, NumPlayer : 1, playerName1: player1.username, playerName2: player2.username});

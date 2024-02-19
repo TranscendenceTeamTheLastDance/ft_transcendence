@@ -73,7 +73,7 @@ class GameState {
   }
 }
 
-class GameStateSend {
+export class GameStateSend {
   ball: { x: number; y: number };
   score: { scoreU1: number; scoreU2: number };
   padU2: { y: number };

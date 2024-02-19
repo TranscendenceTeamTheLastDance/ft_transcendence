@@ -44,8 +44,8 @@ model User {
 
   channels ChannelUser[]
 
-//   gamesWon Game[] @relation("GameWinner")
-//   gamesLose Game[] @relation("GameLoser")
+  gamesWon Game[] @relation("GameWinner")
+  gamesLose Game[] @relation("GameLoser")
 
   @@map("Users")
 }
@@ -87,9 +87,9 @@ model Message {
 model Game {
     id          Int      @id @default(autoincrement())
     createdAt   DateTime @default(now())
-    // winner      User?   @relation("GameWinner", fields: [winnerId], references: [id])
+    winner      User   @relation("GameWinner", fields: [winnerId], references: [id])
     winnerId    Int
-    // loser       User?    @relation("GameLoser", fields: [loserId], references: [id])
+    loser       User    @relation("GameLoser", fields: [loserId], references: [id])
     loserId     Int
     winnerScore Int
     loserScore  Int
