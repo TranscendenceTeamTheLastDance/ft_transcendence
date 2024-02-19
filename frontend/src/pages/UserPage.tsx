@@ -79,6 +79,9 @@ const User = () => {
 			try {
 				const response = await authAxios.post('/users/upload-profile-picture', formData, {
 					withCredentials: true,
+					headers: {
+						'Content-Type': undefined,
+					},
 				});
 				console.log('frontend: new profile pic successfully uploaded!', response.data);
 				setUpdateModalMessage('new profile pic successfully uploaded!');
