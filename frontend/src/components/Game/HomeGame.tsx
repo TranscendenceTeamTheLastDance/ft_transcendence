@@ -40,7 +40,9 @@ const PongGame: React.FC = () => {
     const [scorePlayer1, setScorePlayer1] = useState(0);
     const [scorePlayer2, setScorePlayer2] = useState(0);
     const {user, fetchUserData} = useUserContext();
+    const [joinedGame, setJoinedGame] = useState(false);
 
+    
     useEffect(()=> {
         fetchUserData();
     }, [fetchUserData]);
@@ -48,16 +50,23 @@ const PongGame: React.FC = () => {
     let clienInfoCookie: userDto | undefined;
     clienInfoCookie = user;
     
+    const handleJoinGame = () => {
+        setJoinedGame(true);
+        if (clienInfoCookie?.username !== undefined && clienInfoCookie?.id !== undefined ) {
+            socketRef?.current.emit('join', { username: clienInfoCookie?.username, userId: clienInfoCookie?.id});
+        }
+    };
+    
     // console.log(user.username);
     useEffect(() => {
         const socket = socketRef?.current;
-        if (!socket)
+        if (!socket || !joinedGame)
             return;
 
         // console.log("username:", clienInfoCookie?.username);
         // console.log("userId:", clienInfoCookie?.id);
-        socket.emit('join', { username: clienInfoCookie?.username, userId: clienInfoCookie?.id});
 
+        //quand le client recois room-id c'est que le server a trouve un adversaire et que la partie commence
         socket.on('room-id', (id) => {
             identifiandPlayer.current = id.NumPlayer;
             setInfoGame({
@@ -93,10 +102,8 @@ const PongGame: React.FC = () => {
             }
             socket.emit('finish');
         });
-
-        // Clean up
         return () => {
-            // console.log("je suis pas sense etre allll")
+            console.log("je suis pas sense etre allll")
             socket.emit('client-disconnect');
             socket.off('room-id');
             socket.off('player-left-game');
@@ -104,31 +111,41 @@ const PongGame: React.FC = () => {
 
         };
         // eslint-disable-next-line
-    }, []);
+    }, [joinedGame]);
 
 
     return (
         <div className='game-container'>
-            {infoGame ? (
-                gameFinished ? (
-                    <div>
-                        <p>Finish</p>
-                        <p>{winningStatus}</p>
-                        <p>{infoGame.playerName1} {scorePlayer1}      {infoGame.playerName2} {scorePlayer2}</p>
-                    </div>
-                ) : (
-                    playerLeftGame ? (
-                        <p>The other player has left the game.</p>
+            {!joinedGame ? (
+                <div>
+                    <button onClick={handleJoinGame}>Join Game</button>
+                </div>
+            ) : (    
+                infoGame ? (
+                    gameFinished ? (
+                        <div>
+                            <p>Finish</p>
+                            <p>{winningStatus}</p>
+                            <p>{infoGame.playerName1} {scorePlayer1}      {infoGame.playerName2} {scorePlayer2}</p>
+                        </div>
                     ) : (
-                        <CanvasGame infoGame={infoGame} />
+                        playerLeftGame ? (
+                            <div>
+                                <p>The other player has left the game.</p>
+                            </div>
+                        ) : (
+                            <div>
+                                <p>the match is played in 11 points </p>
+                                <CanvasGame infoGame={infoGame} />
+                            </div>
+                        )
                     )
+                ) : (
+                    <p>Waiting for another player...</p>
                 )
-            ) : (
-                <p>Waiting for another player...</p>
             )}
         </div>
     );
-    
 };
 
 export default PongGame;

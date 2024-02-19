@@ -67,10 +67,10 @@ export class GameGateway {
           const gameRoom = new GameRoom(player1.client, player2.client, player1.userId, player2.userId, this.prisma);
           this.gameRooms.set(roomID, gameRoom);
   
-          // console.log("username1:", player1.username);
-          // console.log("userId1:", player1.userId);
-          // console.log("username2:", player2.username);
-          // console.log("userId2:", player2.userId);
+          console.log("username1:", player1.username);
+          console.log("userId1:", player1.userId);
+          console.log("username2:", player2.username);
+          console.log("userId2:", player2.userId);
           // Informer les joueurs de l'ID de la salle
           // username indefini donc peut etre definir la classe player avec un socket et un username
           player1.client.emit('room-id', {roomID : roomID, NumPlayer : 1, playerName1: player1.username, playerName2: player2.username});
