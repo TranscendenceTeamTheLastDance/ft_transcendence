@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 // import { UseQueryResult } from 'react-query';
 import { Socket } from "socket.io-client";
 
-import info_icon from '../assets/chat/info.svg';
-import send_icon from '../assets/chat/send.svg';
+import info_icon from "../assets/chat/info.svg";
+import send_icon from "../assets/chat/send.svg";
 
 import { ChannelType } from "./Chat";
 import ChatInfos from "./ChatInfos";
@@ -32,6 +32,7 @@ export interface MessageType {
   creadtedAt: string;
   content: string;
   user: UserType;
+  channel: ChannelType;
 }
 
 const Conversation = ({ channel, socket, me }: ConversationProps) => {
@@ -46,16 +47,16 @@ const Conversation = ({ channel, socket, me }: ConversationProps) => {
   }
 
   useEffect(() => {
-    socket.on('message', (data: MessageType) => {
-      console.log(data);
-      setMessages((messages) => [...messages, data]);
+    socket.on("message", (data: MessageType) => {
+      setMessages((prev) => [...prev, data]);
     });
+    
     socket.emit(
       "history",
       { channel: channel.name, offset: 0, limit: 100 },
       (message: MessageType[]) => {
         setMessages(message);
-      },
+      }
     );
     return () => {
       socket.off("message");
@@ -66,8 +67,8 @@ const Conversation = ({ channel, socket, me }: ConversationProps) => {
   const sendMessage = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!message) return;
-    socket.emit('message', { channel: channel.name, content: message });
-    setMessage('');
+    socket.emit("message", { channel: channel.name, content: message });
+    setMessage("");
   };
 
   //   if (isLoading) return <div>loading</div>;
@@ -99,17 +100,17 @@ const Conversation = ({ channel, socket, me }: ConversationProps) => {
       </div>
       <div
         className="flex h-full flex-col gap-1 overflow-y-auto p-3"
-        style={{ maxHeight: '600px' }}
+        style={{ maxHeight: "600px" }}
       >
         {messages.map((m, idx) => {
-          return (
-            <Message
-            key={idx}
-            text={m.content}
-            send_by_user={m.user.username === me?.username}
-            sender={m.user}
-          />
-          );
+            return (
+              <Message
+                key={idx}
+                text={m.content}
+                send_by_user={m.user.username === me?.username}
+                sender={m.user}
+              />
+            );
         })}
       </div>
       <div className="border-t border-t-white-3">

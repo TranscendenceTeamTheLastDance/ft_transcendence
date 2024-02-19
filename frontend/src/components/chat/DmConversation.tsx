@@ -35,6 +35,7 @@ export interface MessageType {
   creadtedAt: string;
   content: string;
   user: UserType;
+  channel: ChannelType;
 }
 
 const DmConversation = ({ channel, socket, me, allUsers }: ConversationProps) => {
@@ -47,7 +48,7 @@ const DmConversation = ({ channel, socket, me, allUsers }: ConversationProps) =>
   const authAxios = useAuthAxios();
   const setAllUsers = (users: userDto[]) => {
     allUsers = users;
-  }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -75,7 +76,10 @@ const DmConversation = ({ channel, socket, me, allUsers }: ConversationProps) =>
 
   useEffect(() => {
     socket.on('dm', (data: MessageType) => {
-      setMessages((messages) => [...messages, data]);
+      // 
+      if (data.channel.name === channel.name) {
+        setMessages((messages) => [...messages, data]);
+      }
     });
 
     socket.emit(
@@ -87,7 +91,7 @@ const DmConversation = ({ channel, socket, me, allUsers }: ConversationProps) =>
     );
 
     return () => {
-      socket.off('message');
+      socket.off('dm');
     };
   }, [channel]);
 
