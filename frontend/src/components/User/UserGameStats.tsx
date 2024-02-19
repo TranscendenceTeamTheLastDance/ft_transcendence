@@ -5,13 +5,16 @@ import LogOutButton from '../LogoutButton.tsx';
 import { useNavigate } from 'react-router-dom';
 import NotConnected from '../NotSignedIn.tsx';
 import { useAuthAxios } from '../../context/AuthAxiosContext.tsx';
+import { useUserContext } from '../../context/UserContext.tsx';
 
 const UserGameStats = ({ gameStats}) => {
 
 	const [winPercentage, setWinPercentage] = useState(0);
 	const [lossPercentage, setLossPercentage] = useState(0);
-
-    const [error, setError] = useState(false);
+	
+	const { setUser } = useUserContext();
+    
+	const [error, setError] = useState(false);
     const navigate = useNavigate();
 	const authAxios = useAuthAxios();
 
@@ -32,6 +35,8 @@ const UserGameStats = ({ gameStats}) => {
 				withCredentials: true,
 			});
 			console.log(response.data);
+			setUser(null); 
+			console.log('user info cleared.');
 			navigate('/');
 		} catch (error: any) {
 			setError(true);
