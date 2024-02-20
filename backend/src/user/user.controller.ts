@@ -20,16 +20,25 @@ import { TwoFactorCodeDto } from './dto/two-factor-code.dto';
 import { Response } from 'express';
 import { UserService } from './user.service';
 
-
-
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
 
   @UseGuards(JwtGuard)
-  @Get('me')
+  @Get('me') // me with stats
   getMe(@GetUser() user: User) {
-    return user;
+    return this.userService.getMe(user.id);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('my-id')
+  getMyId(@GetUser('id') userId: number) {
+    return userId;
+  }
+
+  @Get('all')
+  async getAllUsers() {
+    return this.userService.getAllUsers();
   }
 
   @UseGuards(JwtGuard)
@@ -74,30 +83,61 @@ export class UserController {
 
   @UseGuards(JwtGuard)
   @Post('2FAEnable')
-  async twoFactorAuthEnable(@GetUser() user: User, @Body() dto: TwoFactorCodeDto, @Res() res: Response) {
+  async twoFactorAuthEnable(
+    @GetUser() user: User,
+    @Body() dto: TwoFactorCodeDto,
+    @Res() res: Response,
+  ) {
     console.log('backend: 2FA ENABLE');
     this.userService
-        .enableTwoFactorAuthentication(user, dto.code)
-        .then(() => {
-          res.send('2FA successfully enabled!');
-        })
-        .catch((error: UnauthorizedException) => {
-          res.status(401).send(error.message);
-        });
+      .enableTwoFactorAuthentication(user, dto.code)
+      .then(() => {
+        res.send('2FA successfully enabled!');
+      })
+      .catch((error: UnauthorizedException) => {
+        res.status(401).send(error.message);
+      });
   }
 
   @UseGuards(JwtGuard)
   @Post('2FADisable')
-  async twoFactorAuthDisable(@GetUser() user: User, @Body() dto: TwoFactorCodeDto, @Res() res: Response) {
+  async twoFactorAuthDisable(
+    @GetUser() user: User,
+    @Body() dto: TwoFactorCodeDto,
+    @Res() res: Response,
+  ) {
     console.log('backend: 2FA DISABLE');
     this.userService
-        .disableTwoFactorAuthentication(user, dto.code)
-        .then(() => {
-          res.send('2FA successfully disabled!');
-        })
-        .catch((error: UnauthorizedException) => {
-          res.status(401).send(error.message);
-        });
+      .disableTwoFactorAuthentication(user, dto.code)
+      .then(() => {
+        res.send('2FA successfully disabled!');
+      })
+      .catch((error: UnauthorizedException) => {
+        res.status(401).send(error.message);
+      });
   }
 
+  @UseGuards(JwtGuard)
+  @Post('add-friend')
+  async addFriend(
+    @GetUser('id') userId: number,
+    @Body('friendId') friendId: number,
+  ) {
+    return this.userService.addFriend(userId, friendId);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post('remove-friend')
+  async removeFriend(
+    @GetUser('id') userId: number,
+    @Body('friendId') friendId: number,
+  ) {
+    return this.userService.removeFriend(userId, friendId);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('friends')
+  async getFriends(@GetUser('id') userId: number) {
+    return this.userService.getFriends(userId);
+  }
 }
