@@ -124,36 +124,40 @@ const PongGame: React.FC = () => {
     return (
         <div className='game-container'>
             {!joinedGame ? (
-                <div>
-                    <button onClick={handleJoinNormalGame}>Join normal Game</button>
-                    <button onClick={handleJoinFreestyleGame}>Join freestyle Game</button>
+                <div className="button-container">
+                    <button className="button" onClick={handleJoinNormalGame}>Join normal Game</button>
+                    <button className="button" onClick={handleJoinFreestyleGame}>Join freestyle Game</button>
                 </div>
             ) : (    
                 infoGame ? (
                     gameFinished ? (
-                        <div>
+                        <div className='info-game'>
                             <p>Finish</p>
                             <p>{winningStatus}</p>
                             <p>{infoGame.playerName1} {scorePlayer1}      {infoGame.playerName2} {scorePlayer2}</p>
                         </div>
                     ) : (
                         playerLeftGame ? (
-                            <div>
+                            <div className='info-game'>
                                 <p>The other player has left the game.</p>
                             </div>
                         ) : (
-                            <div>
-                                <p>the match is played in 11 points </p>
-                                <CanvasGame infoGame={infoGame} />
+                            <div className='game-content'>
+                                <p className="game-info">the match is played in 11 points </p>
+                                <div className='canvas-container'>
+                                    <CanvasGame infoGame={infoGame} />
+                                </div>
                             </div>
                         )
                     )
                 ) : (
-                    <p>Waiting for another player...</p>
+                    <div className='info-game'>
+                        <p>Waiting for another player...</p>
+                    </div>
                 )
             )}
         </div>
     );
-};
+};    
 
 export default PongGame;

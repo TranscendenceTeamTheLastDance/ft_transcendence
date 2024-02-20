@@ -1,4 +1,3 @@
-/* Game.css */
 .game-container {
     display: flex;
     justify-content: center;
@@ -16,7 +15,42 @@
     object-fit: contain;
 }
 
+.button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px; /* Ajoute un espace de 20 pixels entre les boutons */
+}
+
 .button {
-    border:#ffffff solid 2px;
+    border: 2px solid #ffffff; /* Ajoute une bordure blanche de 2 pixels */
     border-radius: 5px;
+    padding: 10px 20px; /* Ajoute du rembourrage pour un meilleur aspect */
+    background-color: transparent; /* Rend le fond transparent */
+    color: #ffffff; /* Couleur du texte */
+    font-size: 16px; /* Taille de la police */
+    cursor: pointer; /* Curseur de souris lorsqu'il survole le bouton */
+    transition: background-color 0.3s, color 0.3s; /* Animation lors du survol */
+}
+
+.button:hover {
+    background-color: #ffffff; /* Change la couleur de fond au survol */
+    color: rgb(17, 5, 122); /* Change la couleur du texte au survol */
+}
+
+.game-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.info-game p {
+    font-size: 20px; /* Taille de la police */
+}
+
+.canvas-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px; /* Ajoute un espace de 20 pixels en haut */
 }

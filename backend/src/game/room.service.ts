@@ -87,8 +87,6 @@ export class GameRoom {
         // this.sendGameHistory(gameState1, player1ID, player2ID);
         this.player1.emit('game-finish', gameState1);
         this.player2.emit('game-finish', gameState2);
-        // a faire envoie les donne de fin de partie a prisma pour le game history
-        // this.createGame(1, 2, gameState1.score.scoreU1, gameState1.score.scoreU2);
         clearInterval(this.gameLoopInterval);
       }
       else {

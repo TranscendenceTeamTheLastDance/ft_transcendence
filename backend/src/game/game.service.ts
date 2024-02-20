@@ -97,29 +97,32 @@ export class GameService {
 
     updateGameState(freestyle: boolean): void {
       let ball = this.gameState.ball;
-
+    
       // Mise à jour de la position de la balle
-      ball.x += ball.velocityX;
-      ball.y += ball.velocityY;
 
+      // ball.x += ball.velocityX;
+      ball.x += ball.velocityX;
+
+      ball.y += freestyle ? ball.velocityY * Math.cos(ball.x / 100) : ball.velocityY;
+    
       // Collision avec les murs supérieur et inférieur
       if (ball.y - ball.radius < 1 || ball.y + ball.radius > this.gameState.canvasHeight - 1) {
-          ball.velocityY = -ball.velocityY;
+        ball.velocityY = -ball.velocityY;
       }
-
+    
       // Gestion des scores et réinitialisation de la balle
       if (ball.x - ball.radius < 0) {
-          this.gameState.score.scoreU2++;
-          this.resetBall(this.gameState);
+        this.gameState.score.scoreU2++;
+        this.resetBall(this.gameState);
       } else if (ball.x + ball.radius > this.gameState.canvasWidth) {
-          this.gameState.score.scoreU1++;
-          this.resetBall(this.gameState);
+        this.gameState.score.scoreU1++;
+        this.resetBall(this.gameState);
       }
-
+    
       // Détection de la collision avec les raquettes
       let player = (ball.x + ball.radius < this.gameState.canvasWidth / 2) ? this.gameState.padU1 : this.gameState.padU2;
       if (this.collision(ball, player)) {
-          this.handleBallPaddleCollision(ball, player, this.gameState.canvasWidth, freestyle);
+        this.handleBallPaddleCollision(ball, player, this.gameState.canvasWidth, freestyle);
       }
     }
 
@@ -143,7 +146,7 @@ export class GameService {
       let angleRad = (Math.PI / 4) * collidePoint;
       let direction = ball.x + ball.radius < canvasWidth / 2 ? 1 : -1;
       if (freestyle) {
-        ball.speed = Math.random() * 10;
+        ball.speed = ball.speed + 1;
       }
       ball.velocityX = direction * ball.speed * Math.cos(angleRad);
       ball.velocityY = ball.speed * Math.sin(angleRad);
