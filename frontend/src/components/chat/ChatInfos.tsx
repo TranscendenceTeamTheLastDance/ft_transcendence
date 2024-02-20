@@ -12,6 +12,7 @@ import crown from "../assets/chat/crown.svg";
 
 import { UserType } from "@/common/userType.interface";
 import { channel } from "diagnostics_channel";
+import axios from "axios";
 // import { UserType } from "./Conversation";
 
 interface ChatInfosProps {
@@ -33,6 +34,7 @@ const ChatInfos = ({
   currentUserLogin,
 }: ChatInfosProps) => {
   const [users, setUsers] = useState<UserType[]>([]);
+  const [friendsIds, setFriendIds] = useState<number[]>([]);
   // const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   useEffect(() => {
@@ -60,6 +62,43 @@ const ChatInfos = ({
     };
     // eslint-disable-next-line
   }, [socket, channelName, currentUserLogin]);
+
+  useEffect(() => {
+    const fetchFriends = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8080/users/friends",
+          {
+            withCredentials: true,
+          }
+        );
+        setFriendIds(response.data.map((friend) => friend.id));
+      } catch (error) {
+        console.error("Failed to fetch friends:", error);
+      }
+    };
+
+    fetchFriends();
+  }, []);
+
+  const addFriend = async (friendId: number) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/users/add-friend",
+        {
+          userId: currentUserLogin,
+          friendId,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      console.log("response:", response.data);
+      setFriendIds((prevFriendIds) => [...prevFriendIds, friendId]);
+    } catch (error) {
+      console.error("Failed to add friend:", error);
+    }
+  };
 
   //   const promoteUser = (user: UserType) => {
   //     socket.emit('promote', { channel: channelName, user: user.login });
@@ -97,6 +136,7 @@ const ChatInfos = ({
               key={user.id}
               className="flex items-center justify-between gap-4"
             >
+              {/* need to realign the profile pic with the non-owner ones */}
               {user.role === "OWNER" && (
                 <button
                   disabled
@@ -139,6 +179,7 @@ const ChatInfos = ({
                   <button
                     className="rounded-full p-1 hover:bg-green-1"
                     title="Add friend"
+                    onClick={() => addFriend(user.id)}
                   >
                     <img
                       className="w-6"
