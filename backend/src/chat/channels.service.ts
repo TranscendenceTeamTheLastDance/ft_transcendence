@@ -4,13 +4,28 @@ import { ChannelRole, ChannelType, Prisma, User } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import { UserService } from '../user/user.service';
 
-import { CreateChannelDTO, JoinChannelDTO, SendMessageDTO, MessageHistoryDTO, SendDmDTO } from './chat.dto';
+import {
+  CreateChannelDTO,
+  JoinChannelDTO,
+  SendMessageDTO,
+  MessageHistoryDTO,
+  SendDmDTO,
+  UserListInChannelDTO,
+  PromoteUserDTO,
+  DemoteUserDTO,
+  KickUserDTO,
+  BanUserDTO,
+  MuteUserDTO,
+  LeaveChannelDTO,
+} from './chat.dto';
 
 // payload type that includes information about a channel and its users
 type ChannelWithUsers = Prisma.ChannelGetPayload<{ include: { users: true } }>;
 
 @Injectable()
 export class ChannelsService {
+  private muted = new Set<number>();
+  
   constructor(
     private prisma: PrismaService,
     private userService: UserService,
@@ -140,6 +155,28 @@ export class ChannelsService {
         isDM: channel.isDM,
       },
     };
+  }
+
+  async leaveChannel(channelDTO: LeaveChannelDTO, user: User, reason?: string) {
+    const channel = await this.getChannel(channelDTO.name);
+
+    if (channel.isDM) {
+      throw new WsException('You cannot leave a DM');
+    }
+
+    const channelUser = channel.users.find((u) => u.userId === user.id);
+    if (!channelUser) {
+      throw new WsException('You are not in this channel');
+    }
+
+    await this.prisma.channelUser.delete({
+      where: {
+        userId_channelId: {
+          userId: user.id,
+          channelId: channel.id,
+        },
+      },
+    });
   }
 
   async getChannelList() {
@@ -353,6 +390,249 @@ export class ChannelsService {
         ...created.author,
         role: ChannelRole.USER,
       },
+    };
+  }
+
+  async getUserListInChannel(dto: UserListInChannelDTO, user: User) {
+    const channel = await this.prisma.channel.findUnique({
+      where: {
+        name: dto.channel,
+      },
+      include: {
+        users: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    if (!channel) {
+      throw new WsException(`Channel ${dto.channel} not found`);
+    }
+
+    const channelUser = channel.users.find((u) => u.userId === user.id);
+    if (!channelUser) {
+      throw new WsException(`You are not in channel ${channel.name}`);
+    }
+
+    const usersWithRole = channel.users.map(channelUser => ({
+      ...channelUser.user,
+      role: channelUser.role,
+    }));
+
+    return {
+      channel: channel.name,
+      users: usersWithRole,
+    };
+  }
+
+  async promoteUser(promotion: PromoteUserDTO, user: User) {
+    const channel = await this.getChannel(promotion.channel);
+    const channelUser = channel.users.find((u) => u.userId === user.id);
+
+    if (!channelUser) {
+      throw new WsException(`You are not in channel ${channel.name}`);
+    }
+
+    if (channelUser.role !== ChannelRole.OWNER) {
+      throw new WsException('You must be the channel owner to promote someone');
+    }
+
+    if (promotion.username === user.username) {
+      throw new WsException('You cannot promote yourself');
+    }
+
+    // to get user id from login and check if user exists
+    const toPromoteUser = await this.userService.getUserByUsername(promotion.username);
+    const toPromoteChannelUser = channel.users.find((u) => u.userId === toPromoteUser.id);
+
+    if (!toPromoteChannelUser) {
+      throw new WsException(`${toPromoteUser.username} is not in channel ${channel.name}`);
+    }
+
+    const updatedChannelUser = await this.prisma.channelUser.update({
+      where: {
+        userId_channelId: {
+          channelId: channel.id,
+          userId: toPromoteUser.id,
+        },
+      },
+      data: {
+        role: ChannelRole.ADMIN,
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    return {
+      ...updatedChannelUser.user,
+      role: updatedChannelUser.role,
+    };
+  }
+
+  async demoteUser(demotion: DemoteUserDTO, user: User) {
+    const channel = await this.getChannel(demotion.channel);
+    const channelUser = channel.users.find((u) => u.userId === user.id);
+
+    if (!channelUser) {
+      throw new WsException(`You are not in channel ${channel.name}`);
+    }
+
+    if (channelUser.role !== ChannelRole.OWNER) {
+      throw new WsException('You must be the channel owner to demote someone');
+    }
+
+    if (demotion.username === user.username) {
+      throw new WsException('You cannot demote yourself');
+    }
+
+    const toDemoteUser = await this.userService.getUserByUsername(demotion.username);
+    const toDemoteChannelUser = channel.users.find((u) => u.userId === toDemoteUser.id);
+
+    if (!toDemoteChannelUser) {
+      throw new WsException(`${toDemoteUser.username} is not in channel ${channel.name}`);
+    }
+
+    const updatedChannelUser = await this.prisma.channelUser.update({
+      where: {
+        userId_channelId: {
+          channelId: channel.id,
+          userId: toDemoteUser.id,
+        },
+      },
+      data: {
+        role: ChannelRole.USER,
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    return {
+      ...updatedChannelUser.user,
+      role: updatedChannelUser.role,
+    };
+  }
+
+  async kickUser(kick: KickUserDTO, user: User) {
+    const channel = await this.getChannel(kick.channel);
+    const channelUser = channel.users.find((u) => u.userId === user.id);
+
+    if (!channelUser) {
+      throw new WsException(`You are not in channel ${channel.name}`);
+    }
+
+    if (channelUser.role === ChannelRole.USER) {
+      throw new WsException('You must be an administrator to kick someone');
+    }
+
+    if (kick.username === user.username) {
+      throw new WsException('You cannot kick yourself');
+    }
+
+    const toKickUser = await this.userService.getUserByUsername(kick.username);
+    const toKickChannelUser = channel.users.find((u) => u.userId === toKickUser.id);
+
+    if (!toKickChannelUser) {
+      throw new WsException(`${toKickUser.username} is not in channel ${channel.name}`);
+    }
+
+    if (toKickChannelUser.role !== ChannelRole.USER) {
+      throw new WsException('You can only kick regular users');
+    }
+
+    let reason = `Kicked by ${user.username}: `;
+    reason += kick.reason ? kick.reason : 'no reason specified';
+
+    return await this.leaveChannel({ name: kick.channel }, toKickUser, reason);
+  }
+
+  async banUser(ban: BanUserDTO, user: User) {
+    const channel = await this.getChannel(ban.channel);
+    const channelUser = channel.users.find((u) => u.userId === user.id);
+
+    if (!channelUser) {
+      throw new WsException(`You are not in channel ${channel.name}`);
+    }
+
+    if (channelUser.role === ChannelRole.USER) {
+      throw new WsException('You must be an administrator to ban someone');
+    }
+
+    if (ban.username === user.username) {
+      throw new WsException('You cannot ban yourself');
+    }
+
+    const toBanUser = await this.userService.getUserByUsername(ban.username);
+    const toBanChannelUser = channel.users.find((u) => u.userId === toBanUser.id);
+
+    if (!toBanChannelUser) {
+      throw new WsException(`${toBanUser.username} is not in channel ${channel.name}`);
+    }
+
+    if (toBanChannelUser.role !== ChannelRole.USER) {
+      throw new WsException('You can only ban regular users');
+    }
+
+    let reason = `Banned by ${user.username}: `;
+    reason += ban.reason ? ban.reason : 'no reason specified';
+
+    await this.prisma.channel.update({
+      where: {
+        id: channel.id,
+      },
+      data: {
+        bans: {
+          connect: { id: toBanUser.id },
+        },
+      },
+    });
+
+    return await this.leaveChannel({ name: ban.channel }, toBanUser, reason);
+  }
+
+  async muteUser(mute: MuteUserDTO, user: User) {
+    const channel = await this.getChannel(mute.channel);
+    const channelUser = channel.users.find((u) => u.userId === user.id);
+
+    if (!channelUser) {
+      throw new WsException(`You are not in channel ${channel.name}`);
+    }
+
+    if (channelUser.role === ChannelRole.USER) {
+      throw new WsException('You must be an administrator to mute someone');
+    }
+
+    if (mute.username === user.username) {
+      throw new WsException('You cannot mute yourself');
+    }
+
+    const toMuteUser = await this.userService.getUserByUsername(mute.username);
+    const toMuteChannelUser = channel.users.find((u) => u.userId === toMuteUser.id);
+
+    if (!toMuteChannelUser) {
+      throw new WsException(`${toMuteUser.username} is not in channel ${channel.name}`);
+    }
+
+    if (toMuteChannelUser.role !== ChannelRole.USER) {
+      throw new WsException('You can only mute regular users');
+    }
+
+    let reason = `Muted by ${user.username} for ${mute.duration} seconds: `;
+    reason += mute.reason ? mute.reason : 'no reason specified';
+
+    this.muted.add(toMuteUser.id);
+    setTimeout(() => {
+      this.muted.delete(toMuteUser.id);
+    }, mute.duration * 1000);
+
+    return {
+      channel: channel.name,
+      user: toMuteUser,
+      reason: reason,
+      duration: mute.duration,
     };
   }
 }

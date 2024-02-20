@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 // import { UseQueryResult } from 'react-query';
 import { Socket } from "socket.io-client";
 
@@ -20,6 +20,7 @@ interface ConversationProps {
 }
 
 export interface UserType {
+  intraImageURL: string | undefined;
   id: number;
   username: string;
   status: string;
@@ -40,6 +41,9 @@ const Conversation = ({ channel, socket, me }: ConversationProps) => {
   const [showModal, setShowModal] = React.useState<boolean>(false);
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [message, setMessage] = useState<string>("");
+  const [blockedUsers, setBlockedUsers] = useState<UserType[]>([]);
+  const bottomEl = useRef<HTMLDivElement>(null);
+  const blockedUsersRef = useRef<UserType[]>([]);
 
   let infos: userDto | undefined;
   if (user) {
@@ -47,22 +51,45 @@ const Conversation = ({ channel, socket, me }: ConversationProps) => {
   }
 
   useEffect(() => {
-    socket.on("message", (data: MessageType) => {
-      setMessages((prev) => [...prev, data]);
+    socket.on('message', (data: MessageType) => {
+      // Access the latest blockedUsers using the ref
+      const currentBlockedUsers = blockedUsersRef.current;
+      if (currentBlockedUsers.some((u) => u.id === data.user.id)) {
+        console.log(`blocking message from ${data.user.username}: ${data.content}`);
+        return;
+      }
+
+      setMessages((messages) => [...messages, data]);
     });
     
     socket.emit(
-      "history",
+      'history',
       { channel: channel.name, offset: 0, limit: 100 },
-      (message: MessageType[]) => {
-        setMessages(message);
-      }
+      (messages: MessageType[]) => {
+        const filteredMessages = messages.filter((m) => {
+          return !blockedUsersRef.current.some((u) => u.username === m.user.username);
+        });
+        setMessages(filteredMessages);
+      },
     );
+
+    socket.emit('blockList', (data: UserType[]) => {
+      setBlockedUsers(data);
+    });
+
     return () => {
       socket.off("message");
     };
     // eslint-disable-next-line
   }, [channel]);
+
+  useEffect(() => {
+    blockedUsersRef.current = blockedUsers;
+  }, [blockedUsers]);
+
+  useEffect(() => {
+    bottomEl?.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const sendMessage = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -84,6 +111,8 @@ const Conversation = ({ channel, socket, me }: ConversationProps) => {
             socket={socket}
             channelName={channel.name}
             currentUserLogin={infos.username}
+            blockedUsers={blockedUsers}
+            setBlockedUsers={setBlockedUsers}
           />
         </ChatModal>
       )}

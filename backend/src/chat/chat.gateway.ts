@@ -16,22 +16,27 @@ import {
   WebSocketGateway,
   WebSocketServer,
   WsException,
-  WsResponse,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
 import { BadRequestTransformationFilter } from '../utils/bad-request-exception.filter';
 
-import { ChannelsService } from './channels.service';
 import { 
-	CreateChannelDTO,
+  CreateChannelDTO,
 	JoinChannelDTO,
 	SendMessageDTO,
 	MessageHistoryDTO,
   UserListInChannelDTO,
   SendDmDTO,
+  PromoteUserDTO,
+  DemoteUserDTO,
+  KickUserDTO,
+  BanUserDTO,
+  MuteUserDTO,
+  BlockUserDTO
 } from './chat.dto';
 import { ChatEvent } from './chat.state';
+import { ChannelsService } from './channels.service';
 import { UserService } from '../user/user.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtGuard } from '../auth/guard';
@@ -52,7 +57,6 @@ export class ChatGateway
   @WebSocketServer()
   private io: Server;
   private logger: Logger = new Logger(ChatGateway.name);
-  config: any;
   private socketsID = new Map<string, Socket[]>(); // Map pour stocker les sockets des utilisateurs
 
   constructor(
@@ -84,7 +88,7 @@ export class ChatGateway
         .split(';')
         .find((c) => c.trim().startsWith(cookieName + '='))
         .split('=')[1];
-      
+
       // Validation du token JWT et récupération des données utilisateur
       const payload = this.jwtService.decode(token);
       client.data.user = await this.userService.getUnique(payload.email);
@@ -192,34 +196,45 @@ export class ChatGateway
     this.io.to(messageDTO.channel).emit(ChatEvent.Message, message);
   }
 
+  // @SubscribeMessage(ChatEvent.UserList)
+  // async handleUserList(
+  //   @MessageBody() UserListDTO: UserListInChannelDTO,
+  //   @ConnectedSocket() client: Socket,
+  // ): Promise<{ channel: string; users: userType[] }> {
+  //   try {
+  //     const channelMembers = await this.channelsService.getChannelMembers(
+  //       UserListDTO.channel,
+  //     );
+
+  //     // Extract only the desired fields from UserListDTO (frontend: userType)
+  //     const extractedUserList = channelMembers.map((member) => ({
+  //       id: member.id,
+  //       username: member.username,
+  //       profilePic: member.profilePic,
+  //     }));
+
+  //     const userTypeList = {
+  //       channel: UserListDTO.channel,
+  //       users: extractedUserList,
+  //     };
+
+  //     console.log(userTypeList);
+  //     return userTypeList;
+  //   } catch (error) {
+  //     console.error('Error fetching channel members:', error);
+  //     throw new WsException('Failed to fetch channel members');
+  //   }
+  // }
+
   @SubscribeMessage(ChatEvent.UserList)
-  async handleUserList(
-    @MessageBody() UserListDTO: UserListInChannelDTO,
+  async onUserList(
+    @MessageBody() dto: UserListInChannelDTO,
     @ConnectedSocket() client: Socket,
-  ): Promise<{ channel: string; users: userType[] }> {
-    try {
-      const channelMembers = await this.channelsService.getChannelMembers(
-        UserListDTO.channel,
-      );
-
-      // Extract only the desired fields from UserListDTO (frontend: userType)
-      const extractedUserList = channelMembers.map((member) => ({
-        id: member.id,
-        username: member.username,
-        profilePic: member.profilePic,
-      }));
-
-      const userTypeList = {
-        channel: UserListDTO.channel,
-        users: extractedUserList,
-      };
-
-      console.log(userTypeList);
-      return userTypeList;
-    } catch (error) {
-      console.error('Error fetching channel members:', error);
-      throw new WsException('Failed to fetch channel members');
-    }
+  ) {
+    return await this.channelsService.getUserListInChannel(
+      dto,
+      client.data.user,
+    );
   }
 
   @SubscribeMessage(ChatEvent.MessageHistory)
@@ -231,10 +246,15 @@ export class ChatGateway
   }
 
   @SubscribeMessage(ChatEvent.DirectMessage)
-  async onDirectMessageUser(@MessageBody() dm: SendDmDTO, @ConnectedSocket() client: Socket) {
+  async onDirectMessageUser(
+    @MessageBody() dm: SendDmDTO,
+    @ConnectedSocket() client: Socket,
+  ) {
     const data = await this.channelsService.sendDM(dm, client.data.user);
 
-    this.logger.log("Direct message sent to " + dm.username + ": " + dm.content);
+    this.logger.log(
+      'Direct message sent to ' + dm.username + ': ' + dm.content,
+    );
 
     const sockets = this.socketsID.get(dm.username) || [];
     for (const socket of sockets) {
@@ -245,4 +265,64 @@ export class ChatGateway
   }
 
 
+  @SubscribeMessage(ChatEvent.Block)
+  async onBlockUser(@MessageBody() toBlock: BlockUserDTO, @ConnectedSocket() client: Socket) {
+    const user = await this.userService.blockUser(toBlock.username, client.data.user);
+    return user.blocked;
+  }
+
+  @SubscribeMessage(ChatEvent.Unblock)
+  async onUnblockUser(@MessageBody() toUnblock: BlockUserDTO, @ConnectedSocket() client: Socket) {
+    const user = await this.userService.unblockUser(toUnblock.username, client.data.user);
+    return user.blocked;
+  }
+
+  @SubscribeMessage(ChatEvent.BlockedUsersList)
+  async onBlockedUsersList(@ConnectedSocket() client: Socket) {
+    return await this.userService.getBlockedList(client.data.user);
+  }
+
+  @SubscribeMessage(ChatEvent.Promote)
+  async onPromoteUser(@MessageBody() promotion: PromoteUserDTO, @ConnectedSocket() client: Socket) {
+    const data = await this.channelsService.promoteUser(promotion, client.data.user);
+    this.io.to(promotion.channel).emit(ChatEvent.Promote, data);
+  }
+
+  @SubscribeMessage(ChatEvent.Demote)
+  async onDemoteUser(@MessageBody() demotion: DemoteUserDTO, @ConnectedSocket() client: Socket) {
+    const data = await this.channelsService.demoteUser(demotion, client.data.user);
+    this.io.to(demotion.channel).emit(ChatEvent.Demote, data);
+  }
+
+  @SubscribeMessage(ChatEvent.Kick)
+  async onKickUser(@MessageBody() kick: KickUserDTO, @ConnectedSocket() client: Socket) {
+    const data = await this.channelsService.kickUser(kick, client.data.user);
+
+    const sockets = this.socketsID.get(kick.username) || [];
+    for (const socket of sockets) {
+      socket.leave(kick.channel);
+      socket.emit('youLeft', data);
+    }
+
+    this.io.to(kick.channel).emit(ChatEvent.Leave, data);
+  }
+
+  @SubscribeMessage(ChatEvent.Ban)
+  async onBanUser(@MessageBody() ban: BanUserDTO, @ConnectedSocket() client: Socket) {
+    const data = await this.channelsService.banUser(ban, client.data.user);
+
+    const sockets = this.socketsID.get(ban.username) || [];
+    for (const socket of sockets) {
+      socket.leave(ban.channel);
+      socket.emit('youLeft', data);
+    }
+
+    this.io.to(ban.channel).emit(ChatEvent.Leave, data);
+  }
+
+  @SubscribeMessage(ChatEvent.Mute)
+  async onMuteUser(@MessageBody() mute: MuteUserDTO, @ConnectedSocket() client: Socket) {
+    const data = await this.channelsService.muteUser(mute, client.data.user);
+    this.io.to(mute.channel).emit(ChatEvent.Mute, data);
+  }
 }

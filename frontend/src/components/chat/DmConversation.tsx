@@ -27,7 +27,6 @@ export interface UserType {
   username: string;
   imagePath: string;
   role: string;
-  status: string;
 }
 
 export interface MessageType {
@@ -76,7 +75,6 @@ const DmConversation = ({ channel, socket, me, allUsers }: ConversationProps) =>
 
   useEffect(() => {
     socket.on('dm', (data: MessageType) => {
-      // 
       if (data.channel.name === channel.name) {
         setMessages((messages) => [...messages, data]);
       }

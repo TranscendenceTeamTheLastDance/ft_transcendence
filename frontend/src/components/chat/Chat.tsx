@@ -60,6 +60,9 @@ const Chat = () => {
   const [users, setUsers] = useState<userDto[]>([]);
   let [me, setMe] = useState<userDto | undefined>(undefined);
 
+  useEffect(() => {
+    fetchUserData();
+  }, [fetchUserData]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -85,11 +88,6 @@ const Chat = () => {
     fetchData();
   }, [authAxios, user]);
 
-
-  useEffect(() => {
-    fetchUserData();
-  }, [fetchUserData]);
-
   useEffect(() => {
     const fetchMe = async () => {
       try {
@@ -113,6 +111,7 @@ const Chat = () => {
     tmpSocket.on("connect", () => {
       setSocket(tmpSocket);
       setLoading(false);
+
       console.log("connecting to chat namespace");
       tmpSocket.emit("joinedChannels", (data: ChannelType[]) => {
         setJoinedChannels(data);
@@ -126,29 +125,67 @@ const Chat = () => {
       });
     });
 
+    tmpSocket.on('dm', (data) => {
+      setCurrentChannel(data.channel);
+      setJoinedChannels((prev) => {
+        if (!prev.some((c) => c.name === data.channel.name)) {
+          return [...prev, data.channel];
+        }
+        return prev;
+      });
+      setShowChannels(false);
+    });
+    
+    tmpSocket.on('exception', (data) => {
+      if (Array.isArray(data.message)) {
+        alert(data.message.join('\n'));
+      } else {
+        alert(data.message);
+      }
+    });
+
     return () => {
+      socket?.off('exception');
+      socket?.off('youJoined');
       socket?.off('dm');
-      socket?.off("youJoined");
       socket?.disconnect();
     };
     // eslint-disable-next-line
   }, []);  
 
 
+  // useEffect(() => {
+  //   socket?.on("youLeft", (data: any) => {
+  //     setCurrentChannel(null);
+  //     setJoinedChannels(joinedChannels.filter((c) => c.name !== data.channel));
+  //     if (!data.reason.includes("disconnected")) {
+  //       alert(`You left ${data.channel}, ${data.reason}`);
+  //     }
+  //   });
+
+  //   return () => {
+  //     socket?.off('youLeft');
+  //   };
+  //   // eslint-disable-next-line
+  // }, [joinedChannels]);
+
   useEffect(() => {
     socket?.on("youLeft", (data: any) => {
-      setCurrentChannel(null);
-      setJoinedChannels(joinedChannels.filter((c) => c.name !== data.channel));
-      if (!data.reason.includes("disconnected")) {
-        alert(`You left ${data.channel}, ${data.reason}`);
+      if (data && data.channel) {
+        setCurrentChannel(null);
+        setJoinedChannels(joinedChannels.filter((c) => c.name !== data.channel));
+        if (!data.reason.includes("disconnected")) {
+          alert(`You left ${data.channel}, ${data.reason}`);
+        }
+      } else {
+        console.error("Invalid data or channel is missing in 'youLeft' event");
       }
     });
-
+  
     return () => {
-      socket?.off("youLeft");
+      socket?.off('youLeft');
     };
-    // eslint-disable-next-line
-  }, [joinedChannels]);
+  }, [joinedChannels, socket]);
 
   if (loading) return <div>loading</div>;
   if (!socket) return <div>socket not initialized</div>;
@@ -183,7 +220,6 @@ const Chat = () => {
             setCurrentChannel={setCurrentChannel}
             setShowModal={setShowDmSomeoneModal}
             socket={socket}
-            // users={users }
             users= { users?.filter((user) => user.username !== me?.username)}
             />
         </ChatModal>
