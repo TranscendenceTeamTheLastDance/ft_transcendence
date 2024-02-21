@@ -275,7 +275,7 @@ export default function Particles({
     spawnShootingStar();
     const shootingStarInterval = setInterval(() => {
       spawnShootingStar();
-    }, 2500);
+    }, 5000);
 
     return () => {
       clearInterval(shootingStarInterval);
