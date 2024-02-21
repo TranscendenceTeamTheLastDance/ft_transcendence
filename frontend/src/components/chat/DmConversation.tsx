@@ -23,8 +23,10 @@ interface ConversationProps {
 }
 
 export interface UserType {
+  intraImageURL: string | undefined;
   id: number;
   username: string;
+  status: string;
   imagePath: string;
   role: string;
 }

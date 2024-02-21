@@ -17,6 +17,7 @@ import {
   BanUserDTO,
   MuteUserDTO,
   LeaveChannelDTO,
+  UpdateChannelDTO,
 } from './chat.dto';
 
 // payload type that includes information about a channel and its users
@@ -46,24 +47,28 @@ export class ChannelsService {
     return channel;
   }
 
-  // retrieve the users from a specific channel
-  async getChannelMembers(channelName: string): Promise<User[]> {
-    const channel = await this.getChannel(channelName);
-
-    if (!channel) {
-      throw new WsException(`Channel ${channelName} not found`);
-    }
-
-    const channelUsers = await this.prisma.channelUser.findMany({
-      where: {
-        channelId: channel.id,
-      },
-      include: {
-        user: true,
-      },
-    });
-    return channelUsers.map((chanUser) => chanUser.user);
+  async getAllUsers(): Promise<User[]> {
+    return await this.prisma.user.findMany();
   }
+
+  // // retrieve the users from a specific channel
+  // async getChannelMembers(channelName: string): Promise<User[]> {
+  //   const channel = await this.getChannel(channelName);
+
+  //   if (!channel) {
+  //     throw new WsException(`Channel ${channelName} not found`);
+  //   }
+
+  //   const channelUsers = await this.prisma.channelUser.findMany({
+  //     where: {
+  //       channelId: channel.id,
+  //     },
+  //     include: {
+  //       user: true,
+  //     },
+  //   });
+  //   return channelUsers.map((chanUser) => chanUser.user);
+  // }
 
   async createChannel(
     createChatDto: CreateChannelDTO,
@@ -104,7 +109,7 @@ export class ChannelsService {
       where: {
         name: channelDTO.name,
       },
-      include: { users: true },
+      include: { users: true, bans: true },
     });
 
     if (!channel) {
@@ -125,6 +130,14 @@ export class ChannelsService {
       if (!isPasswordValid) {
         throw new WsException(`Invalid password for channel ${channel.name}`);
       }
+    }
+
+    if (channel.bans.some((u) => u.id === user.id)) {
+      throw new WsException('You are banned from this channel');
+    }
+
+    if (channel.users.some((u) => u.userId === user.id)) {
+      throw new WsException('You already joined this channel');
     }
 
     const channelUser = await this.prisma.channelUser.create({
@@ -177,78 +190,21 @@ export class ChannelsService {
         },
       },
     });
-  }
 
-  async getChannelList() {
-    const channels: any = await this.prisma.channel.findMany({
-      where: {
-        type: {
-          not: ChannelType.PRIVATE,
+    if (channel.users.length <= 1) {
+      // delete the channel if the last user left
+      await this.prisma.channel.delete({
+        where: {
+          name: channel.name,
         },
-        isDM: {
-          not: true,
-        },
-      },
-      // exclude password and isDM field
-      select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        type: true,
-        name: true,
-        messages: {
-          orderBy: {
-            id: 'desc',
-          },
-          take: 1,
-        },
-      },
-    });
+      });
+    }
 
-    channels.forEach((channel: any) => {
-      if (channel.type === ChannelType.PUBLIC) {
-        channel.lastMessage = channel.messages[0];
-      }
-
-      delete channel.messages;
-    });
-
-    return channels;
-  }
-
-  async getAllUsers(): Promise<User[]> {
-    return await this.prisma.user.findMany();
-  }
-
-  async getJoinedChannels(user: User) {
-    const channelUsers = await this.prisma.channelUser.findMany({
-      where: {
-        user: user,
-      },
-      include: {
-        channel: {
-          include: {
-            messages: {
-              orderBy: {
-                id: 'desc',
-              },
-              take: 1,
-            },
-          },
-        },
-      },
-    });
-
-    // return the channel list without the password field
-    // and with last message
-    return channelUsers.map((cu: any) => {
-      cu.channel.lastMessage = cu.channel.messages[0];
-      delete cu.channel.messages;
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...channelWithoutPassword } = cu.channel;
-      return channelWithoutPassword;
-    });
+    return {
+      channel: channel.name,
+      user: user,
+      reason: reason ? reason : 'disconnected',
+    };
   }
 
   async sendMessage(message: SendMessageDTO, user: User) {
@@ -259,9 +215,9 @@ export class ChannelsService {
       throw new WsException('You are not in this channel');
     }
 
-    // if (this.muted.has(user.id)) {
-    //   throw new WsException('You are muted in this channel');
-    // }
+    if (this.muted.has(user.id)) {
+      throw new WsException('You are muted in this channel');
+    }
 
     const created = await this.prisma.message.create({
       data: {
@@ -328,69 +284,95 @@ export class ChannelsService {
       .reverse();
   }
 
-  // Generate the DM channel name between 2 users
-  getDmChannelName(login1: string, login2: string): string {
-    if (login1.localeCompare(login2) > 0) {
-      return `!${login2}_${login1}`;
-    } else {
-      return `!${login1}_${login2}`;
+  async updateChannel(updateData: UpdateChannelDTO, user: User) {
+    const channel = await this.getChannel(updateData.name);
+    const channelUser = channel.users.find((u) => u.userId === user.id);
+
+    if (!channelUser) {
+      throw new WsException(`You are not in channel ${channel.name}`);
     }
+
+    if (channelUser.role !== ChannelRole.OWNER) {
+      throw new WsException('You must be the channel owner to modify the channel visibility');
+    }
+
+    await this.prisma.channel.update({
+      where: {
+        id: channel.id,
+      },
+      data: {
+        type: updateData.type,
+        password: updateData.password
+      },
+    });
   }
 
-  async sendDM(dm: SendDmDTO, user: User) {
-    const otherUser = await this.userService.getUserByUsername(dm.username);
-
-    if (otherUser.id === user.id) {
-      throw new WsException('You cannot send a direct message to yourself');
-    }
-
-    const channelName = this.getDmChannelName(user.username, dm.username);
-    let channel = await this.prisma.channel.findUnique({
-      where: { name: channelName },
+  async getChannelList() {
+    const channels: any = await this.prisma.channel.findMany({
+      where: {
+        type: {
+          not: ChannelType.PRIVATE,
+        },
+        isDM: {
+          not: true,
+        },
+      },
+      // exclude password and isDM field
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        type: true,
+        name: true,
+        messages: {
+          orderBy: {
+            id: 'desc',
+          },
+          take: 1,
+        },
+      },
     });
 
-    if (!channel) {
-      channel = await this.prisma.channel.create({
-        data: {
-          name: channelName,
-          type: ChannelType.PRIVATE,
-          isDM: true,
-          users: {
-            create: [
-              {
-                user: { connect: { id: user.id } },
-                role: ChannelRole.USER,
-              },
-              {
-                user: { connect: { id: otherUser.id } },
-                role: ChannelRole.USER,
-              },
-            ],
-          },
-        },
-      });
-    }
+    channels.forEach((channel: any) => {
+      if (channel.type === ChannelType.PUBLIC) {
+        channel.lastMessage = channel.messages[0];
+      }
 
-    const created = await this.prisma.message.create({
-      data: {
-        content: dm.content,
-        author: { connect: { id: user.id } },
-        channel: { connect: { name: channelName } },
+      delete channel.messages;
+    });
+
+    return channels;
+  }
+
+  async getJoinedChannels(user: User) {
+    const channelUsers = await this.prisma.channelUser.findMany({
+      where: {
+        user: user,
       },
       include: {
-        author: true,
+        channel: {
+          include: {
+            messages: {
+              orderBy: {
+                id: 'desc',
+              },
+              take: 1,
+            },
+          },
+        },
       },
     });
 
-    return {
-      createdAt: created.createdAt,
-      content: created.content,
-      channel: channel,
-      user: {
-        ...created.author,
-        role: ChannelRole.USER,
-      },
-    };
+    // return the channel list without the password field
+    // and with last message
+    return channelUsers.map((cu: any) => {
+      cu.channel.lastMessage = cu.channel.messages[0];
+      delete cu.channel.messages;
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...channelWithoutPassword } = cu.channel;
+      return channelWithoutPassword;
+    });
   }
 
   async getUserListInChannel(dto: UserListInChannelDTO, user: User) {
@@ -633,6 +615,71 @@ export class ChannelsService {
       user: toMuteUser,
       reason: reason,
       duration: mute.duration,
+    };
+  }
+
+  // Generate the DM channel name between 2 users
+  getDmChannelName(login1: string, login2: string): string {
+    if (login1.localeCompare(login2) > 0) {
+      return `!${login2}_${login1}`;
+    } else {
+      return `!${login1}_${login2}`;
+    }
+  }
+
+  async sendDM(dm: SendDmDTO, user: User) {
+    const otherUser = await this.userService.getUserByUsername(dm.username);
+
+    if (otherUser.id === user.id) {
+      throw new WsException('You cannot send a direct message to yourself');
+    }
+
+    const channelName = this.getDmChannelName(user.username, dm.username);
+    let channel = await this.prisma.channel.findUnique({
+      where: { name: channelName },
+    });
+
+    if (!channel) {
+      channel = await this.prisma.channel.create({
+        data: {
+          name: channelName,
+          type: ChannelType.PRIVATE,
+          isDM: true,
+          users: {
+            create: [
+              {
+                user: { connect: { id: user.id } },
+                role: ChannelRole.USER,
+              },
+              {
+                user: { connect: { id: otherUser.id } },
+                role: ChannelRole.USER,
+              },
+            ],
+          },
+        },
+      });
+    }
+
+    const created = await this.prisma.message.create({
+      data: {
+        content: dm.content,
+        author: { connect: { id: user.id } },
+        channel: { connect: { name: channelName } },
+      },
+      include: {
+        author: true,
+      },
+    });
+
+    return {
+      createdAt: created.createdAt,
+      content: created.content,
+      channel: channel,
+      user: {
+        ...created.author,
+        role: ChannelRole.USER,
+      },
     };
   }
 }

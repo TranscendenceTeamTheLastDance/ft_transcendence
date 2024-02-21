@@ -1,5 +1,6 @@
-Fix erreur quand on recupere par le user, renvoyer vers la page avec le bouton Signin et renvoyer vers la page d auth
+- Affiche le message dans la bonne conversation channel
+- Fix l action du bouton MUTE
+- Fix Dm Infos
+- Acceder au user profile de user a qui on parle
+- Rendre le lien cliquable dans l invitation
 
-Fix rechargement Dm Conversation + envoie de plusieurs message si on change le conversation (click = message++)
-
-et affiche le message dans le conv du user actuel meme si c pas le bouton

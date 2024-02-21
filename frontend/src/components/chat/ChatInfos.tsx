@@ -115,8 +115,8 @@ const ChatInfos = ({
   };
 
   const startGame = () => {
-    const code = (Math.random() + 1).toString(36).substring(7);
-    const message = `Come join me in a Pong game! ${window.location.origin}/game?code=${code}`;
+    // const code = (Math.random() + 1).toString(36).substring(7);
+    const message = `Come join me in a Pong game! ${window.location.origin}/play`;
     socket.emit('message', { channel: channelName, content: message });
   };
 

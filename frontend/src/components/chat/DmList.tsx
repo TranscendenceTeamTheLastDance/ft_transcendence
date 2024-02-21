@@ -4,7 +4,6 @@ import { userDto } from './dto/userDto';
 
 import { ChannelType } from './Chat';
 import React from 'react';
-import { Socket } from 'socket.io-client';
 
 interface DmListElemProps {
   allUsers: userDto[] | undefined;
@@ -84,7 +83,6 @@ const DmList = ({
           key={chat.id}
           chatInfos={chat}
           currentChannel={currentChannel}
-
         />
       ))}
     </div>

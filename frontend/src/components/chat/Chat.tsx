@@ -115,13 +115,11 @@ const Chat = () => {
       console.log("connecting to chat namespace");
       tmpSocket.emit("joinedChannels", (data: ChannelType[]) => {
         setJoinedChannels(data);
-        console.log("joinedChannels", data);
       });
 
       tmpSocket.on("youJoined", (data: ChannelType) => {
         setCurrentChannel(data);
         setJoinedChannels((prev) => [...prev, data]);
-        console.log("youJoined", data);
       });
     });
 
@@ -185,7 +183,7 @@ const Chat = () => {
     return () => {
       socket?.off('youLeft');
     };
-  }, [joinedChannels, socket]);
+  }, [joinedChannels]);
 
   if (loading) return <div>loading</div>;
   if (!socket) return <div>socket not initialized</div>;

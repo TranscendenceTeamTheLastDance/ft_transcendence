@@ -33,7 +33,9 @@ import {
   KickUserDTO,
   BanUserDTO,
   MuteUserDTO,
-  BlockUserDTO
+  BlockUserDTO,
+  LeaveChannelDTO,
+  UpdateChannelDTO,
 } from './chat.dto';
 import { ChatEvent } from './chat.state';
 import { ChannelsService } from './channels.service';
@@ -140,60 +142,49 @@ export class ChatGateway
     @MessageBody() channel: CreateChannelDTO,
     @ConnectedSocket() client: Socket,
   ) {
-    // Création d'un nouveau canal de discussion
-    try {
-      const data = await this.channelsService.createChannel(
-        channel,
-        client.data.user,
-      );
-      client.join(channel.name);
-      return { event: 'youJoined', data: data };
-    } catch (error) {
-      throw new WsException('Failed to create channel');
-    }
+    const data = await this.channelsService.createChannel(channel, client.data.user);
+    client.join(channel.name);
+    return { event: 'youJoined', data: data };
   }
 
   @SubscribeMessage(ChatEvent.Join)
-  async onJoinChannel(
-    @MessageBody() channel: JoinChannelDTO,
-    @ConnectedSocket() client: Socket,
-  ) {
-    const data = await this.channelsService.joinChannel(
-      channel,
-      client.data.user,
-    );
-    this.io.to(channel.name).emit(ChatEvent.Join, data.toChannel); // Envoyer un message à tous les utilisateurs du canal
-    client.join(channel.name); // Ajouter l'utilisateur au canal
-    this.logger.log(
-      'User ' + client.data.user.username + ' joined channel ' + channel.name,
-    );
+  async onJoinChannel(@MessageBody() channel: JoinChannelDTO, @ConnectedSocket() client: Socket) {
+    const data = await this.channelsService.joinChannel(channel, client.data.user);
+    this.io.to(channel.name).emit(ChatEvent.Join, data.toChannel);
+    client.join(channel.name);
     return { event: 'youJoined', data: data.toClient };
   }
 
-  // Méthode de souscription à l'événement pour récupérer la liste des canaux disponibles
-  @SubscribeMessage(ChatEvent.ChannelList)
-  async onChannelList() {
-    return await this.channelsService.getChannelList();
-  }
-
-  // Méthode de souscription à l'événement pour obtenir la liste des canaux auxquels l'utilisateur est abonné
-  @SubscribeMessage(ChatEvent.JoinedChannels)
-  async onGetJoinedChannels(@ConnectedSocket() client: Socket) {
-    return await this.channelsService.getJoinedChannels(client.data.user);
+  @SubscribeMessage(ChatEvent.Leave)
+  async onLeaveChannel(@MessageBody() channel: LeaveChannelDTO, @ConnectedSocket() client: Socket) {
+    const data = await this.channelsService.leaveChannel(channel, client.data.user);
+    client.leave(channel.name);
+    this.io.to(channel.name).emit(ChatEvent.Leave, data);
+    return { event: 'youLeft', data: data };
   }
 
   // Méthode de souscription à l'événement pour la réception de messages dans un canal donné
   @SubscribeMessage(ChatEvent.Message)
-  async onMessage(
-    @MessageBody() messageDTO: SendMessageDTO,
+  async onMessage(@MessageBody() messageDTO: SendMessageDTO, @ConnectedSocket() client: Socket) {
+    const message = await this.channelsService.sendMessage(messageDTO, client.data.user);
+    this.io.to(messageDTO.channel).emit(ChatEvent.Message, message);
+  }
+  
+  @SubscribeMessage(ChatEvent.MessageHistory)
+  async onMessageHistory(
+    @MessageBody() dto: MessageHistoryDTO,
     @ConnectedSocket() client: Socket,
   ) {
-    // Envoi du message à tous les utilisateurs du canal spécifié
-    const message = await this.channelsService.sendMessage(
-      messageDTO,
-      client.data.user,
-    );
-    this.io.to(messageDTO.channel).emit(ChatEvent.Message, message);
+    return await this.channelsService.getMessageHistory(dto, client.data.user);
+  }
+
+  @SubscribeMessage(ChatEvent.UpdateChannel)
+  async onUpdateChannel(
+    @MessageBody() updateData: UpdateChannelDTO,
+    @ConnectedSocket() client: Socket,
+  ) {
+    await this.channelsService.updateChannel(updateData, client.data.user);
+    this.io.to(updateData.name).emit(ChatEvent.UpdateChannel, { type: updateData.type });
   }
 
   // @SubscribeMessage(ChatEvent.UserList)
@@ -237,33 +228,17 @@ export class ChatGateway
     );
   }
 
-  @SubscribeMessage(ChatEvent.MessageHistory)
-  async onMessageHistory(
-    @MessageBody() dto: MessageHistoryDTO,
-    @ConnectedSocket() client: Socket,
-  ) {
-    return await this.channelsService.getMessageHistory(dto, client.data.user);
+  // Méthode de souscription à l'événement pour récupérer la liste des canaux disponibles
+  @SubscribeMessage(ChatEvent.ChannelList)
+  async onChannelList() {
+    return await this.channelsService.getChannelList();
   }
 
-  @SubscribeMessage(ChatEvent.DirectMessage)
-  async onDirectMessageUser(
-    @MessageBody() dm: SendDmDTO,
-    @ConnectedSocket() client: Socket,
-  ) {
-    const data = await this.channelsService.sendDM(dm, client.data.user);
-
-    this.logger.log(
-      'Direct message sent to ' + dm.username + ': ' + dm.content,
-    );
-
-    const sockets = this.socketsID.get(dm.username) || [];
-    for (const socket of sockets) {
-      this.io.to(socket.id).emit(ChatEvent.DirectMessage, data);
-    }
-
-    client.emit(ChatEvent.DirectMessage, data);
+  // Méthode de souscription à l'événement pour obtenir la liste des canaux auxquels l'utilisateur est abonné
+  @SubscribeMessage(ChatEvent.JoinedChannels)
+  async onGetJoinedChannels(@ConnectedSocket() client: Socket) {
+    return await this.channelsService.getJoinedChannels(client.data.user);
   }
-
 
   @SubscribeMessage(ChatEvent.Block)
   async onBlockUser(@MessageBody() toBlock: BlockUserDTO, @ConnectedSocket() client: Socket) {
@@ -324,5 +299,17 @@ export class ChatGateway
   async onMuteUser(@MessageBody() mute: MuteUserDTO, @ConnectedSocket() client: Socket) {
     const data = await this.channelsService.muteUser(mute, client.data.user);
     this.io.to(mute.channel).emit(ChatEvent.Mute, data);
+  }
+
+  @SubscribeMessage(ChatEvent.DirectMessage)
+  async onDirectMessageUser(@MessageBody() dm: SendDmDTO, @ConnectedSocket() client: Socket) {
+    const data = await this.channelsService.sendDM(dm, client.data.user);
+
+    const sockets = this.socketsID.get(dm.username) || [];
+    for (const socket of sockets) {
+      this.io.to(socket.id).emit(ChatEvent.DirectMessage, data);
+    }
+
+    client.emit(ChatEvent.DirectMessage, data);
   }
 }
