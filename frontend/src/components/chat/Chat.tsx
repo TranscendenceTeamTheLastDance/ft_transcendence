@@ -86,7 +86,7 @@ const Chat = () => {
     };
 
     fetchData();
-  }, [authAxios, user]);
+  }, [authAxios, users, user]);
 
   useEffect(() => {
     const fetchMe = async () => {
@@ -112,7 +112,6 @@ const Chat = () => {
       setSocket(tmpSocket);
       setLoading(false);
 
-      console.log("connecting to chat namespace");
       tmpSocket.emit("joinedChannels", (data: ChannelType[]) => {
         setJoinedChannels(data);
       });
@@ -150,22 +149,6 @@ const Chat = () => {
     };
     // eslint-disable-next-line
   }, []);  
-
-
-  // useEffect(() => {
-  //   socket?.on("youLeft", (data: any) => {
-  //     setCurrentChannel(null);
-  //     setJoinedChannels(joinedChannels.filter((c) => c.name !== data.channel));
-  //     if (!data.reason.includes("disconnected")) {
-  //       alert(`You left ${data.channel}, ${data.reason}`);
-  //     }
-  //   });
-
-  //   return () => {
-  //     socket?.off('youLeft');
-  //   };
-  //   // eslint-disable-next-line
-  // }, [joinedChannels]);
 
   useEffect(() => {
     socket?.on("youLeft", (data: any) => {
@@ -218,7 +201,7 @@ const Chat = () => {
             setCurrentChannel={setCurrentChannel}
             setShowModal={setShowDmSomeoneModal}
             socket={socket}
-            users= { users?.filter((user) => user.username !== me?.username)}
+            users= {users}
             />
         </ChatModal>
       )}
@@ -308,7 +291,8 @@ const Chat = () => {
           )
         : currentChannel && (
             <DmConversation
-              allUsers={users?.filter((user) => user.username !== me?.username)}
+              // allUsers={users?.filter((user) => user.username !== me?.username)}
+              users={users}
               me={me}
               socket={socket}
               channel={currentChannel}

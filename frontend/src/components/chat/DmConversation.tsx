@@ -19,7 +19,7 @@ interface ConversationProps {
   channel: ChannelType;
   me: userDto | undefined;
   socket: Socket;
-  allUsers: userDto[] | undefined;
+  users: userDto[] | undefined;
 }
 
 export interface UserType {
@@ -39,41 +39,43 @@ export interface MessageType {
   channel: ChannelType;
 }
 
-const DmConversation = ({ channel, socket, me, allUsers }: ConversationProps) => {
+const DmConversation = ({ channel, socket, me, users }: ConversationProps) => {
   const [showInfoModal, setShowInfoModal] = React.useState<boolean>(false);
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [message, setMessage] = useState<string>('');
   const bottomEl = useRef<HTMLDivElement>(null);
 
-  const users: userDto[] | undefined = [];
-  const authAxios = useAuthAxios();
-  const setAllUsers = (users: userDto[]) => {
-    allUsers = users;
-  };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const usersResponse = await authAxios.get("/chat/allUsers", {
-          withCredentials: true,
-        }) as unknown as UseQueryResult<userDto[], unknown>;
+
+  // const authAxios = useAuthAxios();
+  // const setAllUsers = (users: userDto[]) => {
+  //   allUsers = users;
+  // };
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const usersResponse = await authAxios.get("/chat/allUsers", {
+  //         withCredentials: true,
+  //       }) as unknown as UseQueryResult<userDto[], unknown>;
   
-        const fetchedUsers = usersResponse.data;
-        if (fetchedUsers) {
-          setAllUsers(fetchedUsers);
-        }
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
-    };
+  //       const fetchedUsers = usersResponse.data;
+  //       if (fetchedUsers) {
+  //         setAllUsers(fetchedUsers);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching users:", error);
+  //     }
+  //   };
   
-    fetchData(); // Appel de fetchData une fois après le montage du composant
+  //   fetchData(); // Appel de fetchData une fois après le montage du composant
   
-    // Nettoyage de l'écouteur d'événement lorsque le composant est démonté
-    return () => {
-      socket.off('dm');
-    };
-  }, [channel]); // Appel de fetchData lorsque le composant est monté
+  //   // Nettoyage de l'écouteur d'événement lorsque le composant est démonté
+  //   return () => {
+  //     socket.off('dm');
+  //   };
+  // }, [channel]); // Appel de fetchData lorsque le composant est monté
+
 
   useEffect(() => {
     socket.on('dm', (data: MessageType) => {
@@ -110,21 +112,19 @@ const DmConversation = ({ channel, socket, me, allUsers }: ConversationProps) =>
 
   function findUserInfos1(chatName: string) {
     if (!chatName) return '';
-
-    allUsers = users;
-
+    
     const names = chatName.substring(1).split('_');
     if (names[0] === me?.username) {
-      const user = allUsers?.filter((user) => user.username === names[1]);
-      if (user?.length) {
-        return user[0].username;
+      const user = users?.find((user) => user.username === names[1]);
+      if (user) {
+        return user.username;
       } else {
         return names[1];
       }
     } else {
-      const user = allUsers?.filter((user) => user.username === names[0]);
-      if (user?.length) {
-        return user[0].username;
+      const user = users?.find((user) => user.username === names[0]);
+      if (user) {
+        return user.username;
       } else {
         return names[0];
       }
