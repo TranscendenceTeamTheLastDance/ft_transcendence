@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import CanvasGame from './Game';
 import io, { Socket } from 'socket.io-client';
 import './Game.css';
+import Particles from '../Home/Particles';
 import { useUserContext } from '../../context/UserContext';
 
 
@@ -67,7 +68,7 @@ const PongGame: React.FC = () => {
     // console.log(user.username);
     useEffect(() => {
         const socket = socketRef?.current;
-        if (!socket || !joinedGame)
+        if (!socket || !joinedGame || clienInfoCookie === undefined)
             return;
 
         // console.log("username:", clienInfoCookie?.username);
@@ -110,7 +111,7 @@ const PongGame: React.FC = () => {
             socket.emit('finish');
         });
         return () => {
-            console.log("je suis pas sense etre allll")
+            // console.log("je suis pas sense etre allll")
             socket.emit('client-disconnect');
             socket.off('room-id');
             socket.off('player-left-game');
@@ -123,6 +124,7 @@ const PongGame: React.FC = () => {
 
     return (
         <div className='game-container'>
+            <Particles className="absolute inset-0 -z-10" quantity={1000} />
             {!joinedGame ? (
                 <div className="button-container">
                     <button className="button" onClick={handleJoinNormalGame}>Join normal Game</button>
