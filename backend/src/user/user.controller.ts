@@ -25,9 +25,9 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @UseGuards(JwtGuard)
-  @Get('me')
+  @Get('me') // me with stats
   getMe(@GetUser() user: User) {
-    return user;
+    return this.userService.getMe(user.id);
   }
 
   @UseGuards(JwtGuard)

@@ -159,16 +159,6 @@ const User = () => {
 			setError(error.response.data.message);
 		}
 	};
-
-
-	const gameStats = {
-		totalGamesPlayed: 30,
-		totalWins: 20,
-		totalLosses: 10,
-		Rank: 1,
-	  };
-
-
 	  return user ? (
 		<div className="flex items-center justify-center min-h-screen relative pb-8">
 			<Particles className="absolute inset-0 -z-10" quantity={1000} />
@@ -191,8 +181,7 @@ const User = () => {
 	  
 			{/* Right Section: Game Stats */}
 				{/* Game Stats Box */}
-				<UserGameStats 
-					gameStats={gameStats}/>
+				<UserGameStats />
 
 		</div>
 		{display2FAModal ? (
