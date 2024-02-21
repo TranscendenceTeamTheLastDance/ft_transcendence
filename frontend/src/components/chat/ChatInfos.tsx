@@ -32,7 +32,6 @@ interface UserListResponse {
   users: UserType[];
 }
 
-// TODO: leaver button ??
 const ChatInfos = ({
   setShowModal,
   socket,
@@ -91,12 +90,12 @@ const ChatInfos = ({
   };
 
   const blockUser = (user: UserType) => {
-    socket.emit('block', { login: user.username });
+    socket.emit('block', { username: user.username });
     setBlockedUsers((prev) => [...prev, user]);
   };
 
   const unblockUser = (user: UserType) => {
-    socket.emit('unblock', { login: user.username });
+    socket.emit('unblock', { username: user.username });
     setBlockedUsers(blockedUsers.filter((u) => u.id !== user.id));
   };
 
@@ -105,7 +104,7 @@ const ChatInfos = ({
 
     const muteData = {
       channel: channelName,
-      login: muteUserState?.username,
+      username: muteUserState?.username,
       reason: muteReasonRef.current?.value,
       duration: Number(muteDurationRef.current?.value),
     };
@@ -200,7 +199,7 @@ const ChatInfos = ({
                 >
                   <img className="w-6" src={mute_icon} alt="mute" />
                 </button>
-                {/* {blockedUsers.some((u) => u.id === user.id) ? (
+                {blockedUsers.some((u) => u.id === user.id) ? (
                   <button
                     className="rounded-full p-1 enabled:hover:bg-green-1 disabled:cursor-not-allowed"
                     title="Unblock user"
@@ -216,7 +215,7 @@ const ChatInfos = ({
                   >
                     <img className="w-6" src={block_icon} alt="block" />
                   </button>
-                )} */}
+                )}
                 {showMuteModal && (
                   <ChatModal>
                     <div className="flex flex-col gap-2 rounded-lg bg-white-1 p-4">
@@ -261,32 +260,3 @@ const ChatInfos = ({
 };
 
 export default ChatInfos;
-
-
-
-
-// ///
-// ///////////
-
-// interface ChatInfosProps {
-//   {blockedUsers && blockedUsers.some((u) => u.id === user.id) ? (
-//     <button
-//       className="rounded-full p-1 enabled:hover:bg-green-1 disabled:cursor-not-allowed"
-//       title="Unblock user"
-//       onClick={() => unblockUser(user)}
-//     >
-//       <img className="w-6" src={unblock_icon} alt="block" />
-//     </button>
-//   ) : (
-//     <button
-//       className="rounded-full p-1 enabled:hover:bg-red disabled:cursor-not-allowed"
-//       title="Block user"
-//       onClick={() => blockUser(user)}
-//     >
-//       <img className="w-6" src={block_icon} alt="block" />
-//     </button>
-//   )}
-
-
-
-// //////

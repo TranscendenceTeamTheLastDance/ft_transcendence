@@ -1,6 +1,4 @@
 - Affiche le message dans la bonne conversation channel
-- Fix l action du bouton MUTE
-- Fix Dm Infos
 - Acceder au user profile de user a qui on parle
-- Rendre le lien cliquable dans l invitation
+- Rendre le lien cliquable dans l invitation a jouer
 
