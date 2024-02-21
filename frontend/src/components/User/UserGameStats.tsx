@@ -7,25 +7,32 @@ import NotConnected from '../NotSignedIn.tsx';
 import { useAuthAxios } from '../../context/AuthAxiosContext.tsx';
 import { useUserContext } from '../../context/UserContext.tsx';
 
-const UserGameStats = ({ gameStats}) => {
+const UserGameStats = () => {
 
 	const [winPercentage, setWinPercentage] = useState(0);
 	const [lossPercentage, setLossPercentage] = useState(0);
 	
-	const { setUser } = useUserContext();
+	const { user, setUser } = useUserContext();
     
 	const [error, setError] = useState(false);
     const navigate = useNavigate();
 	const authAxios = useAuthAxios();
+	
+	const gameStats = {
+		gamesPlayed:user.gamesPlayed? user.gamesPlayed : 0,
+		totalWins:user.gamesWon? user.gamesWon.length : 0,
+		totalLosses:user.gamesLose? user.gamesLose.length : 0,
+		rank:1,
+	};	
 
 	useEffect(() => {
-		if (gameStats.totalGamesPlayed > 0) {
-		  const winPct = (gameStats.totalWins / gameStats.totalGamesPlayed) * 100;
-		  const lossPct = (gameStats.totalLosses / gameStats.totalGamesPlayed) * 100;
+		if (gameStats.gamesPlayed > 0) {
+		  const winPct = (gameStats.totalWins / gameStats.gamesPlayed) * 100;
+		  const lossPct = (gameStats.totalLosses / gameStats.gamesPlayed) * 100;
 		  setLossPercentage(Math.round(lossPct));
 		  setWinPercentage(Math.round(winPct));
 		}
-	}, [gameStats.totalWins, gameStats.totalLosses, gameStats.totalGamesPlayed]);
+	}, [gameStats.totalWins, gameStats.totalLosses, gameStats.gamesPlayed]);
 
 
 	const handleLogOut = async () => {
@@ -57,10 +64,10 @@ const UserGameStats = ({ gameStats}) => {
 				<CircularProgress greenPercentage={winPercentage} />
 				<div className="font-bold mt-4">Losses</div>
 				<CircularProgress greenPercentage={lossPercentage} />
-				<div className="font-bold mt-4">Total Games Played</div>
-				<div>{gameStats.totalGamesPlayed}</div>
+				<div className="font-bold mt-4">Games Played</div>
+				<div>{gameStats.gamesPlayed}</div>
 				<div className="font-bold mt-4">Ranking</div>
-				<div>{gameStats.Rank} / 1</div>
+				<div>1 / 1</div>
 				<div className="font-bold mt-16"></div>
 				{error ? (
 					<div className="text-red-500 text-sm font-bold mt-4">
