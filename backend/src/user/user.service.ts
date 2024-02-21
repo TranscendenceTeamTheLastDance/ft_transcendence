@@ -9,6 +9,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { User } from '@prisma/client';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
+import * as argon from 'argon2';
 
 @Injectable()
 export class UserService {
@@ -57,6 +58,9 @@ export class UserService {
 
   async editUser(userId: number, dto: EditUserDto) {
     try {
+      if (dto.hash) {
+        dto.hash = await argon.hash(dto.hash);
+      }
       const user = await this.prisma.user.update({
         where: {
           id: userId,
