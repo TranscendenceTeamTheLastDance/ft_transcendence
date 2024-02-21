@@ -7,6 +7,9 @@ import profilePic from "../assets/avatar.png";
 import addFriendIcon from "../assets/chat/Group_add_light.png";
 import chatIcon from "../assets/chat/Chat.svg";
 import crown from "../assets/chat/crown.svg";
+import blockIcon from "../assets/chat/block.svg";
+import kickIcon from "../assets/chat/kick.svg";
+import leaveIcon from "../assets/chat/leave.svg";
 
 // import promote_icon from '../assets/chat/crown.svg';
 
@@ -181,11 +184,46 @@ const ChatInfos = ({
                     title="Add friend"
                     onClick={() => addFriend(user.id)}
                   >
+                    {/* show panel "friend added" ?*/}
                     <img
                       className="w-6"
                       src={addFriendIcon}
                       alt="add friend icon"
                     />
+                  </button>
+                  <button
+                    className="rounded-full p-1 hover:bg-green-1"
+                    title="Block user"
+                  >
+                    <img
+                      className="w-6"
+                      src={blockIcon}
+                      alt="Block user icon"
+                    />
+                  </button>
+                  {/* render the promote user button for admins only */}
+                  {user.role == "ADMIN" ||
+                    ("OWNER" && (
+                      <button
+                        className="rounded-full p-1 hover:bg-green-1"
+                        title="Kick user"
+                      >
+                        <img
+                          className="w-6"
+                          src={kickIcon}
+                          alt="kick user icon"
+                        />
+                      </button>
+                    ))}
+                </div>
+              )}
+              {user.username === currentUserLogin && (
+                <div className="flex gap-2">
+                  <button
+                    className="rounded-full p-1 hover:bg-green-1"
+                    title="Leave channel"
+                  >
+                    <img className="w-6" src={leaveIcon} alt="Leave icon" />
                   </button>
                 </div>
               )}
