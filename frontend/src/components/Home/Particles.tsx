@@ -133,10 +133,11 @@ export default function Particles({
   }, [clearContext, quantity, circleParams, drawCircle]);
 
   /////////////////////////////////////////////////////////////////////
+  // shooting stars
   const shootingStars = useRef<Circle[]>([]);
 
   const generateShootingStar = (): Circle => {
-    const maxSize = 1.5;
+    const maxSize = 1;
     const size = Math.random() * maxSize + 0.5; // Random size (min value of 0.5)
     const x = Math.random() * canvasSize.current.w;
     const y = Math.random() * canvasSize.current.h;
@@ -233,7 +234,8 @@ export default function Particles({
         );
       }
     });
-    ////////////////////////////////////
+    ///////////////////////////////////////////
+    // shooting stars
     shootingStars.current.forEach((star: Circle, i: number) => {
       star.alpha -= 0.01;
       star.x += star.dx;
@@ -262,6 +264,7 @@ export default function Particles({
   }, [clearContext, circleParams, drawCircle, remapValue, staticity, ease]);
 
   ///////////////////
+  // shooting stars
   const spawnShootingStar = useCallback(() => {
     const newStar = generateShootingStar();
     shootingStars.current.push(newStar);
@@ -272,6 +275,7 @@ export default function Particles({
     resizeCanvas();
     drawParticles();
     //////////////////
+    // shooting stars
     spawnShootingStar();
     const shootingStarInterval = setInterval(() => {
       spawnShootingStar();

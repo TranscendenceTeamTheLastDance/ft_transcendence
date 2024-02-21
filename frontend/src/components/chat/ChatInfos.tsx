@@ -56,7 +56,7 @@ const ChatInfos = ({
     // Listen for updates to the user list
     // check event userListUpdate in JoinChannel.tsx
     socket.on("userListUpdate", (res: UserListResponse) => {
-      console.log("===== SOCKET EVENT RECIEVED =====");
+      // console.log("===== SOCKET EVENT RECIEVED =====");
       setUsers(res.users.filter((user) => user.username));
     });
 
