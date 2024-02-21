@@ -53,7 +53,7 @@ const ChatInfos = ({
       const user = res.users.find((user) => user.username === currentUserLogin) || null;
       if (user && (user.role === 'ADMIN' || user.role === 'OWNER')) setIsAdmin(true);
     });
-  }, []);
+  }, [ channelName, currentUserLogin, socket]);
 
   const promoteUser = (user: UserType) => {
     socket.emit('promote', { channel: channelName, username: user.username });

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Socket } from 'socket.io-client';
 
 import { userDto } from './dto/userDto';

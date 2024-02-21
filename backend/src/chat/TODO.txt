@@ -1,4 +1,0 @@
-- Affiche le message dans la bonne conversation channel
-- Acceder au user profile de user a qui on parle
-- Rendre le lien cliquable dans l invitation a jouer
-

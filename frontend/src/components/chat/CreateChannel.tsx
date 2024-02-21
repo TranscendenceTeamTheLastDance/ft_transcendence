@@ -9,32 +9,24 @@ interface CreateChannelProps {
 }
 
 const CreateChannel = ({ setShowModal, socket }: CreateChannelProps) => {
-  // State pour le type de canal
   const [channelType, setChannelType] = useState<string>('Public');
-  // Référence pour le champ de mot de passe du canal
   const passwordRef = useRef<HTMLInputElement>(null);
-  // Référence pour le champ de nom du canal
   const nameRef = useRef<HTMLInputElement>(null);
 
-  // Fonction pour créer un nouveau canal
   const createChannel = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Empêche le rechargement de la page lors de la soumission du formulaire
+    e.preventDefault();
 
-    // Crée un objet Channel avec le nom et le type du canal
     const channel: Channel = {
-      name: nameRef.current?.value || '', // Récupère la valeur du champ de nom du canal, si vide utilise une chaîne vide
-      type: channelType.toUpperCase(), // Convertit le type de canal en majuscules
+      name: nameRef.current?.value || '', 
+      type: channelType.toUpperCase(), 
     };
 
-    // Si le canal est de type 'protected', ajoute le mot de passe à l'objet Channel
     if (channelType === 'protected') {
-      channel.password = passwordRef.current?.value; // Récupère la valeur du champ de mot de passe du canal
+      channel.password = passwordRef.current?.value; 
     }
 
-    // Émet un événement 'create' avec les détails du canal vers le serveur via le socket
     socket.emit('create', channel);
-
-    // Masque le modal après la création du canal
+    
     setShowModal(false);
   };
 

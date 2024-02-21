@@ -1,19 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { UseQueryResult } from 'react-query';
 import { Socket } from 'socket.io-client';
 
 import info_icon from '../assets/chat/info.svg';
 import send_icon from '../assets/chat/send.svg';
+import avatar_icon from '../assets/avatar.png';
 import { userDto } from './dto/userDto';
-// import { useApi } from '../hooks/useApi';
 
 import { ChannelType } from './Chat';
 import ChatModal from './ChatModal';
 import DmInfos from './DmInfos';
 import Message from './Message';
-import axios from 'axios'; // Remove unused import
 
-import { useAuthAxios } from "../../context/AuthAxiosContext.tsx";
 
 interface ConversationProps {
   channel: ChannelType;
@@ -23,7 +20,7 @@ interface ConversationProps {
 }
 
 export interface UserType {
-  intraImageURL: string | undefined;
+  intraImageURL: string | avatar_icon;
   id: number;
   username: string;
   status: string;
@@ -95,7 +92,7 @@ const DmConversation = ({ channel, socket, me, users }: ConversationProps) => {
     return () => {
       socket.off('dm');
     };
-  }, [channel]);
+  }, [channel, socket]);
 
   useEffect(() => {
     bottomEl?.current?.scrollIntoView({ behavior: 'smooth' });

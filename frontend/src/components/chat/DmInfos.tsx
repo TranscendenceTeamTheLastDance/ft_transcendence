@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
+import React from 'react';
 
 import game_icon from '../assets/chat/boxing-glove.svg';
 import avatar_icon from '../assets/avatar.png';
@@ -27,7 +28,7 @@ const DmInfos = ({ setShowModal, socket, channelName, currentUserLogin }: DmInfo
     socket.emit('userList', { channel: channelName }, (res: UserListResponse) => {
       setUsers(res.users.filter((user) => user.username !== currentUserLogin));
     });
-  }, []);
+  }, [ channelName, currentUserLogin, socket]);
 
   const startGame = () => {
     // const code = (Math.random() + 1).toString(36).substring(7);

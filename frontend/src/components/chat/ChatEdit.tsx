@@ -10,7 +10,6 @@ interface ChatEditProps {
   currentUserLogin: string | undefined;
 }
 
-// TODO: leaver button ??
 const ChatEdit = ({ setShowModal, socket, channelName }: ChatEditProps) => {
   const [channelType, setChannelType] = useState<string>('Public');
   const passwordRef = useRef<HTMLInputElement>(null);

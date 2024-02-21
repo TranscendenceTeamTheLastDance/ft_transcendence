@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-// import { UseQueryResult } from 'react-query';
 import { Socket } from "socket.io-client";
 
 import edit_icon from '../assets/chat/edit.svg';
@@ -106,8 +105,6 @@ const Conversation = ({ channel, socket, me }: ConversationProps) => {
     socket.emit('leave', { name: channel.name });
   };
 
-  //   if (isLoading) return <div>loading</div>;
-  //   if (isError) return <div>error</div>;
   if (!infos) return <div>error</div>;
 
   return (

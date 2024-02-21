@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { UseQueryResult } from "react-query";
 import { io, Socket } from "socket.io-client";
-import axios from "axios";
 import "./index.css";
 
 import chat_channel from "../assets/chat/Chat.svg";
@@ -10,7 +9,6 @@ import chat_plus from "../assets/chat/chat_plus.svg";
 import chat_DM from "../assets/chat/comment.svg";
 import find_someone from "../assets/chat/find_someone.png";
 import chat_join from "../assets/chat/join-channel.svg";
-// import { useApi } from "@/hooks/useApi";
 
 import { useAuthAxios } from "../../context/AuthAxiosContext.tsx";
 import { useUserContext } from "../../context/UserContext";
@@ -166,7 +164,7 @@ const Chat = () => {
     return () => {
       socket?.off('youLeft');
     };
-  }, [joinedChannels]);
+  }, [joinedChannels, socket]);
 
   if (loading) return <div>loading</div>;
   if (!socket) return <div>socket not initialized</div>;
