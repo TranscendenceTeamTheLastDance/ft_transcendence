@@ -110,7 +110,7 @@ export class GameRoom {
     const player2ID: number = this.idPlayer2;
     // console.log(player1ID, player2ID);
     this.gameLoopInterval = setInterval(() => {
-      this.gameService.updateGameState();
+      this.gameService.updateGameState(false);
       const gameState1 = this.gameService.broadcastGameState(1);
       const gameState2 = this.gameService.broadcastGameState(2);
       if (gameState1.score.scoreU1 >= 3 || gameState1.score.scoreU2 >= 3) {
@@ -121,6 +121,29 @@ export class GameRoom {
         // this.createGame(1, 2, gameState1.score.scoreU1, gameState1.score.scoreU2);
         clearInterval(this.gameLoopInterval);
       } else {
+        this.player1.emit('game-state', gameState1);
+        this.player2.emit('game-state', gameState2);
+      }
+    }, this.updateInterval);
+  }
+
+  startGameLoopFreestyle(): void {
+    // console.log("startloop");
+    const player1ID : number = this.idPlayer1;
+    const player2ID : number = this.idPlayer2;
+    // console.log(player1ID, player2ID);
+    this.gameLoopInterval = setInterval(() => {
+      this.gameService.updateGameState(true);
+      const gameState1 = this.gameService.broadcastGameState(1);
+      const gameState2 = this.gameService.broadcastGameState(2);
+
+      if (gameState1.score.scoreU1 >= 11 || gameState1.score.scoreU2 >= 11) {
+        // this.sendGameHistory(gameState1, player1ID, player2ID);
+        this.player1.emit('game-finish', gameState1);
+        this.player2.emit('game-finish', gameState2);
+        clearInterval(this.gameLoopInterval);
+      }
+      else {
         this.player1.emit('game-state', gameState1);
         this.player2.emit('game-state', gameState2);
       }
