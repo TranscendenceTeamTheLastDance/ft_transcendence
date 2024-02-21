@@ -135,9 +135,9 @@ const PongGame: React.FC = () => {
                 infoGame ? (
                     gameFinished ? (
                         <div className='info-game'>
-                            <p className="text-4xl text-zinc-300 ">Finish</p>
-                            <p className="text-4xl text-zinc-300 ">{winningStatus}</p>
-                            <p className="text-4xl text-zinc-300 ">{infoGame.playerName1} {scorePlayer1}      {infoGame.playerName2} {scorePlayer2}</p>
+                            <p className="text-4xl text-zinc-300 text-center">Finish</p>
+                            <p className="text-4xl text-zinc-300 text-center">{winningStatus}</p>
+                            <p className="text-4xl text-zinc-300 text-center">{infoGame.playerName1} {scorePlayer1}      {infoGame.playerName2} {scorePlayer2}</p>
                         </div>
                     ) : (
                         playerLeftGame ? (
@@ -155,7 +155,7 @@ const PongGame: React.FC = () => {
                     )
                 ) : (
                     <div className='info-game'>
-                        <p className="text-4xl text-zinc-300 animate-pulse">Waiting for another player...</p>
+                        <p className="text-4xl duration-300 text-zinc-300 animate-pulse">Waiting for another player...</p>
                     </div>
                 )
             )}
