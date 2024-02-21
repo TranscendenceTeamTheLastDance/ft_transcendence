@@ -100,9 +100,7 @@ export class GameService {
     
       // Mise à jour de la position de la balle
 
-      // ball.x += ball.velocityX;
       ball.x += ball.velocityX;
-
       ball.y += freestyle ? ball.velocityY * Math.cos(ball.x / 100) : ball.velocityY;
     
       // Collision avec les murs supérieur et inférieur
