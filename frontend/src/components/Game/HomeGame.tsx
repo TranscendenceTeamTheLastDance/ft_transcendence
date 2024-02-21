@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import CanvasGame from './Game';
 import io, { Socket } from 'socket.io-client';
 import './Game.css';
+import Particles from '../Home/Particles';
 import { useUserContext } from '../../context/UserContext';
 
 
@@ -40,7 +41,9 @@ const PongGame: React.FC = () => {
     const [scorePlayer1, setScorePlayer1] = useState(0);
     const [scorePlayer2, setScorePlayer2] = useState(0);
     const {user, fetchUserData} = useUserContext();
+    const [joinedGame, setJoinedGame] = useState(false);
 
+    
     useEffect(()=> {
         fetchUserData();
     }, [fetchUserData]);
@@ -48,16 +51,30 @@ const PongGame: React.FC = () => {
     let clienInfoCookie: userDto | undefined;
     clienInfoCookie = user;
     
+    const handleJoinNormalGame = () => {
+        setJoinedGame(true);
+        if (clienInfoCookie?.username !== undefined && clienInfoCookie?.id !== undefined ) {
+            socketRef?.current.emit('join', { username: clienInfoCookie?.username, userId: clienInfoCookie?.id});
+        }
+    };
+
+    const handleJoinFreestyleGame = () => {
+        setJoinedGame(true);
+        if (clienInfoCookie?.username !== undefined && clienInfoCookie?.id !== undefined ) {
+            socketRef?.current.emit('join-freestyle', { username: clienInfoCookie?.username, userId: clienInfoCookie?.id});
+        }
+    };
+    
     // console.log(user.username);
     useEffect(() => {
         const socket = socketRef?.current;
-        if (!socket)
+        if (!socket || !joinedGame || clienInfoCookie === undefined)
             return;
 
         // console.log("username:", clienInfoCookie?.username);
         // console.log("userId:", clienInfoCookie?.id);
-        socket.emit('join', { username: clienInfoCookie?.username, userId: clienInfoCookie?.id});
 
+        //quand le client recois room-id c'est que le server a trouve un adversaire et que la partie commence
         socket.on('room-id', (id) => {
             identifiandPlayer.current = id.NumPlayer;
             setInfoGame({
@@ -93,8 +110,6 @@ const PongGame: React.FC = () => {
             }
             socket.emit('finish');
         });
-
-        // Clean up
         return () => {
             // console.log("je suis pas sense etre allll")
             socket.emit('client-disconnect');
@@ -104,31 +119,47 @@ const PongGame: React.FC = () => {
 
         };
         // eslint-disable-next-line
-    }, []);
+    }, [joinedGame]);
 
 
     return (
         <div className='game-container'>
-            {infoGame ? (
-                gameFinished ? (
-                    <div>
-                        <p>Finish</p>
-                        <p>{winningStatus}</p>
-                        <p>{infoGame.playerName1} {scorePlayer1}      {infoGame.playerName2} {scorePlayer2}</p>
-                    </div>
-                ) : (
-                    playerLeftGame ? (
-                        <p>The other player has left the game.</p>
+            <Particles className="absolute inset-0 -z-10" quantity={1000} />
+            {!joinedGame ? (
+                <div className="button-container">
+                    <button className="button" onClick={handleJoinNormalGame}>Join normal Game</button>
+                    <button className="button" onClick={handleJoinFreestyleGame}>Join freestyle Game</button>
+                </div>
+            ) : (    
+                infoGame ? (
+                    gameFinished ? (
+                        <div className='info-game'>
+                            <p>Finish</p>
+                            <p>{winningStatus}</p>
+                            <p>{infoGame.playerName1} {scorePlayer1}      {infoGame.playerName2} {scorePlayer2}</p>
+                        </div>
                     ) : (
-                        <CanvasGame infoGame={infoGame} />
+                        playerLeftGame ? (
+                            <div className='info-game'>
+                                <p>The other player has left the game.</p>
+                            </div>
+                        ) : (
+                            <div className='game-content'>
+                                <p className="game-info">the match is played in 11 points </p>
+                                <div className='canvas-container'>
+                                    <CanvasGame infoGame={infoGame} />
+                                </div>
+                            </div>
+                        )
                     )
+                ) : (
+                    <div className='info-game'>
+                        <p>Waiting for another player...</p>
+                    </div>
                 )
-            ) : (
-                <p>Waiting for another player...</p>
             )}
         </div>
     );
-    
-};
+};    
 
 export default PongGame;
