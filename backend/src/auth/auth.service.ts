@@ -242,6 +242,11 @@ export class AuthService {
         secure: false,
         sameSite: 'strict',
       });
+      res.clearCookie(this.config.get('JWT_REFRESH_TOKEN_COOKIE'), {
+        httpOnly: false,
+        secure: false,
+        sameSite: 'strict',
+      });
     } catch (error) {
       throw error;
     }

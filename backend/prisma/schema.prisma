@@ -26,7 +26,7 @@ enum ChannelRole {
 model User {
   id Int @id @default(autoincrement())
   email     String   @unique
-  username  String
+  username  String   @unique
   firstName String?
   lastName  String?
   hash      String?

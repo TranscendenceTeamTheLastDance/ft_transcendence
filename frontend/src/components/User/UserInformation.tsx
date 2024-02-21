@@ -37,7 +37,7 @@ const UserInformation = ({ handle2FAToggle, handleUpdateProfile, onAvatarFileSel
     firstName: user?.firstName ||'', // Default to an empty string
     lastName: user?.lastName ||'', // Default to an empty string
     email: user?.email || '' , // Use the user's email as the default value
-    password: user?.password || '*****', // Default to an empty string
+    password: user?.hash || '', // Default to an empty string
   });
 
   const toggleEditMode = () => {
