@@ -1,5 +1,3 @@
-// import logo from '@/assets/logo.svg';
-
 import { ChannelType } from "./Chat";
 
 interface ChatListElemProps {

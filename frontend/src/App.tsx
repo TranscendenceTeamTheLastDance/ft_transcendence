@@ -8,6 +8,7 @@ import User from './pages/UserPage';
 import { UserProvider } from './context/UserContext';
 import { AuthAxiosProvider } from './context/AuthAxiosContext';
 import Chat from './pages/ChatPage';
+import UserProfile from './pages/UserProfilePage';
 
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
 				<Route path="/user" element={<User />} />
 				<Route path="/chat" element={<Chat />} />
 				<Route path="/play" element={<PongGame />} />
+				<Route path="user/:username" element={<UserProfile />} />
 			</Routes>
 		</AuthAxiosProvider>
 	</UserProvider>
