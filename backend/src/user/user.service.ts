@@ -19,7 +19,11 @@ export class UserService {
     return this.prisma.user.findUnique({
       where: { id: userId },
       include: {
-        gamesWon: true,
+        gamesWon: {
+          select: {
+            winnerScore: true,
+          },
+        },
         gamesLose: true,
       },
     });

@@ -47,6 +47,7 @@ model User {
   gamesWon Game[] @relation("GameWinner")
   gamesLose Game[] @relation("GameLoser")
   gamesPlayed Int @default(0)
+  totalPoints Int @default(0)
 
   friendships       Friendship[] @relation("UserFriends")
   friendOf          Friendship[] @relation("FriendToUser")
