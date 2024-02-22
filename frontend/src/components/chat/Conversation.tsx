@@ -11,6 +11,7 @@ import ChatEdit from './ChatEdit';
 import ChatInfos from "./ChatInfos";
 import ChatModal from "./ChatModal";
 import Message from "./Message";
+import { MessageType } from "./DmConversation";
 
 import { useUserContext } from "../../context/UserContext";
 import { userDto } from "./dto/userDto";
@@ -30,14 +31,6 @@ export interface UserType {
   role: string;
 }
 
-export interface MessageType {
-  id: number;
-  creadtedAt: string;
-  content: string;
-  user: UserType;
-  channel: ChannelType;
-}
-
 const Conversation = ({ channel, socket, me }: ConversationProps) => {
   const { user } = useUserContext();
   const [showInfoModal, setShowInfoModal] = React.useState<boolean>(false);
@@ -55,14 +48,15 @@ const Conversation = ({ channel, socket, me }: ConversationProps) => {
 
   useEffect(() => {
     socket.on('message', (data: MessageType) => {
-      // Access the latest blockedUsers using the ref
       const currentBlockedUsers = blockedUsersRef.current;
       if (currentBlockedUsers.some((u) => u.id === data.user.id)) {
         console.log(`blocking message from ${data.user.username}: ${data.content}`);
         return;
       }
 
-      setMessages((messages) => [...messages, data]);
+      if (data.channel === channel.name) {
+        setMessages((messages) => [...messages, data]);
+      }
     });
     
     socket.emit(
@@ -97,8 +91,8 @@ const Conversation = ({ channel, socket, me }: ConversationProps) => {
   const sendMessage = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!message) return;
-    socket.emit("message", { channel: channel.name, content: message });
-    setMessage("");
+    socket.emit('message', { channel: channel.name, content: message });
+    setMessage('');
   };
 
   const leaveChannel = (channel: ChannelType) => {

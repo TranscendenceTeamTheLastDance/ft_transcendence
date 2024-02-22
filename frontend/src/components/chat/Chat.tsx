@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
 import { UseQueryResult } from "react-query";
 import { io, Socket } from "socket.io-client";
