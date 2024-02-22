@@ -114,7 +114,6 @@ export class GameRoom {
       const gameState2 = this.gameService.broadcastGameState(2);
       if (gameState1.score.scoreU1 >= 3 || gameState1.score.scoreU2 >= 3) {
         this.sendGameHistory(gameState1, player1ID, player2ID);
-        this.incrementGamesPlayed(player1ID, player2ID);
         this.player1.emit('game-finish', gameState1);
         this.player2.emit('game-finish', gameState2);
         clearInterval(this.gameLoopInterval);
@@ -128,8 +127,8 @@ export class GameRoom {
 
   startGameLoopFreestyle(): void {
     // mettre à jour le status du joueur "en jeu"
-    const player1ID : number = this.idPlayer1;
-    const player2ID : number = this.idPlayer2;
+    const player1ID: number = this.idPlayer1;
+    const player2ID: number = this.idPlayer2;
     this.gameLoopInterval = setInterval(() => {
       this.gameService.updateGameState(true);
       const gameState1 = this.gameService.broadcastGameState(1);
@@ -139,8 +138,7 @@ export class GameRoom {
         this.player1.emit('game-finish', gameState1);
         this.player2.emit('game-finish', gameState2);
         clearInterval(this.gameLoopInterval);
-      }
-      else {
+      } else {
         this.player1.emit('game-state', gameState1);
         this.player2.emit('game-state', gameState2);
       }

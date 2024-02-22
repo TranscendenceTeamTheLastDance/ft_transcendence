@@ -65,13 +65,11 @@ const UserGameStats = () => {
 				<CircularProgress greenPercentage={winPercentage} />
 				<div className="font-bold mt-4">Losses</div>
 				<CircularProgress greenPercentage={lossPercentage} />
-				<div className="font-bold mt-4">Games Played</div>
+				<div className="font-bold mt-16">Games Played</div>
 				<div>{gameStats.gamesPlayed}</div>
 				<div className="font-bold mt-4">Total Points</div>
 				<div>{gameStats.totalPoints}</div>
-				<div className="font-bold mt-4">Ranking</div>
-				<div>1 / 1</div>
-				<div className="font-bold mt-4"></div>
+				<div className="font-bold mt-8"></div>
 				{error ? (
 					<div className="text-red-500 text-sm font-bold mt-4">
 						You are not signed in...
