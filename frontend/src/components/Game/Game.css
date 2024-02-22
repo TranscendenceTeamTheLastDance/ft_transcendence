@@ -44,10 +44,6 @@
     align-items: center;
 }
 
-.info-game p {
-    font-size: 20px; /* Taille de la police */
-}
-
 .canvas-container {
     display: flex;
     justify-content: center;
