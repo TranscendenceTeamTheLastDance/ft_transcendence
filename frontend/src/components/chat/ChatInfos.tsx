@@ -8,13 +8,16 @@ import addFriendIcon from "../assets/chat/Group_add_light.png";
 import chatIcon from "../assets/chat/Chat.svg";
 import crown from "../assets/chat/crown.svg";
 import blockIcon from "../assets/chat/block.svg";
+import unblockIcon from "../assets/chat/unblock.svg";
 import kickIcon from "../assets/chat/kick.svg";
 import leaveIcon from "../assets/chat/leave.svg";
+import promoteIcon from "../assets/chat/expand_up.svg";
+import demoteIcon from "../assets/chat/expand_down.svg";
 
 // import promote_icon from '../assets/chat/crown.svg';
 
 import { UserType } from "@/common/userType.interface";
-import { channel } from "diagnostics_channel";
+// import { channel } from "diagnostics_channel";
 import axios from "axios";
 // import { UserType } from "./Conversation";
 
@@ -23,6 +26,10 @@ interface ChatInfosProps {
   socket: Socket;
   channelName: string;
   currentUserLogin: string;
+  blockedList: UserType[];
+  setBlockedList: (
+    users: UserType[] | ((prev: UserType[]) => UserType)
+  ) => void;
 }
 
 interface UserListResponse {
@@ -35,6 +42,8 @@ const ChatInfos = ({
   socket,
   channelName,
   currentUserLogin,
+  blockedList,
+  setBlockedList,
 }: ChatInfosProps) => {
   const [users, setUsers] = useState<UserType[]>([]);
   const [friendsIds, setFriendIds] = useState<number[]>([]);
@@ -101,6 +110,23 @@ const ChatInfos = ({
     } catch (error) {
       console.error("Failed to add friend:", error);
     }
+  };
+
+  const blockUser = (user: UserType) => {
+    socket.emit("ban", { chanel: channelName, username: user.username });
+    setBlockedList((prev) => [...prev, user]);
+  };
+
+  const kickUser = (user: UserType) => {
+    socket.emit("kick", { channel: channelName, user: user.username });
+    setUsers(users.filter((u) => u.id !== user.id));
+  };
+
+  const currentUser = users.find((user) => user.username === currentUserLogin);
+
+  const leaveChannel = () => {
+    socket.emit("leave", { channel: channelName });
+    setShowModal(false);
   };
 
   //   const promoteUser = (user: UserType) => {
@@ -191,30 +217,75 @@ const ChatInfos = ({
                       alt="add friend icon"
                     />
                   </button>
-                  <button
+                  {/* render the block and unblock buttons */}
+                  {blockedList ? (
+                    blockedList.find((u) => u.id === user.id) ? (
+                      <button
+                        className="rounded-full p-1 hover:bg-green-1"
+                        title="Unblock user"
+                      >
+                        <img
+                          className="w-5"
+                          src={blockIcon}
+                          alt="Unblock user icon"
+                          onClick={() =>
+                            setBlockedList((prev) =>
+                              prev.filter((u) => u.id !== user.id)
+                            )
+                          }
+                        />
+                      </button>
+                    ) : (
+                      <button
+                        className="rounded-full p-1 hover:bg-green-1"
+                        title="Block user"
+                      >
+                        <img
+                          className="w-5"
+                          src={blockIcon}
+                          alt="Block user icon"
+                          onClick={() => blockUser(user)}
+                        />
+                      </button>
+                    )
+                  ) : (
+                    <button
+                      className="rounded-full p-1 hover:bg-green-1"
+                      title="Block user"
+                    >
+                      <img
+                        className="w-5"
+                        src={blockIcon}
+                        alt="Block user icon"
+                        onClick={() => blockUser(user)}
+                      />
+                    </button>
+                  )}
+                  {/* <button
                     className="rounded-full p-1 hover:bg-green-1"
                     title="Block user"
                   >
                     <img
-                      className="w-6"
+                      className="w-5"
                       src={blockIcon}
                       alt="Block user icon"
+                      onClick={() => blockUser(user)}
                     />
-                  </button>
-                  {/* render the promote user button for admins only */}
-                  {user.role == "ADMIN" ||
-                    ("OWNER" && (
-                      <button
-                        className="rounded-full p-1 hover:bg-green-1"
-                        title="Kick user"
-                      >
-                        <img
-                          className="w-6"
-                          src={kickIcon}
-                          alt="kick user icon"
-                        />
-                      </button>
-                    ))}
+                  </button> */}
+                  {/* render the promote and kick buttons for admins only */}
+                  {(currentUser.role === "ADMIN" || "OWNER") && (
+                    <button
+                      className="rounded-full p-1 hover:bg-green-1"
+                      title="Kick user"
+                    >
+                      <img
+                        className="w-5"
+                        src={kickIcon}
+                        alt="kick user icon"
+                        onClick={() => kickUser(user)}
+                      />
+                    </button>
+                  )}
                 </div>
               )}
               {user.username === currentUserLogin && (
@@ -222,6 +293,7 @@ const ChatInfos = ({
                   <button
                     className="rounded-full p-1 hover:bg-green-1"
                     title="Leave channel"
+                    onClick={leaveChannel}
                   >
                     <img className="w-6" src={leaveIcon} alt="Leave icon" />
                   </button>
