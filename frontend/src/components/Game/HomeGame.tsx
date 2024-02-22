@@ -4,6 +4,7 @@ import io, { Socket } from 'socket.io-client';
 import './Game.css';
 import Particles from '../Home/Particles';
 import { useUserContext } from '../../context/UserContext';
+import ButtonGame from './ButtonGame';
 
 
 interface InfoGame {
@@ -127,25 +128,25 @@ const PongGame: React.FC = () => {
             <Particles className="absolute inset-0 -z-10" quantity={1000} />
             {!joinedGame ? (
                 <div className="button-container">
-                    <button className="button" onClick={handleJoinNormalGame}>Join normal Game</button>
-                    <button className="button" onClick={handleJoinFreestyleGame}>Join freestyle Game</button>
+                    <ButtonGame text="Normal Game" onClick={handleJoinNormalGame}/>
+                    <ButtonGame text="Freestyle Game" onClick={handleJoinFreestyleGame}/>
                 </div>
             ) : (    
                 infoGame ? (
                     gameFinished ? (
                         <div className='info-game'>
-                            <p>Finish</p>
-                            <p>{winningStatus}</p>
-                            <p>{infoGame.playerName1} {scorePlayer1}      {infoGame.playerName2} {scorePlayer2}</p>
+                            <p className="text-4xl text-zinc-300 text-center">Finish</p>
+                            <p className="text-4xl text-zinc-300 text-center">{winningStatus}</p>
+                            <p className="text-4xl text-zinc-300 text-center">{infoGame.playerName1} {scorePlayer1}      {infoGame.playerName2} {scorePlayer2}</p>
                         </div>
                     ) : (
                         playerLeftGame ? (
                             <div className='info-game'>
-                                <p>The other player has left the game.</p>
+                                <p className="text-4xl text-zinc-300">The other player has left the game.</p>
                             </div>
                         ) : (
                             <div className='game-content'>
-                                <p className="game-info">the match is played in 11 points </p>
+                                <p className="text-4xl text-zinc-300 ">the match is played in 11 points </p>
                                 <div className='canvas-container'>
                                     <CanvasGame infoGame={infoGame} />
                                 </div>
@@ -154,7 +155,7 @@ const PongGame: React.FC = () => {
                     )
                 ) : (
                     <div className='info-game'>
-                        <p>Waiting for another player...</p>
+                        <p className="text-4xl duration-300 text-zinc-300 animate-pulse">Waiting for another player...</p>
                     </div>
                 )
             )}

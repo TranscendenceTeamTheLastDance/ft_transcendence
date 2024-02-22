@@ -26,7 +26,7 @@ export class GameRoom {
     this.player2 = player2;
     this.gameService = new GameService();
     this.gameService.resetGameState();
-    this.prisma = prisma; // Assign prisma here
+    this.prisma = prisma;
   }
 
   async createGame(
@@ -40,10 +40,10 @@ export class GameRoom {
         winnerScore: scoreWinner,
         loserScore: scoreLoser,
         winner: {
-          connect: { id: IDwinner }, // Connectez l'utilisateur gagnant par son ID
+          connect: { id: IDwinner },
         },
         loser: {
-          connect: { id: IDloser }, // Connectez l'utilisateur perdant par son ID
+          connect: { id: IDloser },
         },
       },
     });
@@ -93,41 +93,37 @@ export class GameRoom {
   }
 
   startGameLoop(): void {
-    // console.log("startloop");
+    // mettre à jour le status du joueur "en jeu"
     const player1ID: number = this.idPlayer1;
     const player2ID: number = this.idPlayer2;
-    // console.log(player1ID, player2ID);
     this.gameLoopInterval = setInterval(() => {
       this.gameService.updateGameState(false);
       const gameState1 = this.gameService.broadcastGameState(1);
       const gameState2 = this.gameService.broadcastGameState(2);
       if (gameState1.score.scoreU1 >= 3 || gameState1.score.scoreU2 >= 3) {
         this.sendGameHistory(gameState1, player1ID, player2ID);
+        this.incrementGamesPlayed(player1ID, player2ID);
         this.player1.emit('game-finish', gameState1);
         this.player2.emit('game-finish', gameState2);
-        this.incrementGamesPlayed(player1ID, player2ID);
-        // a faire envoie les donne de fin de partie a prisma pour le game history
-        // this.createGame(1, 2, gameState1.score.scoreU1, gameState1.score.scoreU2);
         clearInterval(this.gameLoopInterval);
       } else {
         this.player1.emit('game-state', gameState1);
         this.player2.emit('game-state', gameState2);
       }
     }, this.updateInterval);
+    // mettre à jour le status du joueur "en ligne"
   }
 
   startGameLoopFreestyle(): void {
-    // console.log("startloop");
+    // mettre à jour le status du joueur "en jeu"
     const player1ID : number = this.idPlayer1;
     const player2ID : number = this.idPlayer2;
-    // console.log(player1ID, player2ID);
     this.gameLoopInterval = setInterval(() => {
       this.gameService.updateGameState(true);
       const gameState1 = this.gameService.broadcastGameState(1);
       const gameState2 = this.gameService.broadcastGameState(2);
 
       if (gameState1.score.scoreU1 >= 11 || gameState1.score.scoreU2 >= 11) {
-        // this.sendGameHistory(gameState1, player1ID, player2ID);
         this.player1.emit('game-finish', gameState1);
         this.player2.emit('game-finish', gameState2);
         clearInterval(this.gameLoopInterval);
@@ -137,10 +133,10 @@ export class GameRoom {
         this.player2.emit('game-state', gameState2);
       }
     }, this.updateInterval);
+    // mettre à jour le status du joueur "en ligne"
   }
 
   stopGameLoop(): void {
-    // console.log("endloop");
     if (this.gameLoopInterval) {
       clearInterval(this.gameLoopInterval);
       this.gameLoopInterval = null;
