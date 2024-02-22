@@ -10,6 +10,7 @@ import {
   Patch,
   UseInterceptors,
   UploadedFile,
+  Param,
 } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
 import { User } from '@prisma/client';
@@ -36,6 +37,7 @@ export class UserController {
     return userId;
   }
 
+  @UseGuards(JwtGuard)
   @Get('all')
   async getAllUsers() {
     return this.userService.getAllUsers();
@@ -140,4 +142,10 @@ export class UserController {
   async getFriends(@GetUser('id') userId: number) {
     return this.userService.getFriends(userId);
   }
+
+  @Get('profile/:username')
+  async getUserByUsername(@Param('username') username: string) {
+    return this.userService.getUserByUsername(username);
+  }
+
 }

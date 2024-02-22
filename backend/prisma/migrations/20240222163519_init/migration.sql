@@ -19,6 +19,7 @@ CREATE TABLE "Users" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "hashedRefreshToken" TEXT,
     "gamesPlayed" INTEGER NOT NULL DEFAULT 0,
+    "totalPoints" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "Users_pkey" PRIMARY KEY ("id")
 );

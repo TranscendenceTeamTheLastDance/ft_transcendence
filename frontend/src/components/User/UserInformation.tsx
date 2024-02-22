@@ -29,6 +29,23 @@ const EditableUserDetail = ({ label, value, onChange, isEditMode, editableUser }
   </div>
 );
 
+const PasswordField = ({ label, onChange, isEditMode }) => (
+  <div className="flex justify-between mb-2">
+    <span className="font-bold">{label}:</span>
+   {isEditMode ? (
+    <input
+      type="password"
+      placeholder="Enter new password"
+      onChange={onChange}
+      className="border border-gray-300 rounded p-2"
+      style={{ width: '150px', height: '30px' }}
+    />
+  ) : (
+    <span>********</span>
+  )}
+  </div>
+);
+
 const UserInformation = ({ handle2FAToggle, handleUpdateProfile, onAvatarFileSelect }) => {
   const { user, updateUser } = useUserContext();
   const [isEditMode, setIsEditMode] = useState(false);
@@ -37,7 +54,6 @@ const UserInformation = ({ handle2FAToggle, handleUpdateProfile, onAvatarFileSel
     firstName: user?.firstName ||'', // Default to an empty string
     lastName: user?.lastName ||'', // Default to an empty string
     email: user?.email || '' , // Use the user's email as the default value
-    password: user?.hash || '', // Default to an empty string
   });
 
   const toggleEditMode = () => {
@@ -48,6 +64,9 @@ const UserInformation = ({ handle2FAToggle, handleUpdateProfile, onAvatarFileSel
   };
 
   const handleChange = (e, field) => {
+    if (field === 'password' && e.target.value === '') {
+      return;
+    }
     setEditableUser({ ...editableUser, [field]: e.target.value });
   };
 
@@ -73,7 +92,7 @@ const UserInformation = ({ handle2FAToggle, handleUpdateProfile, onAvatarFileSel
               <EditableUserDetail label="firstName" value={editableUser.firstName} onChange={handleChange} isEditMode={isEditMode} editableUser={editableUser}/>
               <EditableUserDetail label="lastName" value={editableUser.lastName} onChange={handleChange} isEditMode={isEditMode} editableUser={editableUser}/>
               <EditableUserDetail label="email" value={editableUser.email} onChange={handleChange} isEditMode={isEditMode} editableUser={editableUser}/>
-              <EditableUserDetail label="password" value={editableUser.password} onChange={handleChange} isEditMode={isEditMode} editableUser={editableUser}/>
+              <PasswordField label="password" onChange={(e) => handleChange(e, 'password')} isEditMode={isEditMode} />
             </>
           ) : (
             /* Render UserDetails in view mode */

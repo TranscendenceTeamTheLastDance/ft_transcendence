@@ -2,6 +2,7 @@ import {
   ForbiddenException,
   NotFoundException,
   Injectable,
+  BadRequestException,
 } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { EditUserDto } from './dto';
@@ -19,7 +20,11 @@ export class UserService {
     return this.prisma.user.findUnique({
       where: { id: userId },
       include: {
-        gamesWon: true,
+        gamesWon: {
+          select: {
+            winnerScore: true,
+          },
+        },
         gamesLose: true,
       },
     });
@@ -36,6 +41,17 @@ export class UserService {
     }
   }
 
+  async getUserByUsername(username: string): Promise<User> {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { username: username },
+      });
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+  
   // get all existing users
   // should i order these by rank???
   async getAllUsers() {
@@ -190,5 +206,60 @@ export class UserService {
     return Array.from(new Set(friends.map((friend) => friend.id))).map((id) =>
       friends.find((friend) => friend.id === id),
     );
+  }
+
+  async blockUser(blockedUserLogin: string, user: User) {
+    if (blockedUserLogin === user.username) {
+      throw new BadRequestException('You cannot block yourself');
+    }
+
+    // make sure that the other user exists
+    await this.getUnique(blockedUserLogin);
+
+    return await this.prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        blocked: {
+          connect: { username: blockedUserLogin },
+        },
+      },
+      include: {
+        blocked: true,
+      },
+    });
+  }
+
+  async unblockUser(toUnblockLogin: string, user: User) {
+    // make sure that the other user exists
+    await this.getUnique(toUnblockLogin);
+
+    return await this.prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        blocked: {
+          disconnect: { username: toUnblockLogin },
+        },
+      },
+      include: {
+        blocked: true,
+      },
+    });
+  }
+
+  async getBlockedList(user: User) {
+    const userWithBlocked = await this.prisma.user.findUnique({
+      where: {
+        id: user.id,
+      },
+      include: {
+        blocked: true,
+      },
+    });
+
+    return userWithBlocked!.blocked;
   }
 }
