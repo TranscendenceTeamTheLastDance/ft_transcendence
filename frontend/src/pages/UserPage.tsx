@@ -55,6 +55,7 @@ const User = () => {
 			firstName: user.firstName,
 			lastName: user.lastName,
 			email: user.email,
+			hash: user.password,
 		  };
 		  console.log("frontend: data being passed to back:", userData);
 		  try {
@@ -63,11 +64,11 @@ const User = () => {
 			});
 				console.log('frontend: user information successfully updated!', response.data);
 				setUpdateModalMessage('User information successfully updated!');
-				triggerModal(true); // Trigger modal with success status
+				triggerModal(true); 
 			} catch (error) {
 				console.error('frontend: error updating user information:', error);
 				setUpdateModalMessage('Error updating user information.');
-				triggerModal(false); // Trigger modal with failure status
+				triggerModal(false); 
 			}
 		
 		// Check if there's a new avatar to upload
@@ -79,14 +80,17 @@ const User = () => {
 			try {
 				const response = await authAxios.post('/users/upload-profile-picture', formData, {
 					withCredentials: true,
+					headers: {
+						'Content-Type': undefined,
+					},
 				});
 				console.log('frontend: new profile pic successfully uploaded!', response.data);
 				setUpdateModalMessage('new profile pic successfully uploaded!');
-				triggerModal(true); // Trigger modal with success status
+				triggerModal(true); 
 			} catch (error) {
 				console.error('frontend: error uploading a new profile pic:', error);
 				setUpdateModalMessage('error uploading a new profile pic!');
-				triggerModal(true); // Trigger modal with success status
+				triggerModal(false);
 			}
 		} else {
 			console.log('frontend: no new avatar to upload, no request made to back.');
@@ -156,28 +160,6 @@ const User = () => {
 			setError(error.response.data.message);
 		}
 	};
-
-
-	//@@@TODO: Fetch data from backend 
-	const friends = [
-		{ nickname: 'Friend1', online: true },
-		{ nickname: 'Friend2', online: false },
-		{ nickname: 'Friend3', online: false },
-		{ nickname: 'Friend4', online: false },
-		{ nickname: 'Friend5', online: true },
-		{ nickname: 'Friend6', online: false },
-		{ nickname: 'Friend7', online: true },
-		{ nickname: 'Friend8', online: false },
-	];
-
-	const gameStats = {
-		totalGamesPlayed: 30,
-		totalWins: 20,
-		totalLosses: 10,
-		Rank: 1,
-	  };
-
-
 	  return user ? (
 		<div className="flex items-center justify-center min-h-screen relative pb-8">
 			<Particles className="absolute inset-0 -z-10" quantity={1000} />
@@ -195,13 +177,12 @@ const User = () => {
 					/>
 	  
 				{/* Friends Box */}
-				<FriendsList friends={friends}/>
+				<FriendsList/>
 			</div>
 	  
 			{/* Right Section: Game Stats */}
 				{/* Game Stats Box */}
-				<UserGameStats 
-					gameStats={gameStats}/>
+				<UserGameStats />
 
 		</div>
 		{display2FAModal ? (

@@ -19,6 +19,7 @@ jobs:
       POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
 
     steps:
       - name: Checkout

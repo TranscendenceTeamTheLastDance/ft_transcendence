@@ -145,7 +145,7 @@
 	justify-content: center;
 }
 
-.bg-gray-500.text-white {
+.logsbutton {
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -160,7 +160,7 @@
 	margin: 0 auto; /* Center the button */
   }
   
-.bg-gray-500.text-white:hover {
+.logsbutton:hover {
   background-color: #fff; /* Background color on hover */
   color: black; /* Text color on hover */
   border: 2px solid gray; /* Add a border on hover */
