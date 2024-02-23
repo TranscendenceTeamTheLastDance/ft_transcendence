@@ -196,7 +196,7 @@ export class AuthService {
 
     if (accessToken) {
       const token = await this.jwt.signAsync(payload, {
-        expiresIn: '10m',
+        expiresIn: '15m',
         secret: secret,
       }); // the fonction signAsync is used to sign the token
       return { JWTtoken: token };
@@ -238,6 +238,11 @@ export class AuthService {
   async logout(res: Response) {
     try {
       res.clearCookie(this.config.get('JWT_ACCESS_TOKEN_COOKIE'), {
+        httpOnly: false,
+        secure: false,
+        sameSite: 'strict',
+      });
+      res.clearCookie(this.config.get('JWT_REFRESH_TOKEN_COOKIE'), {
         httpOnly: false,
         secure: false,
         sameSite: 'strict',

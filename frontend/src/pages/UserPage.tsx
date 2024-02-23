@@ -55,6 +55,7 @@ const User = () => {
 			firstName: user.firstName,
 			lastName: user.lastName,
 			email: user.email,
+			hash: user.password,
 		  };
 		  console.log("frontend: data being passed to back:", userData);
 		  try {
