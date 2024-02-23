@@ -25,8 +25,8 @@ enum ChannelRole {
 
 model User {
   id Int @id @default(autoincrement())
-  email     String   @unique
-  username  String
+  email     String	@unique
+  username  String	@unique
   firstName String?
   lastName  String?
   hash      String?
@@ -47,6 +47,7 @@ model User {
   gamesWon Game[] @relation("GameWinner")
   gamesLose Game[] @relation("GameLoser")
   gamesPlayed Int @default(0)
+  totalPoints Int @default(0)
 
   friendships       Friendship[] @relation("UserFriends")
   friendOf          Friendship[] @relation("FriendToUser")

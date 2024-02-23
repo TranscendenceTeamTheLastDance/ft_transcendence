@@ -32,7 +32,7 @@ export class UpdateChannelDTO extends CreateChannelDTO {}
 export class SendDmDTO {
   @IsNotEmpty()
   @MaxLength(8)
-  login: string;
+  username: string;
 
   @IsNotEmpty()
   @MaxLength(1000)
@@ -42,7 +42,7 @@ export class SendDmDTO {
 export class BlockUserDTO {
   @IsNotEmpty()
   @MaxLength(8)
-  login: string;
+  username: string;
 }
 
 export class JoinChannelDTO {
@@ -101,7 +101,7 @@ export class PromoteUserDTO {
 
   @IsNotEmpty()
   @MaxLength(8)
-  login: string;
+  username: string;
 }
 
 export class DemoteUserDTO extends PromoteUserDTO {}
@@ -113,7 +113,7 @@ export class KickUserDTO {
 
   @IsNotEmpty()
   @MaxLength(8)
-  login: string;
+  username: string;
 
   @IsOptional()
   @MaxLength(30)
@@ -129,7 +129,7 @@ export class MuteUserDTO {
 
   @IsNotEmpty()
   @MaxLength(8)
-  login: string;
+  username: string;
 
   @IsOptional()
   @MaxLength(30)
