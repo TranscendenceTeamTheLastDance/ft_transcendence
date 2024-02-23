@@ -16,22 +16,32 @@ import {
   WebSocketGateway,
   WebSocketServer,
   WsException,
-  WsResponse,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
 import { BadRequestTransformationFilter } from '../utils/bad-request-exception.filter';
 
-import { ChannelsService } from './channels.service';
 import {
   CreateChannelDTO,
   JoinChannelDTO,
   SendMessageDTO,
+  MessageHistoryDTO,
   UserListInChannelDTO,
+  SendDmDTO,
+  PromoteUserDTO,
+  DemoteUserDTO,
+  KickUserDTO,
+  BanUserDTO,
+  MuteUserDTO,
+  BlockUserDTO,
+  LeaveChannelDTO,
+  UpdateChannelDTO,
 } from './chat.dto';
 import { ChatEvent } from './chat.state';
+import { ChannelsService } from './channels.service';
 import { UserService } from '../user/user.service';
 import { ConfigService } from '@nestjs/config';
+import { JwtGuard } from '../auth/guard';
 import { userType } from '@/common/userType.interface';
 
 @UsePipes(new ValidationPipe())
@@ -49,7 +59,6 @@ export class ChatGateway
   @WebSocketServer()
   private io: Server;
   private logger: Logger = new Logger(ChatGateway.name);
-  config: any;
   private socketsID = new Map<string, Socket[]>(); // Map pour stocker les sockets des utilisateurs
 
   constructor(
@@ -68,7 +77,7 @@ export class ChatGateway
   async handleConnection(client: Socket, ...args: any[]) {
     try {
       // Vérification de l'authentification du client à l'aide de JWT
-      const cookieName = this.configService.get('JWT_REFRESH_TOKEN_COOKIE');
+      const cookieName = this.configService.get('JWT_ACCESS_TOKEN_COOKIE');
       const cookieHeaderValue = client.handshake.headers.cookie;
 
       if (!cookieHeaderValue) {
@@ -81,6 +90,7 @@ export class ChatGateway
         .split(';')
         .find((c) => c.trim().startsWith(cookieName + '='))
         .split('=')[1];
+
       // Validation du token JWT et récupération des données utilisateur
       const payload = this.jwtService.decode(token);
       client.data.user = await this.userService.getUnique(payload.email);
@@ -126,24 +136,18 @@ export class ChatGateway
     }
   }
 
+  // Gestion des événements de création, de rejoindre un canal, etc.
   @SubscribeMessage(ChatEvent.Create)
   async onCreateChannel(
     @MessageBody() channel: CreateChannelDTO,
     @ConnectedSocket() client: Socket,
   ) {
-    this.logger.log('Create channel: ' + JSON.stringify(channel));
-    this.logger.log('User: ' + JSON.stringify(client.data.user));
-    try {
-      const data = await this.channelsService.createChannel(
-        channel,
-        client.data.user,
-      );
-      client.join(channel.name);
-      return { event: 'youJoined', data: data };
-    } catch (error) {
-      // Gérer les erreurs et renvoyer une réponse appropriée au client
-      throw new WsException('Failed to create channel');
-    }
+    const data = await this.channelsService.createChannel(
+      channel,
+      client.data.user,
+    );
+    client.join(channel.name);
+    return { event: 'youJoined', data: data };
   }
 
   @SubscribeMessage(ChatEvent.Join)
@@ -155,12 +159,96 @@ export class ChatGateway
       channel,
       client.data.user,
     );
-    this.io.to(channel.name).emit(ChatEvent.Join, data.toChannel); // Envoyer un message à tous les utilisateurs du canal
-    client.join(channel.name); // Ajouter l'utilisateur au canal
-    this.logger.log(
-      'User ' + client.data.user.username + ' joined channel ' + channel.name,
-    );
+    this.io.to(channel.name).emit(ChatEvent.Join, data.toChannel);
+    client.join(channel.name);
     return { event: 'youJoined', data: data.toClient };
+  }
+
+  @SubscribeMessage(ChatEvent.Leave)
+  async onLeaveChannel(
+    @MessageBody() channel: LeaveChannelDTO,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const data = await this.channelsService.leaveChannel(
+      channel,
+      client.data.user,
+    );
+    client.leave(channel.name);
+    this.io.to(channel.name).emit(ChatEvent.Leave, data);
+    return { event: 'youLeft', data: data };
+  }
+
+  // Méthode de souscription à l'événement pour la réception de messages dans un canal donné
+  @SubscribeMessage(ChatEvent.Message)
+  async onMessage(
+    @MessageBody() messageDTO: SendMessageDTO,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const message = await this.channelsService.sendMessage(
+      messageDTO,
+      client.data.user,
+    );
+    this.io.to(messageDTO.channel).emit(ChatEvent.Message, message);
+  }
+
+  @SubscribeMessage(ChatEvent.MessageHistory)
+  async onMessageHistory(
+    @MessageBody() dto: MessageHistoryDTO,
+    @ConnectedSocket() client: Socket,
+  ) {
+    return await this.channelsService.getMessageHistory(dto, client.data.user);
+  }
+
+  @SubscribeMessage(ChatEvent.UpdateChannel)
+  async onUpdateChannel(
+    @MessageBody() updateData: UpdateChannelDTO,
+    @ConnectedSocket() client: Socket,
+  ) {
+    await this.channelsService.updateChannel(updateData, client.data.user);
+    this.io
+      .to(updateData.name)
+      .emit(ChatEvent.UpdateChannel, { type: updateData.type });
+  }
+
+  // @SubscribeMessage(ChatEvent.UserList)
+  // async handleUserList(
+  //   @MessageBody() UserListDTO: UserListInChannelDTO,
+  //   @ConnectedSocket() client: Socket,
+  // ): Promise<{ channel: string; users: userType[] }> {
+  //   try {
+  //     const channelMembers = await this.channelsService.getChannelMembers(
+  //       UserListDTO.channel,
+  //     );
+
+  //     // Extract only the desired fields from UserListDTO (frontend: userType)
+  //     const extractedUserList = channelMembers.map((member) => ({
+  //       id: member.id,
+  //       username: member.username,
+  //       profilePic: member.profilePic,
+  //     }));
+
+  //     const userTypeList = {
+  //       channel: UserListDTO.channel,
+  //       users: extractedUserList,
+  //     };
+
+  //     console.log(userTypeList);
+  //     return userTypeList;
+  //   } catch (error) {
+  //     console.error('Error fetching channel members:', error);
+  //     throw new WsException('Failed to fetch channel members');
+  //   }
+  // }
+
+  @SubscribeMessage(ChatEvent.UserList)
+  async onUserList(
+    @MessageBody() dto: UserListInChannelDTO,
+    @ConnectedSocket() client: Socket,
+  ) {
+    return await this.channelsService.getUserListInChannel(
+      dto,
+      client.data.user,
+    );
   }
 
   // Méthode de souscription à l'événement pour récupérer la liste des canaux disponibles
@@ -175,47 +263,112 @@ export class ChatGateway
     return await this.channelsService.getJoinedChannels(client.data.user);
   }
 
-  // Méthode de souscription à l'événement pour la réception de messages dans un canal donné
-  @SubscribeMessage(ChatEvent.Message)
-  async onMessage(
-    @MessageBody() messageDTO: SendMessageDTO,
+  @SubscribeMessage(ChatEvent.Block)
+  async onBlockUser(
+    @MessageBody() toBlock: BlockUserDTO,
     @ConnectedSocket() client: Socket,
   ) {
-    // Envoi du message à tous les utilisateurs du canal spécifié
-    const message = await this.channelsService.sendMessage(
-      messageDTO,
+    const user = await this.userService.blockUser(
+      toBlock.username,
       client.data.user,
     );
-    this.io.to(messageDTO.channel).emit(ChatEvent.Message, message);
+    return user.blocked;
   }
 
-  @SubscribeMessage(ChatEvent.UserList)
-  async handleUserList(
-    @MessageBody() UserListDTO: UserListInChannelDTO,
+  @SubscribeMessage(ChatEvent.Unblock)
+  async onUnblockUser(
+    @MessageBody() toUnblock: BlockUserDTO,
     @ConnectedSocket() client: Socket,
-  ): Promise<{ channel: string; users: userType[] }> {
-    try {
-      const channelMembers = await this.channelsService.getChannelMembers(
-        UserListDTO.channel,
-      );
+  ) {
+    const user = await this.userService.unblockUser(
+      toUnblock.username,
+      client.data.user,
+    );
+    return user.blocked;
+  }
 
-      const extractedUserList = channelMembers.map((member) => ({
-        id: member.id,
-        username: member.username,
-        profilePic: member.profilePic,
-        role: member.role,
-      }));
+  @SubscribeMessage(ChatEvent.BlockedUsersList)
+  async onBlockedUsersList(@ConnectedSocket() client: Socket) {
+    return await this.userService.getBlockedList(client.data.user);
+  }
 
-      const userTypeList = {
-        channel: UserListDTO.channel,
-        users: extractedUserList,
-      };
+  @SubscribeMessage(ChatEvent.Promote)
+  async onPromoteUser(
+    @MessageBody() promotion: PromoteUserDTO,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const data = await this.channelsService.promoteUser(
+      promotion,
+      client.data.user,
+    );
+    this.io.to(promotion.channel).emit(ChatEvent.Promote, data);
+  }
 
-      console.log(userTypeList);
-      return userTypeList;
-    } catch (error) {
-      console.error('Error fetching channel members:', error);
-      throw new WsException('Failed to fetch channel members');
+  @SubscribeMessage(ChatEvent.Demote)
+  async onDemoteUser(
+    @MessageBody() demotion: DemoteUserDTO,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const data = await this.channelsService.demoteUser(
+      demotion,
+      client.data.user,
+    );
+    this.io.to(demotion.channel).emit(ChatEvent.Demote, data);
+  }
+
+  @SubscribeMessage(ChatEvent.Kick)
+  async onKickUser(
+    @MessageBody() kick: KickUserDTO,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const data = await this.channelsService.kickUser(kick, client.data.user);
+
+    const sockets = this.socketsID.get(kick.username) || [];
+    for (const socket of sockets) {
+      socket.leave(kick.channel);
+      socket.emit('youLeft', data);
     }
+
+    this.io.to(kick.channel).emit(ChatEvent.Leave, data);
+  }
+
+  @SubscribeMessage(ChatEvent.Ban)
+  async onBanUser(
+    @MessageBody() ban: BanUserDTO,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const data = await this.channelsService.banUser(ban, client.data.user);
+
+    const sockets = this.socketsID.get(ban.username) || [];
+    for (const socket of sockets) {
+      socket.leave(ban.channel);
+      socket.emit('youLeft', data);
+    }
+
+    this.io.to(ban.channel).emit(ChatEvent.Leave, data);
+  }
+
+  @SubscribeMessage(ChatEvent.Mute)
+  async onMuteUser(
+    @MessageBody() mute: MuteUserDTO,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const data = await this.channelsService.muteUser(mute, client.data.user);
+    this.io.to(mute.channel).emit(ChatEvent.Mute, data);
+  }
+
+  @SubscribeMessage(ChatEvent.DirectMessage)
+  async onDirectMessageUser(
+    @MessageBody() dm: SendDmDTO,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const data = await this.channelsService.sendDM(dm, client.data.user);
+
+    const sockets = this.socketsID.get(dm.username) || [];
+    for (const socket of sockets) {
+      this.io.to(socket.id).emit(ChatEvent.DirectMessage, data);
+    }
+
+    client.emit(ChatEvent.DirectMessage, data);
   }
 }

@@ -24,4 +24,8 @@ export class EditUserDto {
   @IsBoolean()
   @IsOptional()
   twoFactorEnabled?: boolean;
+
+  @IsString()
+  @IsOptional()
+  hash?: string;
 }

@@ -12,7 +12,6 @@ import TwoFactorFormMod from './TwoFactorForm.tsx';
 import { Toaster, toast } from 'sonner';
 import Lottie, {LottieRefCurrentProps}from 'lottie-react';
 
-
 const LoginSignup = () => {
 	const navigate = useNavigate();
 	const [formData, setFormData] = useState({ username: '', email: '', password: '' });
