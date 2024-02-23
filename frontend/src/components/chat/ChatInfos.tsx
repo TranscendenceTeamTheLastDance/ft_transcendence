@@ -139,7 +139,7 @@ const ChatInfos = ({
                 <div className="flex items-center gap-2">
                   <img
                     className="w-8 rounded-full"
-                    src={user.imagePath ? user.imagePath : avatar_icon}
+                    src={user.profilePic ? user.profilePic : avatar_icon}
                     alt="user"
                   />
                   <h3 className="text-lg">{user.username ? user.username : "NO USERNAME"}</h3>
