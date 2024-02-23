@@ -31,9 +31,7 @@ interface userDto {
   }
 
 const PongGame: React.FC = () => {
-    // const {user} = useUserContext();
     const socketRef = useRef(io('http://localhost:8080/game'));
-    // const socketRef = useRef(io('http://localhost:8080/game', { withCredentials: true }));
     const identifiandPlayer = useRef(0);
     const [infoGame, setInfoGame] = useState<InfoGame | null>(null);
     const [playerLeftGame, setPlayerLeftGame] = useState(false);
@@ -52,6 +50,19 @@ const PongGame: React.FC = () => {
     let clienInfoCookie: userDto | undefined;
     clienInfoCookie = user;
     
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const password = urlParams.get('pwd');
+        if (password && clienInfoCookie?.username && clienInfoCookie?.id) {
+            socketRef.current.emit('join-invite', { 
+                username: clienInfoCookie.username, 
+                userId: clienInfoCookie.id, 
+                inviteID: password 
+            });
+            setJoinedGame(true);
+        }
+    }, [clienInfoCookie]);
+
     const handleJoinNormalGame = () => {
         setJoinedGame(true);
         if (clienInfoCookie?.username !== undefined && clienInfoCookie?.id !== undefined ) {
@@ -65,15 +76,12 @@ const PongGame: React.FC = () => {
             socketRef?.current.emit('join-freestyle', { username: clienInfoCookie?.username, userId: clienInfoCookie?.id});
         }
     };
-    
-    // console.log(user.username);
+
     useEffect(() => {
         const socket = socketRef?.current;
         if (!socket || !joinedGame || clienInfoCookie === undefined)
             return;
 
-        // console.log("username:", clienInfoCookie?.username);
-        // console.log("userId:", clienInfoCookie?.id);
 
         //quand le client recois room-id c'est que le server a trouve un adversaire et que la partie commence
         socket.on('room-id', (id) => {
@@ -112,7 +120,6 @@ const PongGame: React.FC = () => {
             socket.emit('finish');
         });
         return () => {
-            // console.log("je suis pas sense etre allll")
             socket.emit('client-disconnect');
             socket.off('room-id');
             socket.off('player-left-game');

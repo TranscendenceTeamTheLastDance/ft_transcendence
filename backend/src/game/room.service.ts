@@ -124,6 +124,8 @@ export class GameRoom {
       const gameState2 = this.gameService.broadcastGameState(2);
 
       if (gameState1.score.scoreU1 >= 11 || gameState1.score.scoreU2 >= 11) {
+        this.sendGameHistory(gameState1, player1ID, player2ID);
+        this.incrementGamesPlayed(player1ID, player2ID);
         this.player1.emit('game-finish', gameState1);
         this.player2.emit('game-finish', gameState2);
         clearInterval(this.gameLoopInterval);
