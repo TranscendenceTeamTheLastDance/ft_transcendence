@@ -15,9 +15,10 @@ const navigation = [
   
 	// Vérifiez si la route actuelle est "/home"
 	const isHome = location.pathname === "/home";
+	const isLogin = location.pathname === "/";
   
 	// Ne rien rendre si la route est "/home"
-	if (isHome) {
+	if (isHome || isLogin) {
 	  return null;
 	}
   
