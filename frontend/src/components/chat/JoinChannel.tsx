@@ -3,13 +3,8 @@ import { Socket } from "socket.io-client";
 
 import lock from "../assets/chat/lock.svg";
 
-import { UserType } from "@/common/userType.interface";
 import { ChannelType } from "./Chat";
 
-interface UserListResponse {
-  channel: string;
-  users: UserType[];
-}
 interface JoinChannelProps {
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
   socket: Socket;
@@ -28,7 +23,6 @@ const JoinChannel = ({
   const [channels, setChannels] = useState<ChannelType[]>([]);
   const [channelName, setChannelName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [users, setUsers] = useState<UserType[]>([]);
 
   useEffect(() => {
     socket.emit("channelList", (data: ChannelType[]) => {
@@ -60,13 +54,6 @@ const JoinChannel = ({
 
   const handleJoinChannel = () => {
     socket.emit("join", { name: channelName, password: password });
-    socket.emit(
-      "userListUpdate",
-      { channel: channelName },
-      (res: UserListResponse) => {
-        setUsers(res.users.filter((user) => user.username));
-      }
-    );
     // TODO send notification if error
     setShowModal(false);
   };
