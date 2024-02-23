@@ -28,7 +28,6 @@ const JoinChannel = ({
   const [channels, setChannels] = useState<ChannelType[]>([]);
   const [channelName, setChannelName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [users, setUsers] = useState<UserType[]>([]);
 
   useEffect(() => {
     socket.emit("channelList", (data: ChannelType[]) => {
@@ -60,13 +59,6 @@ const JoinChannel = ({
 
   const handleJoinChannel = () => {
     socket.emit("join", { name: channelName, password: password });
-    socket.emit(
-      "userListUpdate",
-      { channel: channelName },
-      (res: UserListResponse) => {
-        setUsers(res.users.filter((user) => user.username));
-      }
-    );
     // TODO send notification if error
     setShowModal(false);
   };

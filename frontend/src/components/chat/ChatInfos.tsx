@@ -46,7 +46,7 @@ const ChatInfos = ({
   setBlockedUsers,
 }: ChatInfosProps) => {
   const [users, setUsers] = useState<UserType[]>([]);
-  const [friendsIds, setFriendIds] = useState<number[]>([]);
+  const setFriendIds = useState<number[]>([1]);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [showMuteModal, setShowMuteModal] = useState<boolean>(false);
   const [muteUserState, setMuteUser] = useState<UserType>();
@@ -170,7 +170,7 @@ const ChatInfos = ({
     socket.emit("message", { channel: channelName, content: message });
   };
 
-  const currentUser = users.find((user) => user.username === currentUserLogin);
+  // const currentUser = users.find((user) => user.username === currentUserLogin);
 
   // Contains the list of members in the channel, whith a possibility to kick them, to promote them as admin, and to start a game with them
   return (
