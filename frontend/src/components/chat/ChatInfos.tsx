@@ -46,7 +46,8 @@ const ChatInfos = ({
   setBlockedUsers,
 }: ChatInfosProps) => {
   const [users, setUsers] = useState<UserType[]>([]);
-  const setFriendIds = useState<number[]>([1]);
+  //eslint-disable-next-line
+  const [friendIds, setFriendIds] = useState<number[]>([]);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [showMuteModal, setShowMuteModal] = useState<boolean>(false);
   const [muteUserState, setMuteUser] = useState<UserType>();

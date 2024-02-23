@@ -3,13 +3,8 @@ import { Socket } from "socket.io-client";
 
 import lock from "../assets/chat/lock.svg";
 
-import { UserType } from "@/common/userType.interface";
 import { ChannelType } from "./Chat";
 
-interface UserListResponse {
-  channel: string;
-  users: UserType[];
-}
 interface JoinChannelProps {
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
   socket: Socket;
