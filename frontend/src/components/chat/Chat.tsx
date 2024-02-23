@@ -23,7 +23,6 @@ import JoinChannel from "./JoinChannel";
 import { userDto } from "./dto/userDto";
 import NotConnected from '../../components/NotSignedIn.tsx';
 
-
 export interface Channel {
   name: string;
   type: string;
@@ -60,6 +59,13 @@ const Chat = () => {
   useEffect(() => {
     fetchUserData();
   }, [fetchUserData]);
+
+  // useEffect(() => {
+  //   if (!user) {
+  //     navigate('/login'); // Redirigez vers la page de connexion si l'utilisateur n'est pas connecté
+  //   }
+  // }, [user, navigate]);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -173,7 +179,9 @@ const Chat = () => {
     setShowChannels(boolean);
   };
 
-  return user ? (
+  if (!user) return <NotConnected message="User profile not found" />;
+
+  return (
     <div className="flex max-h-full min-h-[65%] w-full rounded-lg bg-white-1 md:w-auto">
       {showCreateChannelModal && (
         <ChatModal>
@@ -296,9 +304,7 @@ const Chat = () => {
             />
           )}
     </div>
-  ) : (
-    <NotConnected message="You need to log in to access your settings" />
-  );
+  ) 
 };
 
 export default Chat;

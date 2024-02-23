@@ -1,6 +1,3 @@
-- Affiche le message dans la bonne conversation channel
-- Coherence MAJ imagePath 
-- Acceder au user profile de user a qui on parle
-- Rendre le lien cliquable dans l invitation a jouer
+- Rendre le lien cliquable dans l invitation a jouer + code ?
 - Fix les erreurs suppose des imports assets png/svg
 - warning dans l inspecteur : chat:1 Form submission canceled because the form is not connected
