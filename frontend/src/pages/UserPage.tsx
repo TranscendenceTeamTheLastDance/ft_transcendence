@@ -161,7 +161,7 @@ const User = () => {
 		}
 	};
 	  return user ? (
-		<div className="flex items-center justify-center min-h-screen relative pb-8">
+		<div className="flex items-center justify-center flex-col min-h-screen relative pb-8 ">
 			<Particles className="absolute inset-0 -z-10" quantity={1000} />
 			  {/* Conditional rendering of the update status modal */}
 			<UpdateModal showUpdateModal={showUpdateModal} updateModalMessage={updateModalMessage} isUpdateSuccessful={isUpdateSuccessful}/>
