@@ -56,7 +56,7 @@ const DmInfos = ({ setShowModal, socket, channelName, currentUserLogin }: DmInfo
             <div key={user.id} className="flex items-center justify-between gap-4">
               <Link to={'/user/' + user.username}>
                 <div className="flex items-center gap-2">
-                  <img className="w-8 rounded-full" src={user.imagePath ? user.imagePath : avatar_icon} alt="user" />
+                  <img className="w-8 rounded-full" src={user.profilePic ? user.profilePic : avatar_icon} alt="user" />
                   <h3 className="text-lg">{user.username}</h3>
                 </div>
               </Link>

@@ -159,13 +159,16 @@ const User = () => {
 			setError(error.response.data.message);
 		}
 	};
-	  return user ? (
+
+	if (!user) return <NotConnected message="User profile not found" />;
+
+	return (
 		<div className="flex items-center justify-center min-h-screen relative pb-8">
 			<Particles className="absolute inset-0 -z-10" quantity={1000} />
-			  {/* Conditional rendering of the update status modal */}
+				{/* Conditional rendering of the update status modal */}
 			<UpdateModal showUpdateModal={showUpdateModal} updateModalMessage={updateModalMessage} isUpdateSuccessful={isUpdateSuccessful}/>
 			<div className="flex justify-start"> 
-	  
+		
 			{/* Left Section: User Information and Friends */}
 			<div className="flex flex-col mr-8"> {/* Margin right to separate from Game Stats */}
 				{/* User Information Box */}
@@ -174,41 +177,38 @@ const User = () => {
 					handleUpdateProfile={handleUpdateProfile}
 					onAvatarFileSelect={onAvatarFileSelect}
 					/>
-	  
+		
 				{/* Friends Box */}
 				<FriendsList/>
 			</div>
-	  
+		
 			{/* Right Section: Game Stats */}
 				{/* Game Stats Box */}
 				<UserGameStats />
 
 		</div>
 		{display2FAModal ? (
-                <TwoFactorMod
-                    title="TWO-FACTOR AUTHENTICATION"
-                    qrCodeDataUrl={qrCodeDataUrl}
-                    secret={twoFactorSecret}
-                    modalId={'Enable-2fa-modal'}
-                    closeModal={() => setDisplay2FAModal(false)}
-                    onSubmit={enableTwoFactor}
-                    error={error}
-                />
-            ) : null}
-        {display2FADisableModal ? (
-                <TwoFactorMod
-                    title="TWO-FACTOR AUTHENTICATION"
-                    modalId={'Disable-2fa-modal'}
-                    closeModal={() => setDisplay2FADisableModal(false)}
-                    onSubmit={disableTwoFactor}
-                    error={error}
-                />
-            ) : null}
+				<TwoFactorMod
+					title="TWO-FACTOR AUTHENTICATION"
+					qrCodeDataUrl={qrCodeDataUrl}
+					secret={twoFactorSecret}
+					modalId={'Enable-2fa-modal'}
+					closeModal={() => setDisplay2FAModal(false)}
+					onSubmit={enableTwoFactor}
+					error={error}
+				/>
+			) : null}
+		{display2FADisableModal ? (
+				<TwoFactorMod
+					title="TWO-FACTOR AUTHENTICATION"
+					modalId={'Disable-2fa-modal'}
+					closeModal={() => setDisplay2FADisableModal(false)}
+					onSubmit={disableTwoFactor}
+					error={error}
+				/>
+			) : null}
 	</div>
 	)
-	: (
-		<NotConnected message="You need to log in to access your settings" />
-	);
 }
 
 export default User;
