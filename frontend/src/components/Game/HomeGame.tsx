@@ -21,12 +21,11 @@ interface userDto {
     first_name: string;
     last_name: string;
     email: string;
-    imagePath: string;
+    profilePic: string;
     JWTtoken?: string;
     displayName: string;
     description: string;
     bannerPath: string;
-    intraImageURL: string;
     status: string;
   }
 

@@ -47,6 +47,7 @@ export class AuthService {
       const user = await this.createupdateUser(email, username);
       user.hash = undefined;
       user.twoFactorSecret = undefined;
+      user.status = 1;
       if (user.twoFactorEnabled) {
         return user;
       }
@@ -78,6 +79,7 @@ export class AuthService {
     }
     user.hash = undefined;
     user.twoFactorSecret = undefined;
+    user.status = 1;
     if (user.twoFactorEnabled) {
       return user;
     }
@@ -96,6 +98,7 @@ export class AuthService {
           email: dto.email,
           hash,
           username: dto.username,
+          status: 1,
           //connectionNb: 1,
         },
       });
@@ -177,6 +180,8 @@ export class AuthService {
         hashedRefreshToken: hash,
       },
     });
+
+    this.updateStatus(userId, 1);
   }
 
   async signToken(
@@ -196,7 +201,7 @@ export class AuthService {
 
     if (accessToken) {
       const token = await this.jwt.signAsync(payload, {
-        expiresIn: '10m',
+        expiresIn: '15m',
         secret: secret,
       }); // the fonction signAsync is used to sign the token
       return { JWTtoken: token };
@@ -235,9 +240,15 @@ export class AuthService {
     return user;
   }
 
-  async logout(res: Response) {
+  async logout(user: User, res: Response) {
     try {
+      await this.updateStatus(user.id, 0);
       res.clearCookie(this.config.get('JWT_ACCESS_TOKEN_COOKIE'), {
+        httpOnly: false,
+        secure: false,
+        sameSite: 'strict',
+      });
+      res.clearCookie(this.config.get('JWT_REFRESH_TOKEN_COOKIE'), {
         httpOnly: false,
         secure: false,
         sameSite: 'strict',
@@ -263,5 +274,19 @@ export class AuthService {
         sameSite: 'strict',
       },
     );
+  }
+
+  async updateStatus(userId: number, status: number) {
+    return this.prismaService.user.update({
+      where: { id: userId },
+      data: { status },
+    });
+  }
+
+  async getStatus(userId: number) {
+    return this.prismaService.user.findUnique({
+      where: { id: userId },
+      select: { status: true },
+    });
   }
 }

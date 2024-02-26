@@ -4,6 +4,8 @@ import axios from 'axios';
 interface User {
     id: number;
     username: string;
+    status:number;
+    totalPoints: number;
   }
 
 const Leaderboard = () => {
@@ -18,12 +20,13 @@ const Leaderboard = () => {
                 const response = await axios.get('http://localhost:8080/users/all', {
                     withCredentials: true,
                 });
-                console.log('response:', response.data)
-                setUsersList(response.data);
+              const sortedUsers = response.data.sort((a, b) => b.totalPoints - a.totalPoints);
+              setUsersList(sortedUsers);
             } catch (error) {
-                console.error('Failed to fetch users:', error);
+              console.error('Failed to fetch users:', error);
             }
-        };
+          };
+          
         const fetchFriends = async () => {
             try {
                 const response = await axios.get('http://localhost:8080/users/friends', {
@@ -38,12 +41,12 @@ const Leaderboard = () => {
 
         const fetchUserId = async () => {
             try {
-                // We could just use the user context here
-                const response = await axios.get('http://localhost:8080/users/my-id', {
-                    withCredentials: true,
-                });
-                console.log('response:', response.data)
-                setUserId(response.data);
+            // We could just use the user context here
+            const response = await axios.get('http://localhost:8080/users/my-id', {
+                withCredentials: true,
+            });
+            console.log('response:', response.data)
+            setUserId(response.data);
             } catch (error) {
                 console.error('Failed to fetch user:', error);
             }
@@ -70,23 +73,29 @@ const Leaderboard = () => {
 
     return (
         <div className="overflow-auto">
-            <div className="flex justify-center w-full">
-                <h2 className="text-xl font-semibold text-white mb-4">👑 LEADERBOARD 👑</h2>
-            </div>
-            <div className="divide-y divide-gray-200">
-                {usersList.map((userList, index) => (
-                    <div key={index} className="flex items-center justify-between py-2">
-                        <span className="text-white">{index + 1}</span> {/* Rank */}
-                        <span className="text-white flex-grow pl-4">{userList.username}</span> {/* Username */}
-                        {!friendIds.includes(userList.id) && userId !== userList.id && (
-                            <button onClick={() => addFriend(userId, userList.id)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded text-xs">
-                                Add Friend
-                            </button> 
-                        )}
-                        {/* // @@@TODO amend to online or not  */}
-                        {/* // <span className={`h-3 w-3 bg-${index % 2 === 0 ? 'green' : 'red'}-500 rounded-full ml-4`}></span> Online/Offline Dot */}
-                    </div>
-                ))}
+    <div className="flex justify-center w-full">
+        <h2 className="text-xl font-semibold text-white mb-4">👑 LEADERBOARD 👑</h2>
+    </div>
+    <div className="divide-y divide-gray-200">
+        {usersList.map((user, index) => (
+            <div key={user.id} className="flex items-center justify-between py-2">
+                <div className="w-12 text-center text-white">{index + 1}</div> {/* Rank with fixed width */}
+                <div className="flex-grow px-4 text-white">{user.username}</div> {/* Username with padding */}
+                <div className="w-24 text-center text-white">{user.totalPoints}</div> {/* Total Points with fixed width */}
+                {!friendIds.includes(user.id) && userId !== user.id ? (
+                    <button onClick={() => addFriend(userId, user.id)} style={{ width: '100px' /* Example fixed width */, margin: '0 4px' /* Example margins */ }} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded text-xs">
+                        Add Friend
+                    </button>
+                ) : (
+                    <div style={{ width: '100px', margin: '0 4px', visibility: 'hidden' }}>Placeholder</div>
+                )}
+                {/* offline / online status dot */}
+                <span className={`h-3 w-3 ${
+                    user.status === 1 ? 'bg-green-500' : 
+                    user.status === 2 ? 'bg-orange-500' : 'bg-red'
+                    } rounded-full ml-4`}></span>
+                </div>
+             ))}
             </div>
         </div>
     );

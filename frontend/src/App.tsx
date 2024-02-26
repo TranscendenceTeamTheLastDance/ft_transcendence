@@ -8,7 +8,8 @@ import User from './pages/UserPage';
 import { UserProvider } from './context/UserContext';
 import { AuthAxiosProvider } from './context/AuthAxiosContext';
 import Chat from './pages/ChatPage';
-
+import UserProfile from './pages/UserProfilePage';
+import NotFound from './components/NotFound';
 
 function App() {
   return (
@@ -21,6 +22,8 @@ function App() {
 				<Route path="/user" element={<User />} />
 				<Route path="/chat" element={<Chat />} />
 				<Route path="/play" element={<PongGame />} />
+				<Route path="user/:username" element={<UserProfile />} />
+				<Route path="*" element={<NotFound />} />
 			</Routes>
 		</AuthAxiosProvider>
 	</UserProvider>
