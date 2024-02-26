@@ -11,6 +11,7 @@ import password_icon from '../assets/password.png';
 import TwoFactorFormMod from './TwoFactorForm.tsx';
 import { Toaster, toast } from 'sonner';
 import Lottie, {LottieRefCurrentProps}from 'lottie-react';
+import { motion } from 'framer-motion';
 
 const LoginSignup = () => {
 	const navigate = useNavigate();
@@ -129,7 +130,7 @@ const LoginSignup = () => {
 
 				</div>
 			</div>
-			<div className='submit-container'>
+			<motion.div className='submit-container' whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.5 }}>
 				{action==="Login" ? <div></div>:
 				<button 
 					className="logsbutton"
@@ -140,7 +141,7 @@ const LoginSignup = () => {
 					className="logsbutton"
 					onClick={(e)=>{handleSignIn(e);}}
 					>Login</button>}
-			</div>
+			</motion.div>
 			<div className='switch-button'>
     		{action === 'Login' ? (
     		  <div>
@@ -160,10 +161,10 @@ const LoginSignup = () => {
     		  </div>
     		)}
   			</div>
-			<div className="button42" onClick={handleRedir42}>
+			<motion.div className="button42" onClick={handleRedir42} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.5 }}>
 				<Lottie className='animation42' onMouseOver={() => {phoneRef.current?.play()}} lottieRef={phoneRef} animationData={animationData} style={{width: '50px', height: '50px'}} />
 				<button className="buttonsubmit42"> Login with 42</button>
-			</div>
+			</motion.div>
 			{twoFactor ? (
     	            <TwoFactorFormMod
     	                title="Sign-In two-factor authentication"

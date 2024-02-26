@@ -1,6 +1,12 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuthAxios } from '../context/AuthAxiosContext.tsx';
+import { useUserContext } from '../context/UserContext.tsx';
+import { motion } from 'framer-motion';
 import Particles from './Home/Particles';
+import RedButton from './RedButton.tsx';
+import NotConnected from './NotSignedIn.tsx';
 
 const navigation = [
 	{ name: "HOME", href: "/home" },
@@ -10,37 +16,75 @@ const navigation = [
   ];
 
   const NavBar = () => {
+
+    const navigate = useNavigate();
+	const authAxios = useAuthAxios();
+	const [error, setError] = useState(false);
+	const { setUser } = useUserContext();
+
 	// Utilisez useLocation pour obtenir la route actuelle
 	const location = useLocation();
   
 	// Vérifiez si la route actuelle est "/home"
 	const isHome = location.pathname === "/home";
+	const isSignIn = location.pathname === "/signwith42";
 	const isLogin = location.pathname === "/";
   
 	// Ne rien rendre si la route est "/home"
-	if (isHome || isLogin) {
+	if (isHome || isLogin || isSignIn) {
 	  return null;
 	}
   
-	return (
-	  <>
-		<nav className="my-6">
-		  <Particles className="absolute inset-0 -z-10" quantity={1000} />
-		  <ul className="flex items-top justify-center gap-8">
-			{navigation.map((item) => (
-			  <li key={item.href}>
-				<Link
-				  to={item.href}
-				  className="text-4xl duration-500 text-zinc-500 hover:text-zinc-300"
-				>
-				  {item.name}
-				</Link>
-			  </li>
-			))}
-		  </ul>
-		</nav>
-	  </>
-	);
+	const handleLogOut = async () => {
+		console.log('frontend: logging out...');
+		try {
+			const response = await authAxios.get('/auth/logout', {
+				withCredentials: true,
+			});
+			console.log(response.data);
+			setUser(null);
+			console.log('user info cleared.');
+			navigate('/');
+		} catch (error: any) {
+			setError(true);
+			console.log(error.response.data.message);
+		}
+	};
+
+
+	if (error) {
+		return (
+			<NotConnected message="You need to log in to access your settings" />
+		); }
+	else {
+		return (
+		  <>
+			<nav className="my-6">
+			  <Particles className="absolute inset-0 -z-10" quantity={1000} />
+			  <ul className="flex items-top justify-center gap-8">
+				{navigation.map((item) => (
+				  <motion.li key={item.href} 
+				  	whileHover={{ scale: 1.2 }}
+				  	whileTap={{ scale: 0.5 }}>
+					<Link
+					  to={item.href}
+					  className="text-4xl duration-500 text-zinc-500 hover:text-zinc-300"
+					>
+					  {item.name}
+					</Link>
+				  </motion.li>
+
+				))}
+				<RedButton
+					  text="⏻"
+					  onclick={handleLogOut}
+				/>
+			  </ul>
+				
+			</nav>
+		  </>
+		);
+	}
   };
 
 export default NavBar;

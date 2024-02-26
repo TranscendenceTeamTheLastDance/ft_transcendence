@@ -164,7 +164,7 @@ const User = () => {
 	if (!user) return <NotConnected message="User profile not found" />;
 
 	return (
-		<div className="flex items-center justify-center flex-col min-h-screen relative pb-8 ">
+		<div className="flex items-center justify-center flex-col min-h-screen relative pb-8 " style={{ minHeight: `calc(100vh - 210px)` }}>
 			<Particles className="absolute inset-0 -z-10" quantity={1000} />
 				{/* Conditional rendering of the update status modal */}
 			<UpdateModal showUpdateModal={showUpdateModal} updateModalMessage={updateModalMessage} isUpdateSuccessful={isUpdateSuccessful}/>
