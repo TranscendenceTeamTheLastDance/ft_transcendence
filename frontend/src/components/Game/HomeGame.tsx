@@ -5,6 +5,7 @@ import './Game.css';
 import Particles from '../Home/Particles';
 import { useUserContext } from '../../context/UserContext';
 import ButtonGame from './ButtonGame';
+import NotConnected from '../NotSignedIn';
 
 
 interface InfoGame {
@@ -129,13 +130,13 @@ const PongGame: React.FC = () => {
     }, [joinedGame]);
 
 
-    return (
+    return user ? (
         <div className='game-container'>
             <Particles className="absolute inset-0 -z-10" quantity={1000} />
             {!joinedGame ? (
                 <div className="button-container">
-                    <ButtonGame text="Normal Game" onClick={handleJoinNormalGame}/>
-                    <ButtonGame text="Freestyle Game" onClick={handleJoinFreestyleGame}/>
+                    <ButtonGame text="NORMAL GAME" onClick={handleJoinNormalGame}/>
+                    <ButtonGame text="FREESTYLE GAME" onClick={handleJoinFreestyleGame}/>
                 </div>
             ) : (    
                 infoGame ? (
@@ -166,6 +167,8 @@ const PongGame: React.FC = () => {
                 )
             )}
         </div>
+    ) : (
+        <NotConnected message="You need to log in to access your settings" />
     );
 };    
 

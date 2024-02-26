@@ -166,8 +166,6 @@ export class GameGateway {
       if (roomId) {
         const gameRoom = this.gameRooms.get(roomId);
         if (gameRoom) {
-          //peut etre notifie les deux joueur que la partie est terminer????
-          // Supprimer la salle de jeu
           gameRoom.stopGameLoop();
           this.gameRooms.delete(roomId);
         }

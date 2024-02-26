@@ -118,6 +118,7 @@ export class GameRoom {
     player2ID: number,
     Status: number,
   ): Promise<void> {
+    
     await this.prisma.user.update({
       where: { id: player1ID },
       data: {
