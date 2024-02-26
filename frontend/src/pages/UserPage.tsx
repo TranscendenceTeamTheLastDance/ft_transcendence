@@ -9,6 +9,7 @@ import { useAuthAxios } from '../context/AuthAxiosContext';
 import UpdateModal from '../components/UpdateModal.tsx'
 import TwoFactorMod from '../components/LoginSignup/TwoFactorMod.tsx';
 import { ModalInputs } from '../components/LoginSignup/TwoFactorMod.tsx';
+import MatchHistory from '../components/User/UserMatchHistory.tsx';
 
 const User = () => {
 	const {user, updateUser, fetchUserData } = useUserContext();
@@ -16,7 +17,7 @@ const User = () => {
 	const [showUpdateModal, setShowUpdateModal] = useState(false);
 	const [updateModalMessage, setUpdateModalMessage] = useState('');
 	const [isUpdateSuccessful, setIsUpdateSuccessful] = useState(false);
-
+	const [showMatchHistory, setShowMatchHistory] = useState(false);
 	const [is2FAEnabled, setIs2FAEnabled] = useState(user ? user.twoFactorEnabled : false);
 	const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | undefined>();
 	const [twoFactorSecret, setTwoFactorSecret] = useState<string | undefined>();
@@ -166,50 +167,65 @@ const User = () => {
 	return (
 		<div className="flex items-center justify-center flex-col min-h-screen relative pb-8 " style={{ minHeight: `calc(100vh - 210px)` }}>
 			<Particles className="absolute inset-0 -z-10" quantity={1000} />
-				{/* Conditional rendering of the update status modal */}
+			{/* Conditional rendering of the update status modal */}
 			<UpdateModal showUpdateModal={showUpdateModal} updateModalMessage={updateModalMessage} isUpdateSuccessful={isUpdateSuccessful}/>
-			<div className="flex justify-start"> 
-		
-			{/* Left Section: User Information and Friends */}
-			<div className="flex flex-col mr-8"> {/* Margin right to separate from Game Stats */}
-				{/* User Information Box */}
-				<UserInformation 
-					handle2FAToggle={handle2FAToggle}
-					handleUpdateProfile={handleUpdateProfile}
-					onAvatarFileSelect={onAvatarFileSelect}
-					/>
-		
-				{/* Friends Box */}
-				<FriendsList/>
+	
+			{/* Centering Container with Max Width */}
+			<div className="w-full max-w-4xl mx-auto px-4"> {/* Adjust max-w-4xl based on your desired max width, px-4 for some padding */}
+	
+				{/* Flex Container for User Info and Game Stats, plus the Button */}
+				<div className="flex flex-col justify-center items-center space-y-4"> 
+					{/* Inner Flex Container for Horizontal Layout of User Info and Game Stats */}
+					<div className="flex flex-col md:flex-row justify-center items-start md:items-center space-y-4 md:space-y-0 md:space-x-4 w-full"> 
+						{/* Left Section: User Information and Friends */}
+						<div className="flex flex-col flex-1">
+							<UserInformation 
+								handle2FAToggle={handle2FAToggle}
+								handleUpdateProfile={handleUpdateProfile}
+								onAvatarFileSelect={onAvatarFileSelect}
+							/>
+	
+							{/* Friends Box */}
+							<FriendsList/>
+						</div>
+	
+						{/* Right Section: Game Stats */}
+						<div className="flex-1">
+							<UserGameStats />
+						</div>
+					</div>
+	
+					{/* Button Centered underneath both sections */}
+					<div className="w-full flex justify-center">
+						<button className="mt-4 bg-red-500 text-white py-2 px-4 rounded" onClick={() => setShowMatchHistory(!showMatchHistory)}>click for match history..</button>
+					</div>
+				</div>
+				
+				{showMatchHistory && <MatchHistory />}
 			</div>
-		
-			{/* Right Section: Game Stats */}
-				{/* Game Stats Box */}
-				<UserGameStats />
-
+	
+			{display2FAModal ? (
+					<TwoFactorMod
+						title="TWO-FACTOR AUTHENTICATION"
+						qrCodeDataUrl={qrCodeDataUrl}
+						secret={twoFactorSecret}
+						modalId={'Enable-2fa-modal'}
+						closeModal={() => setDisplay2FAModal(false)}
+						onSubmit={enableTwoFactor}
+						error={error}
+					/>
+				) : null}
+			{display2FADisableModal ? (
+					<TwoFactorMod
+						title="TWO-FACTOR AUTHENTICATION"
+						modalId={'Disable-2fa-modal'}
+						closeModal={() => setDisplay2FADisableModal(false)}
+						onSubmit={disableTwoFactor}
+						error={error}
+					/>
+				) : null}
 		</div>
-		{display2FAModal ? (
-				<TwoFactorMod
-					title="TWO-FACTOR AUTHENTICATION"
-					qrCodeDataUrl={qrCodeDataUrl}
-					secret={twoFactorSecret}
-					modalId={'Enable-2fa-modal'}
-					closeModal={() => setDisplay2FAModal(false)}
-					onSubmit={enableTwoFactor}
-					error={error}
-				/>
-			) : null}
-		{display2FADisableModal ? (
-				<TwoFactorMod
-					title="TWO-FACTOR AUTHENTICATION"
-					modalId={'Disable-2fa-modal'}
-					closeModal={() => setDisplay2FADisableModal(false)}
-					onSubmit={disableTwoFactor}
-					error={error}
-				/>
-			) : null}
-	</div>
-	)
+	)	
 }
 
 export default User;

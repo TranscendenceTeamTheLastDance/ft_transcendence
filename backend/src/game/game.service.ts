@@ -143,7 +143,7 @@ export class GameService {
       collidePoint = collidePoint / (paddle.height / 2);
       let angleRad = (Math.PI / 4) * collidePoint;
       let direction = ball.x + ball.radius < canvasWidth / 2 ? 1 : -1;
-      if (freestyle) {
+      if (freestyle && ball.speed < 15) {
         ball.speed = ball.speed + 1;
       }
       ball.velocityX = direction * ball.speed * Math.cos(angleRad);

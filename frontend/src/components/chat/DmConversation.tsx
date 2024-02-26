@@ -1,15 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Socket } from 'socket.io-client';
+import React, { useEffect, useRef, useState } from "react";
+import { Socket } from "socket.io-client";
 
-import info_icon from '../assets/chat/info.svg';
-import send_icon from '../assets/chat/send.svg';
-import { userDto } from './dto/userDto';
+import info_icon from "../assets/chat/info.svg";
+import send_icon from "../assets/chat/send.svg";
+import { userDto } from "./dto/userDto";
 
-import { ChannelType } from './Chat';
-import ChatModal from './ChatModal';
-import DmInfos from './DmInfos';
-import Message from './Message';
-
+import { ChannelType } from "./Chat";
+import ChatModal from "./ChatModal";
+import DmInfos from "./DmInfos";
+import Message from "./Message";
 
 interface ConversationProps {
   channel: ChannelType;
@@ -37,10 +36,10 @@ export interface MessageType {
 const DmConversation = ({ channel, socket, me, users }: ConversationProps) => {
   const [showInfoModal, setShowInfoModal] = React.useState<boolean>(false);
   const [messages, setMessages] = useState<MessageType[]>([]);
-  const [message, setMessage] = useState<string>('');
+  const [message, setMessage] = useState<string>("");
+  const [blockedUsers, setBlockedUsers] = useState<UserType[]>([]);
+  const blockedUsersRef = useRef<UserType[]>([]);
   const bottomEl = useRef<HTMLDivElement>(null);
-
-
 
   // const authAxios = useAuthAxios();
   // const setAllUsers = (users: userDto[]) => {
@@ -53,7 +52,7 @@ const DmConversation = ({ channel, socket, me, users }: ConversationProps) => {
   //       const usersResponse = await authAxios.get("/chat/allUsers", {
   //         withCredentials: true,
   //       }) as unknown as UseQueryResult<userDto[], unknown>;
-  
+
   //       const fetchedUsers = usersResponse.data;
   //       if (fetchedUsers) {
   //         setAllUsers(fetchedUsers);
@@ -62,53 +61,70 @@ const DmConversation = ({ channel, socket, me, users }: ConversationProps) => {
   //       console.error("Error fetching users:", error);
   //     }
   //   };
-  
+
   //   fetchData(); // Appel de fetchData une fois après le montage du composant
-  
+
   //   // Nettoyage de l'écouteur d'événement lorsque le composant est démonté
   //   return () => {
   //     socket.off('dm');
   //   };
   // }, [channel]); // Appel de fetchData lorsque le composant est monté
 
-
   useEffect(() => {
-    socket.on('dm', (data: MessageType) => {
+    socket.on("dm", (data: MessageType) => {
+      const currentBlockedUsers = blockedUsersRef.current;
+      if (currentBlockedUsers.some((u) => u.id === data.user.id)) {
+        console.log(
+          `blocking message from ${data.user.username}: ${data.content}`
+        );
+        return;
+      }
       if (data.channel.name === channel.name) {
         setMessages((messages) => [...messages, data]);
       }
     });
 
     socket.emit(
-      'history',
+      "history",
       { channel: channel.name, offset: 0, limit: 100 },
       (res: MessageType[]) => {
         setMessages(res);
-      },
+      }
     );
 
+    socket.emit("blockList", (data: UserType[]) => {
+      setBlockedUsers(data);
+    });
+
     return () => {
-      socket.off('dm');
+      socket.off("dm");
     };
   }, [channel, socket]);
 
   useEffect(() => {
-    bottomEl?.current?.scrollIntoView({ behavior: 'smooth' });
+    bottomEl?.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const sendMessage = (e: React.FormEvent<HTMLFormElement>, channelName: string) => {
+  useEffect(() => {
+    blockedUsersRef.current = blockedUsers;
+  }, [blockedUsers]);
+
+  const sendMessage = (
+    e: React.FormEvent<HTMLFormElement>,
+    channelName: string
+  ) => {
     e.preventDefault();
     if (!message) return;
-    const names = channelName.substring(1).split('_');
+    const names = channelName.substring(1).split("_");
     const otherLogin = names[0] === me?.username ? names[1] : names[0];
-    socket.emit('dm', { username: otherLogin, content: message });
-    setMessage('');
+    socket.emit("dm", { username: otherLogin, content: message });
+    setMessage("");
   };
 
   function findUserInfos1(chatName: string) {
-    if (!chatName) return '';
-    
-    const names = chatName.substring(1).split('_');
+    if (!chatName) return "";
+
+    const names = chatName.substring(1).split("_");
     if (names[0] === me?.username) {
       const user = users?.find((user) => user.username === names[1]);
       if (user) {
@@ -135,6 +151,8 @@ const DmConversation = ({ channel, socket, me, users }: ConversationProps) => {
             socket={socket}
             channelName={channel.name}
             currentUserLogin={me?.username}
+            blockedUsers={blockedUsers}
+            setBlockedUsers={setBlockedUsers}
           />
         </ChatModal>
       )}
@@ -151,7 +169,7 @@ const DmConversation = ({ channel, socket, me, users }: ConversationProps) => {
       </div>
       <div
         className="flex h-full flex-col gap-1 overflow-y-auto p-3"
-        style={{ maxHeight: '600px' }}
+        style={{ maxHeight: "600px" }}
       >
         {messages.map((m, idx) => {
           // TODO replace idx by message id
