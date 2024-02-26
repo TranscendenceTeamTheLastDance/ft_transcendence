@@ -180,6 +180,8 @@ export class AuthService {
         hashedRefreshToken: hash,
       },
     });
+
+    this.updateStatus(userId, 1);
   }
 
   async signToken(
