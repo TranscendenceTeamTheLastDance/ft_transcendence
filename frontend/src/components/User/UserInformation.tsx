@@ -4,7 +4,6 @@ import ToggleSwitch from '../2FAToggle.tsx';
 import { useUserContext } from '../../context/UserContext';
 import EditButton from '../EditButton.tsx';
 
-
 const UserDetail = ({ label, value }) => (
   <div className="flex justify-between mb-2">
     <span className="font-bold">{label}:</span>

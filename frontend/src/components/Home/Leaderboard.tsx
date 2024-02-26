@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import axios from 'axios';
 
 interface User {
@@ -83,9 +84,9 @@ const Leaderboard = () => {
                 <div className="flex-grow px-4 text-white">{user.username}</div> {/* Username with padding */}
                 <div className="w-24 text-center text-white">{user.totalPoints}</div> {/* Total Points with fixed width */}
                 {!friendIds.includes(user.id) && userId !== user.id ? (
-                    <button onClick={() => addFriend(userId, user.id)} style={{ width: '100px' /* Example fixed width */, margin: '0 4px' /* Example margins */ }} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded text-xs">
+                    <motion.button onClick={() => addFriend(userId, user.id)} style={{ width: '100px' /* Example fixed width */, margin: '0 4px' /* Example margins */ }} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded text-xs" whileHover={{ scale: 1.3 }} whileTap={{ scale: 0.5 }}>
                         Add Friend
-                    </button>
+                    </motion.button>
                 ) : (
                     <div style={{ width: '100px', margin: '0 4px', visibility: 'hidden' }}>Placeholder</div>
                 )}

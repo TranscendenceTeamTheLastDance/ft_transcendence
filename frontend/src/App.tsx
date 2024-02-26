@@ -10,11 +10,14 @@ import { AuthAxiosProvider } from './context/AuthAxiosContext';
 import Chat from './pages/ChatPage';
 import UserProfile from './pages/UserProfilePage';
 import NotFound from './components/NotFound';
+import NavBar from './components/NavBar';
+
 
 function App() {
   return (
 	<UserProvider>
 		<AuthAxiosProvider>
+			<NavBar />
 			<Routes>
 				<Route path="/" element={<LoginSignup />} />
 				<Route path="/signwith42" element={<Signwith42 />} />
