@@ -68,7 +68,7 @@ model Friendship {
 
 model ChannelUser {
 	id        Int         @id @default(autoincrement())
-	user      User        @relation(fields: [userId], references: [id])
+	user      User        @relation(fields: [userId], references: [id]) //must be unique
 	userId    Int
 	channel   Channel     @relation(fields: [channelId], references: [id])
 	channelId Int

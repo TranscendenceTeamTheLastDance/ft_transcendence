@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useRef, useEffect, useCallback } from 'react';
-import { useMousePosition } from './Mouse';
-
+import React, { useRef, useEffect, useCallback } from "react";
+import { useMousePosition } from "./Mouse";
 
 interface Circle {
   x: number;
@@ -41,7 +40,6 @@ export default function Particles({
   const canvasSize = useRef<{ w: number; h: number }>({ w: 0, h: 0 });
   const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1;
 
-
   const onMouseMove = useCallback(() => {
     if (canvasRef.current) {
       const rect = canvasRef.current.getBoundingClientRect();
@@ -57,17 +55,17 @@ export default function Particles({
   }, [mousePosition.x, mousePosition.y, canvasSize]);
 
   const resizeCanvas = useCallback(() => {
-  if (canvasContainerRef.current && canvasRef.current && context.current) {
-    circles.current.length = 0;
-    canvasSize.current.w = canvasContainerRef.current.offsetWidth;
-    canvasSize.current.h = canvasContainerRef.current.offsetHeight;
-    canvasRef.current.width = canvasSize.current.w * dpr;
-    canvasRef.current.height = canvasSize.current.h * dpr;
-    canvasRef.current.style.width = `${canvasSize.current.w}px`;
-    canvasRef.current.style.height = `${canvasSize.current.h}px`;
-    context.current.scale(dpr, dpr);
-  }
-}, [dpr]);
+    if (canvasContainerRef.current && canvasRef.current && context.current) {
+      circles.current.length = 0;
+      canvasSize.current.w = canvasContainerRef.current.offsetWidth;
+      canvasSize.current.h = canvasContainerRef.current.offsetHeight;
+      canvasRef.current.width = canvasSize.current.w * dpr;
+      canvasRef.current.height = canvasSize.current.h * dpr;
+      canvasRef.current.style.width = `${canvasSize.current.w}px`;
+      canvasRef.current.style.height = `${canvasSize.current.h}px`;
+      context.current.scale(dpr, dpr);
+    }
+  }, [dpr]);
 
   const circleParams = useCallback((): Circle => {
     const x = Math.floor(Math.random() * canvasSize.current.w);
@@ -80,29 +78,48 @@ export default function Particles({
     const dx = (Math.random() - 0.5) * 0.2;
     const dy = (Math.random() - 0.5) * 0.2;
     const magnetism = 0.1 + Math.random() * 4;
-    return { x, y, translateX, translateY, size, alpha, targetAlpha, dx, dy, magnetism };
+    return {
+      x,
+      y,
+      translateX,
+      translateY,
+      size,
+      alpha,
+      targetAlpha,
+      dx,
+      dy,
+      magnetism,
+    };
   }, []);
 
-  const drawCircle = useCallback((circle: Circle, update = false) => {
-    if (context.current) {
-      const { x, y, translateX, translateY, size, alpha } = circle;
-      const brightAlpha = alpha + 0.5; 
-      context.current.translate(translateX, translateY);
-      context.current.beginPath();
-      context.current.arc(x, y, size, 0, 2 * Math.PI);
-      context.current.fillStyle = `rgba(255, 255, 255, ${brightAlpha})`;
-      context.current.fill();
-      context.current.setTransform(dpr, 0, 0, dpr, 0, 0);
-  
-      if (!update) {
-        circles.current.push(circle);
+  const drawCircle = useCallback(
+    (circle: Circle, update = false) => {
+      if (context.current) {
+        const { x, y, translateX, translateY, size, alpha } = circle;
+        const brightAlpha = alpha + 0.5;
+        context.current.translate(translateX, translateY);
+        context.current.beginPath();
+        context.current.arc(x, y, size, 0, 2 * Math.PI);
+        context.current.fillStyle = `rgba(255, 255, 255, ${brightAlpha})`;
+        context.current.fill();
+        context.current.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        if (!update) {
+          circles.current.push(circle);
+        }
       }
-    }
-  }, [context, dpr, circles]);
+    },
+    [context, dpr, circles]
+  );
 
   const clearContext = useCallback(() => {
     if (context.current) {
-      context.current.clearRect(0, 0, canvasSize.current.w, canvasSize.current.h);
+      context.current.clearRect(
+        0,
+        0,
+        canvasSize.current.w,
+        canvasSize.current.h
+      );
     }
   }, []);
 
@@ -115,10 +132,50 @@ export default function Particles({
     }
   }, [clearContext, quantity, circleParams, drawCircle]);
 
-  const remapValue = useCallback((value: number, start1: number, end1: number, start2: number, end2: number): number => {
-    const remapped = ((value - start1) * (end2 - start2)) / (end1 - start1) + start2;
-    return remapped > 0 ? remapped : 0;
-  }, []);
+  /////////////////////////////////////////////////////////////////////
+  // shooting stars
+  const shootingStars = useRef<Circle[]>([]);
+
+  const generateShootingStar = (): Circle => {
+    const maxSize = 1;
+    const size = Math.random() * maxSize + 0.5; // Random size (min value of 0.5)
+    const x = Math.random() * canvasSize.current.w;
+    const y = Math.random() * canvasSize.current.h;
+    const translateX = 0;
+    const translateY = 0;
+    const alpha = 1; // Shooting stars are fully visible
+    const targetAlpha = 0.2; // Target alpha for fading out
+    const dx = (Math.random() - 0.5) * 12; // Random horizontal speed
+    const dy = (Math.random() - 0.5) * 12; // Random vertical speed
+    const magnetism = 1; // Low magnetism for shooting stars
+    return {
+      x,
+      y,
+      translateX,
+      translateY,
+      size,
+      alpha,
+      targetAlpha,
+      dx,
+      dy,
+      magnetism,
+    };
+  };
+  ///////////////////////////////////////////////////////////////////////
+  const remapValue = useCallback(
+    (
+      value: number,
+      start1: number,
+      end1: number,
+      start2: number,
+      end2: number
+    ): number => {
+      const remapped =
+        ((value - start1) * (end2 - start2)) / (end1 - start1) + start2;
+      return remapped > 0 ? remapped : 0;
+    },
+    []
+  );
 
   const animate = useCallback(() => {
     clearContext();
@@ -131,7 +188,9 @@ export default function Particles({
         canvasSize.current.h - circle.y - circle.translateY - circle.size, // distance from bottom edge
       ];
       const closestEdge = edge.reduce((a, b) => Math.min(a, b));
-      const remapClosestEdge = parseFloat(remapValue(closestEdge, 0, 20, 0, 1).toFixed(2));
+      const remapClosestEdge = parseFloat(
+        remapValue(closestEdge, 0, 20, 0, 1).toFixed(2)
+      );
       if (remapClosestEdge > 1) {
         circle.alpha += 0.02;
         if (circle.alpha > circle.targetAlpha) {
@@ -143,9 +202,11 @@ export default function Particles({
       circle.x += circle.dx;
       circle.y += circle.dy;
       circle.translateX +=
-        (mouse.current.x / (staticity / circle.magnetism) - circle.translateX) / ease;
+        (mouse.current.x / (staticity / circle.magnetism) - circle.translateX) /
+        ease;
       circle.translateY +=
-        (mouse.current.y / (staticity / circle.magnetism) - circle.translateY) / ease;
+        (mouse.current.y / (staticity / circle.magnetism) - circle.translateY) /
+        ease;
       // circle gets out of the canvas
       if (
         circle.x < -circle.size ||
@@ -169,17 +230,62 @@ export default function Particles({
             translateY: circle.translateY,
             alpha: circle.alpha,
           },
-          true,
+          true
         );
       }
     });
+    ///////////////////////////////////////////
+    // shooting stars
+    shootingStars.current.forEach((star: Circle, i: number) => {
+      star.alpha -= 0.01;
+      star.x += star.dx;
+      star.y += star.dy;
+      star.translateX +=
+        (mouse.current.x / (staticity / star.magnetism) - star.translateX) /
+        ease;
+      star.translateY +=
+        (mouse.current.y / (staticity / star.magnetism) - star.translateY) /
+        ease;
+      if (
+        star.x < -star.size ||
+        star.x > canvasSize.current.w + star.size ||
+        star.y < -star.size ||
+        star.y > canvasSize.current.h + star.size ||
+        star.alpha <= 0
+      ) {
+        // Remove the shooting star from the array
+        shootingStars.current.splice(i, 1);
+      } else {
+        drawCircle({ ...star, alpha: star.alpha }, true);
+      }
+    });
+    //////////////////////////////////////////
     window.requestAnimationFrame(animate);
-}, [clearContext, circleParams, drawCircle, remapValue, staticity, ease]);
+  }, [clearContext, circleParams, drawCircle, remapValue, staticity, ease]);
+
+  ///////////////////
+  // shooting stars
+  const spawnShootingStar = useCallback(() => {
+    const newStar = generateShootingStar();
+    shootingStars.current.push(newStar);
+  }, []);
+  ///////////////////
 
   const initCanvas = useCallback(() => {
     resizeCanvas();
     drawParticles();
-  }, [resizeCanvas, drawParticles]);
+    //////////////////
+    // shooting stars
+    spawnShootingStar();
+    const shootingStarInterval = setInterval(() => {
+      spawnShootingStar();
+    }, 5000);
+
+    return () => {
+      clearInterval(shootingStarInterval);
+    };
+    /////////////////
+  }, [resizeCanvas, drawParticles, spawnShootingStar]);
 
   useEffect(() => {
     if (canvasRef.current) {

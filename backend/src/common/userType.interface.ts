@@ -3,5 +3,5 @@ export interface userType {
   username: string;
   // status: string;
   profilePic: string;
-  // role: string;
+  role: string;
 }
