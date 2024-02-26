@@ -35,6 +35,7 @@ model User {
   twoFactorEnabled Boolean? @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  status    Int? @default(0) //0 offline, 1 online, 2 in game
 
   blocked             User[]        @relation("blocked")
   blockedBy           User[]        @relation("blocked")
