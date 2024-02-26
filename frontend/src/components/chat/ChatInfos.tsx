@@ -11,9 +11,11 @@ import kick_icon from '../assets/chat/kick.svg';
 import mute_icon from '../assets/chat/mute.svg';
 import unblock_icon from '../assets/chat/unblock.svg';
 import avatar_icon from '../assets/avatar.png';
+import addFriendIcon from "../assets/chat/Group_add_light.png";
 
 import ChatModal from './ChatModal';
 import { UserType } from './DmConversation';
+import axios from 'axios';
 
 
 
@@ -41,6 +43,8 @@ const ChatInfos = ({
   setBlockedUsers,
 }: ChatInfosProps) => {
   const [users, setUsers] = useState<UserType[]>([]);
+  //eslint-disable-next-line
+  const [friendsIds, setFriendIds] = useState<number[]>([]);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [showMuteModal, setShowMuteModal] = useState<boolean>(false);
   const [muteUserState, setMuteUser] = useState<UserType>();
@@ -54,6 +58,44 @@ const ChatInfos = ({
       if (user && (user.role === 'ADMIN' || user.role === 'OWNER')) setIsAdmin(true);
     });
   }, [ channelName, currentUserLogin, socket]);
+
+  useEffect(() => {
+
+  const fetchFriends = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8080/users/friends",
+        {
+          withCredentials: true,
+        }
+      );
+      setFriendIds(response.data.map((friend) => friend.id));
+    } catch (error) {
+      console.error("Failed to fetch friends:", error);
+    }
+  };
+
+  fetchFriends();
+}, []);
+
+const addFriend = async (friendId: number) => {
+  try {
+    const response = await axios.post(
+      "http://localhost:8080/users/add-friend",
+      {
+        userId: currentUserLogin,
+        friendId,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+    console.log("response:", response.data);
+    setFriendIds((prevFriendIds) => [...prevFriendIds, friendId]);
+  } catch (error) {
+    console.error("Failed to add friend:", error);
+  }
+};
 
   const promoteUser = (user: UserType) => {
     socket.emit('promote', { channel: channelName, username: user.username });
@@ -139,7 +181,7 @@ const ChatInfos = ({
                 <div className="flex items-center gap-2">
                   <img
                     className="w-8 rounded-full"
-                    src={user.imagePath ? user.imagePath : avatar_icon}
+                    src={user.profilePic ? user.profilePic : avatar_icon}
                     alt="user"
                   />
                   <h3 className="text-lg">{user.username ? user.username : "NO USERNAME"}</h3>
@@ -172,6 +214,18 @@ const ChatInfos = ({
                     <img className="w-6" src={promote_icon} alt="promote" />
                   </button>
                 )}
+                <button
+                    className="rounded-full p-1 hover:bg-green-1"
+                    title="Add friend"
+                    onClick={() => addFriend(user.id)}
+                  >
+                    {/* show panel "friend added" ?*/}
+                    <img
+                      className="w-6"
+                      src={addFriendIcon}
+                      alt="add friend icon"
+                    />
+                  </button>
                 <button
                   className="rounded-full p-1 enabled:hover:bg-red disabled:cursor-not-allowed"
                   title={isAdmin ? 'Kick user' : "Can't kick user because you are not admin"}

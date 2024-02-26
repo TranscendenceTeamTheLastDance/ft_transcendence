@@ -51,7 +51,7 @@ export class UserService {
       throw error;
     }
   }
-  
+
   // get all existing users
   // should i order these by rank???
   async getAllUsers() {

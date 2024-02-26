@@ -35,6 +35,7 @@ model User {
   twoFactorEnabled Boolean? @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  status    Int? @default(0) //0 offline, 1 online, 2 in game
 
   blocked             User[]        @relation("blocked")
   blockedBy           User[]        @relation("blocked")
@@ -68,7 +69,7 @@ model Friendship {
 
 model ChannelUser {
 	id        Int         @id @default(autoincrement())
-	user      User        @relation(fields: [userId], references: [id])
+	user      User        @relation(fields: [userId], references: [id]) //must be unique
 	userId    Int
 	channel   Channel     @relation(fields: [channelId], references: [id])
 	channelId Int

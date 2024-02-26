@@ -3,7 +3,6 @@ import { Socket } from 'socket.io-client';
 
 import info_icon from '../assets/chat/info.svg';
 import send_icon from '../assets/chat/send.svg';
-import avatar_icon from '../assets/avatar.png';
 import { userDto } from './dto/userDto';
 
 import { ChannelType } from './Chat';
@@ -20,11 +19,10 @@ interface ConversationProps {
 }
 
 export interface UserType {
-  intraImageURL: string | avatar_icon;
   id: number;
   username: string;
   status: string;
-  imagePath: string;
+  profilePic: string;
   role: string;
 }
 

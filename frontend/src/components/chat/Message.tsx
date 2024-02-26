@@ -18,7 +18,7 @@ const Message = ({ sender, text, send_by_user }: MessageProps) => {
       <div className="flex gap-2">
         <img
           className="flex items-center justify-center w-8 h-8 rounded-full"
-          src={sender.imagePath ? sender.imagePath : avatar_icon}
+          src={sender.profilePic ? sender.profilePic : avatar_icon}
           alt={sender.username}
         />
         <span>{sender.username}</span>

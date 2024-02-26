@@ -4,6 +4,7 @@ import axios from 'axios';
 interface User {
     id: number;
     username: string;
+    status:number;
     totalPoints: number;
   }
 
@@ -40,12 +41,12 @@ const Leaderboard = () => {
 
         const fetchUserId = async () => {
             try {
-                // We could just use the user context here
-                const response = await axios.get('http://localhost:8080/users/my-id', {
-                    withCredentials: true,
-                });
-                console.log('response:', response.data)
-                setUserId(response.data);
+            // We could just use the user context here
+            const response = await axios.get('http://localhost:8080/users/my-id', {
+                withCredentials: true,
+            });
+            console.log('response:', response.data)
+            setUserId(response.data);
             } catch (error) {
                 console.error('Failed to fetch user:', error);
             }
@@ -86,10 +87,13 @@ const Leaderboard = () => {
                         Add Friend
                     </button>
                 ) : (
-                    <div style={{ width: '100px' /* Match button width */, margin: '0 4px' /* Match button margins */, visibility: 'hidden' }}>Placeholder</div>
+                    <div style={{ width: '100px', margin: '0 4px', visibility: 'hidden' }}>Placeholder</div>
                 )}
-                {/* // @@@TODO amend to online or not  */}
-                {/* // <span className={`h-3 w-3 bg-${index % 2 === 0 ? 'green' : 'red'}-500 rounded-full ml-4`}></span> Online/Offline Dot */}
+                {/* offline / online status dot */}
+                <span className={`h-3 w-3 ${
+                    user.status === 1 ? 'bg-green-500' : 
+                    user.status === 2 ? 'bg-orange-500' : 'bg-red'
+                    } rounded-full ml-4`}></span>
                 </div>
              ))}
             </div>
