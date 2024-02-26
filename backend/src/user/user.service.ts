@@ -262,4 +262,49 @@ export class UserService {
 
     return userWithBlocked!.blocked;
   }
+
+  async getUserMatchHistory(userId: number): Promise<any> {
+    const gamesWon = await this.prisma.game.findMany({
+      where: { winnerId: userId },
+      include: {
+        loser: {
+          select: {
+            username: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    const gamesLost = await this.prisma.game.findMany({
+      where: { loserId: userId },
+      include: {
+        winner: {
+          select: {
+            username: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    // Merge, map, and sort all games by createdAt, including opponent username and scores
+    // to get history without adding anything to the schema
+    const allGames = [
+      ...gamesWon.map((game) => ({
+        ...game,
+        opponentUsername: game.loser.username,
+        userScore: game.winnerScore,
+        opponentScore: game.loserScore,
+      })),
+      ...gamesLost.map((game) => ({
+        ...game,
+        opponentUsername: game.winner.username,
+        userScore: game.loserScore,
+        opponentScore: game.winnerScore,
+      })),
+    ].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+
+    return allGames;
+  }
 }
