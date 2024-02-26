@@ -205,6 +205,18 @@ const ChatInfos = ({
                 >
                   <img className="w-6" src={game_icon} alt="close" />
                 </button>
+                <button
+                  className="rounded-full p-1 hover:bg-green-1"
+                  title="Add friend"
+                  onClick={() => addFriend(user.id)}
+                >
+                  {/* show panel "friend added" ?*/}
+                  <img
+                    className="w-6"
+                    src={addFriendIcon}
+                    alt="add friend icon"
+                  />
+                </button>
                 {user.role === "ADMIN" || user.role === "OWNER" ? (
                   <button
                     className="rounded-full p-1 enabled:hover:bg-yellow-1 disabled:cursor-not-allowed"
@@ -224,18 +236,6 @@ const ChatInfos = ({
                     <img className="w-6" src={promote_icon} alt="promote" />
                   </button>
                 )}
-                <button
-                  className="rounded-full p-1 hover:bg-green-1"
-                  title="Add friend"
-                  onClick={() => addFriend(user.id)}
-                >
-                  {/* show panel "friend added" ?*/}
-                  <img
-                    className="w-6"
-                    src={addFriendIcon}
-                    alt="add friend icon"
-                  />
-                </button>
                 <button
                   className="rounded-full p-1 enabled:hover:bg-red disabled:cursor-not-allowed"
                   title={
