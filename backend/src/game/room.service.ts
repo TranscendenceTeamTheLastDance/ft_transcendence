@@ -29,6 +29,15 @@ export class GameRoom {
     this.prisma = prisma;
   }
 
+  getIdPlayer1(): number {
+    return this.idPlayer1;
+  }
+
+  getIdPlayer2(): number {
+    return this.idPlayer2;
+  }
+
+
   async createGame(
     IDwinner: number,
     IDloser: number,
@@ -169,7 +178,7 @@ export class GameRoom {
   }
 
   stopGameLoop(): void {
-    this.updateStatusUsers(this.idPlayer1, this.idPlayer2, 1);
+    // this.updateStatusUsers(player1ID, player2ID, 1);
     if (this.gameLoopInterval) {
       clearInterval(this.gameLoopInterval);
       this.gameLoopInterval = null;
