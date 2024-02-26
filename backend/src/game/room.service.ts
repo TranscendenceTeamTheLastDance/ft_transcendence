@@ -104,10 +104,31 @@ export class GameRoom {
     });
   }
 
+  async updateStatusUsers(
+    player1ID: number,
+    player2ID: number,
+    Status: number,
+  ): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: player1ID },
+      data: {
+        status: Status,
+      },
+    });
+
+    await this.prisma.user.update({
+      where: { id: player2ID },
+      data: {
+        status: Status,
+      },
+    });
+  }
+
   startGameLoop(): void {
     // mettre à jour le status du joueur "en jeu"
     const player1ID: number = this.idPlayer1;
     const player2ID: number = this.idPlayer2;
+    this.updateStatusUsers(player1ID, player2ID, 2);
     this.gameLoopInterval = setInterval(() => {
       this.gameService.updateGameState(false);
       const gameState1 = this.gameService.broadcastGameState(1);
@@ -122,13 +143,12 @@ export class GameRoom {
         this.player2.emit('game-state', gameState2);
       }
     }, this.updateInterval);
-    // mettre à jour le status du joueur "en ligne"
   }
 
   startGameLoopFreestyle(): void {
-    // mettre à jour le status du joueur "en jeu"
     const player1ID: number = this.idPlayer1;
     const player2ID: number = this.idPlayer2;
+    this.updateStatusUsers(player1ID, player2ID, 2);
     this.gameLoopInterval = setInterval(() => {
       this.gameService.updateGameState(true);
       const gameState1 = this.gameService.broadcastGameState(1);
@@ -136,19 +156,20 @@ export class GameRoom {
 
       if (gameState1.score.scoreU1 >= 11 || gameState1.score.scoreU2 >= 11) {
         this.sendGameHistory(gameState1, player1ID, player2ID);
-        this.incrementGamesPlayed(player1ID, player2ID);
+        // this.incrementGamesPlayed(player1ID, player2ID);
         this.player1.emit('game-finish', gameState1);
         this.player2.emit('game-finish', gameState2);
+        this.updateStatusUsers(player1ID, player2ID, 1);
         clearInterval(this.gameLoopInterval);
       } else {
         this.player1.emit('game-state', gameState1);
         this.player2.emit('game-state', gameState2);
       }
     }, this.updateInterval);
-    // mettre à jour le status du joueur "en ligne"
   }
 
   stopGameLoop(): void {
+    this.updateStatusUsers(this.idPlayer1, this.idPlayer2, 1);
     if (this.gameLoopInterval) {
       clearInterval(this.gameLoopInterval);
       this.gameLoopInterval = null;

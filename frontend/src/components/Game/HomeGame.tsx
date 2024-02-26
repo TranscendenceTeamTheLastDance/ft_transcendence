@@ -49,18 +49,19 @@ const PongGame: React.FC = () => {
     let clienInfoCookie: userDto | undefined;
     clienInfoCookie = user;
     
-    useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const password = urlParams.get('pwd');
-        if (password && clienInfoCookie?.username && clienInfoCookie?.id) {
-            socketRef.current.emit('join-invite', { 
-                username: clienInfoCookie.username, 
-                userId: clienInfoCookie.id, 
-                inviteID: password 
-            });
-            setJoinedGame(true);
-        }
-    }, [clienInfoCookie]);
+    // useEffect(() => {
+    //     const urlParams = new URLSearchParams(window.location.search);
+    //     const password = urlParams.get('pwd');
+    //     if (password && clienInfoCookie?.username && clienInfoCookie?.id) {
+    //         socketRef.current.emit('join-invite', { 
+    //             username: clienInfoCookie.username, 
+    //             userId: clienInfoCookie.id, 
+    //             inviteID: password 
+    //         });
+    //         setJoinedGame(true);
+    //     }
+    //     // eslint-disable-next-line
+    // }, [clienInfoCookie]);
 
     const handleJoinNormalGame = () => {
         setJoinedGame(true);
