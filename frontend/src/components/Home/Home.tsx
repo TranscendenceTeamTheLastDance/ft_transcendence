@@ -6,7 +6,7 @@ import { useUserContext } from '../../context/UserContext';
 import { useAuthAxios } from '../../context/AuthAxiosContext.tsx';
 import NotConnected from '../NotSignedIn';
 import { motion } from 'framer-motion';
-import RedButton from '../RedButton';
+import Alien from '../assets/alien.png';
 
 const navigation = [
   { name: "CHAT", href: "/chat" },
@@ -40,7 +40,13 @@ const Home = () => {
 	
 	return user ? (
 	<div className="flex flex-col items-center justify-center w-screen h-screen overflow-hidden bg-gradient-to-tl from-black via-zinc-600/20 to-black">
-	  <nav className="my-4 animate-fade-in">
+	  <motion.div animate={{
+      	scale: [1, 1.5, 1.5, 1, 1, 1.5, 1.5, 1, 1],
+      	x: [0, 180, 0, -180, 0, 180, 0, -180, 0],
+      }} transition={{ duration: 3, times: [0, 0.5, 1] }}>
+	  <img src={Alien} alt="alien" className="w-90 h-90"/>
+	  </motion.div>
+	  <nav className="my-0 animate-fade-in">
 	  <ul className="flex items-top justify-center gap-8">
 			{navigation.map((item) => (
 			  <motion.li key={item.href} 
@@ -48,17 +54,18 @@ const Home = () => {
 			  	whileTap={{ scale: 0.5 }}>
 				<Link
 				  to={item.href}
-				  className="text-4xl duration-500 text-zinc-500 hover:text-zinc-300"
+				  className="text-5xl duration-500 text-zinc-500 hover:text-zinc-300"
 				>
 				  {item.name}
 				</Link>
 			  </motion.li>
 
 			))}
-			<RedButton
-				  text="⏻"
-				  onclick={handleLogOut}
-			/>
+			<motion.button onClick={handleLogOut} className="text-5xl bg-red-500 text-red font-bold py-1 rounded"
+				whileHover={{ scale: 1.5 }}
+				whileTap={{ scale: 0.5 }}>
+            	⏻
+        	</motion.button>
 		  </ul>
 	  </nav>
 	  <Particles className="absolute inset-0 -z-10" quantity={1000} />
