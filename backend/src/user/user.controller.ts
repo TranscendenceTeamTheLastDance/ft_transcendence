@@ -148,4 +148,9 @@ export class UserController {
     return this.userService.getUserByUsername(username);
   }
 
+  @UseGuards(JwtGuard)
+  @Get('match-history')
+  async getUserMatchHistory(@GetUser('id') userId: number) {
+    return this.userService.getUserMatchHistory(userId);
+  }
 }
