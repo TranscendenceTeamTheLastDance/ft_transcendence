@@ -27,7 +27,7 @@ const UserGameStats = () => {
 	}, [gameStats.totalWins, gameStats.totalLosses, gameStats.gamesPlayed]);
 
 	return (
-	<div className="bg-white rounded-lg z-10">
+	<div className="bg-white pb-[44px] rounded-lg z-10">
 		<h2 className="text-black text-2xl font-bold mx-auto mt-8 text-center">STATS</h2>
 			<div className="p-4 flex flex-col items-center">
 			<div className="font-bold mt-4">Wins</div>

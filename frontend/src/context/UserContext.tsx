@@ -30,7 +30,7 @@ export const UserProvider = ({ children }) => {
 				if (error.response && error.response.status === 401) {
 					try
 					{
-						await axios.get('http://localhost:8080/auth/refresh', { withCredentials: true });
+						await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/auth/refresh`, { withCredentials: true });
 						const response = await authAxios.get('/users/me', { withCredentials: true });
 						const userData = response.data;
 						setUser({

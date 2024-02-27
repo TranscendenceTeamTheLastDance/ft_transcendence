@@ -9,7 +9,7 @@ const MatchHistory = () => {
     useEffect(() => {
         const fetchUserMatchHistory = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/users/match-history', {
+                const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/users/match-history`, {
                     withCredentials: true,
                 });
                 setMatches(response.data);

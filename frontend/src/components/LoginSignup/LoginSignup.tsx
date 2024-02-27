@@ -29,7 +29,7 @@ const LoginSignup = () => {
 	const handleSignUp = async (e) => {
 		e.preventDefault();
 		try {
-			const response = await fetch('http://localhost:8080/auth/signup', {
+			const response = await fetch(`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/auth/signup`, {
 			method: 'POST',
 			credentials: 'include',
 			headers: {
@@ -51,7 +51,7 @@ const LoginSignup = () => {
 	const handleSignIn = async (e) => {
 		e.preventDefault();
 		try {
-			const response = await fetch('http://localhost:8080/auth/signin', {
+			const response = await fetch(`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/auth/signin`, {
 			method: 'POST',
 			credentials: 'include',
 			headers: {
@@ -79,7 +79,7 @@ const LoginSignup = () => {
 
 	const handleRedir42 = (event: React.FormEvent) => {
         event.preventDefault();
-        window.location.href = `https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-fefc1c5e4c70bebd2ed7324e9922eba3a64229d2bb0de7c6842cec51f3ee8f2b&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fsignwith42&response_type=code`;
+        window.location.href = `https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-fefc1c5e4c70bebd2ed7324e9922eba3a64229d2bb0de7c6842cec51f3ee8f2b&redirect_uri=http%3A%2F%2F${process.env.REACT_APP_SERVER_ADDRESS}%3A3000%2Fsignwith42&response_type=code`;
     };
 
 	return (

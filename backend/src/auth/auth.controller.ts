@@ -50,7 +50,7 @@ export class AuthController {
 
   // this function creates a user in the database
   // unless you delete the volume
-  // you can access your users on localhost:5555
+  // you can access your users on ${process.env.REACT_APP_SERVER_ADDRESS}:5555
   @Post('signup')
   signup(@Body() dto: SignupDto, @Res() res: Response) {
     this.authService

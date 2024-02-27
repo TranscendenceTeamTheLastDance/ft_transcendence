@@ -13,7 +13,7 @@ async function bootstrap(): Promise<string>{
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
   
   const corsOptions: CorsOptions = {
-    origin: 'http://localhost:3000', // Autorise l'origine de la requête
+    origin: `http://${process.env.REACT_APP_SERVER_ADDRESS}:3000`, // Autorise l'origine de la requête
     credentials: true, // Autorise l'envoi des cookies
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], // Ajoute les méthodes HTTP nécessaires
     allowedHeaders: ['Content-Type', 'Authorization'], // Ajoute les en-têtes CORS nécessaires
