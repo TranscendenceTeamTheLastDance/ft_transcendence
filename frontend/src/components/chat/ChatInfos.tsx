@@ -164,8 +164,6 @@ const ChatInfos = ({
     socket.emit("message", { channel: channelName, content: message });
   };
 
-  const currentUser = users.find((user) => user.username === currentUserLogin);
-
   // Contains the list of members in the channel, whith a possibility to kick them, to promote them as admin, and to start a game with them
   return (
     <div className="flex flex-col gap-2 rounded-lg bg-white-1 p-4">
@@ -227,7 +225,11 @@ const ChatInfos = ({
                   {user.role === "ADMIN" || user.role === "OWNER" ? (
                     <button
                       className="rounded-full p-1 enabled:hover:bg-yellow-1 disabled:cursor-not-allowed"
-                      title={"Demote user"}
+                      title={
+                        !isAdmin
+                          ? "Can't demote user because you are not admin"
+                          : "Demote user"
+                      }
                       disabled={!isAdmin}
                       onClick={() => demoteUser(user)}
                     >
@@ -236,7 +238,11 @@ const ChatInfos = ({
                   ) : (
                     <button
                       className="rounded-full p-1 enabled:hover:bg-yellow-1 disabled:cursor-not-allowed"
-                      title={"Promote user to admin"}
+                      title={
+                        !isAdmin
+                          ? "Can't promote user because you are not admin"
+                          : "Promote user to admin"
+                      }
                       disabled={!isAdmin}
                       onClick={() => promoteUser(user)}
                     >
