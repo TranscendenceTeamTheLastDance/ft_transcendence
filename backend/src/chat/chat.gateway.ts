@@ -79,7 +79,7 @@ export class ChatGateway
       const cookieHeaderValue = client.handshake.headers.cookie;
 
       if (!cookieHeaderValue) {
-        this.logger.error('No cookies found in the request headers.');
+        // this.logger.error('No cookies found in the request headers.');
         client.disconnect(); // Déconnecter proprement le client
         return;
       }
@@ -184,36 +184,6 @@ export class ChatGateway
     await this.channelsService.updateChannel(updateData, client.data.user);
     this.io.to(updateData.name).emit(ChatEvent.UpdateChannel, { type: updateData.type });
   }
-
-  // @SubscribeMessage(ChatEvent.UserList)
-  // async handleUserList(
-  //   @MessageBody() UserListDTO: UserListInChannelDTO,
-  //   @ConnectedSocket() client: Socket,
-  // ): Promise<{ channel: string; users: userType[] }> {
-  //   try {
-  //     const channelMembers = await this.channelsService.getChannelMembers(
-  //       UserListDTO.channel,
-  //     );
-
-  //     // Extract only the desired fields from UserListDTO (frontend: userType)
-  //     const extractedUserList = channelMembers.map((member) => ({
-  //       id: member.id,
-  //       username: member.username,
-  //       profilePic: member.profilePic,
-  //     }));
-
-  //     const userTypeList = {
-  //       channel: UserListDTO.channel,
-  //       users: extractedUserList,
-  //     };
-
-  //     console.log(userTypeList);
-  //     return userTypeList;
-  //   } catch (error) {
-  //     console.error('Error fetching channel members:', error);
-  //     throw new WsException('Failed to fetch channel members');
-  //   }
-  // }
 
   @SubscribeMessage(ChatEvent.UserList)
   async onUserList(

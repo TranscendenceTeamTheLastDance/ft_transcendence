@@ -60,13 +60,6 @@ const Chat = () => {
     fetchUserData();
   }, [fetchUserData]);
 
-  // useEffect(() => {
-  //   if (!user) {
-  //     navigate('/login'); // Redirigez vers la page de connexion si l'utilisateur n'est pas connecté
-  //   }
-  // }, [user, navigate]);
-
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -89,7 +82,7 @@ const Chat = () => {
     };
 
     fetchData();
-  }, [authAxios, users, user]);
+  }, []);
 
   useEffect(() => {
     const fetchMe = async () => {
@@ -151,7 +144,7 @@ const Chat = () => {
       socket?.disconnect();
     };
     // eslint-disable-next-line
-  }, []);  
+  }, [user]);  
 
   useEffect(() => {
     socket?.on("youLeft", (data: any) => {
