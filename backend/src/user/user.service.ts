@@ -45,6 +45,18 @@ export class UserService {
     try {
       const user = await this.prisma.user.findUnique({
         where: { username: username },
+        include: {
+          gamesWon: {
+            select: {
+              winnerScore: true,
+            },
+          },
+          gamesLose: {
+            select: {
+              loserScore: true,
+            },
+          },
+        },
       });
       return user;
     } catch (error) {

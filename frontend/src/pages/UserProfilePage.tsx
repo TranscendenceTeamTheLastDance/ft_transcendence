@@ -75,8 +75,8 @@ function UserProfile() {
 						GAME STATS
 					</h2>
 					<div className="p-4 flex flex-col items-center">
-						<div className="font-bold mt-4">Wins: {userProfile.gamesWon}</div>
-						<div className="font-bold mt-4">Losses: {userProfile.gamesLose}</div>
+					<div className="font-bold mt-4">Wins: {userProfile.gamesWon?.length || 0}</div>
+					<div className="font-bold mt-4">Losses: {userProfile.gamesLose?.length || 0}</div>
 						<div className="font-bold mt-4">
 							Games Played: {userProfile.gamesPlayed}
 						</div>
