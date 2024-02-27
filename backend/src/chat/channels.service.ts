@@ -26,7 +26,7 @@ type ChannelWithUsers = Prisma.ChannelGetPayload<{ include: { users: true } }>;
 @Injectable()
 export class ChannelsService {
   private muted = new Set<number>();
-  
+
   constructor(
     private prisma: PrismaService,
     private userService: UserService,
@@ -269,7 +269,9 @@ export class ChannelsService {
 
     return messages
       .map((msg) => {
-        const channelUser = channel.users.find((u) => u.userId === msg.authorId);
+        const channelUser = channel.users.find(
+          (u) => u.userId === msg.authorId,
+        );
 
         return {
           createdAt: msg.createdAt,
@@ -293,7 +295,9 @@ export class ChannelsService {
     }
 
     if (channelUser.role !== ChannelRole.OWNER) {
-      throw new WsException('You must be the channel owner to modify the channel visibility');
+      throw new WsException(
+        'You must be the channel owner to modify the channel visibility',
+      );
     }
 
     await this.prisma.channel.update({
@@ -302,7 +306,7 @@ export class ChannelsService {
       },
       data: {
         type: updateData.type,
-        password: updateData.password
+        password: updateData.password,
       },
     });
   }
@@ -398,7 +402,7 @@ export class ChannelsService {
       throw new WsException(`You are not in channel ${channel.name}`);
     }
 
-    const usersWithRole = channel.users.map(channelUser => ({
+    const usersWithRole = channel.users.map((channelUser) => ({
       ...channelUser.user,
       role: channelUser.role,
     }));
@@ -417,8 +421,8 @@ export class ChannelsService {
       throw new WsException(`You are not in channel ${channel.name}`);
     }
 
-    if (channelUser.role !== ChannelRole.OWNER) {
-      throw new WsException('You must be the channel owner to promote someone');
+    if (channelUser.role === ChannelRole.USER) {
+      throw new WsException('You must be an administrator to promote someone');
     }
 
     if (promotion.username === user.username) {
@@ -426,11 +430,17 @@ export class ChannelsService {
     }
 
     // to get user id from login and check if user exists
-    const toPromoteUser = await this.userService.getUserByUsername(promotion.username);
-    const toPromoteChannelUser = channel.users.find((u) => u.userId === toPromoteUser.id);
+    const toPromoteUser = await this.userService.getUserByUsername(
+      promotion.username,
+    );
+    const toPromoteChannelUser = channel.users.find(
+      (u) => u.userId === toPromoteUser.id,
+    );
 
     if (!toPromoteChannelUser) {
-      throw new WsException(`${toPromoteUser.username} is not in channel ${channel.name}`);
+      throw new WsException(
+        `${toPromoteUser.username} is not in channel ${channel.name}`,
+      );
     }
 
     const updatedChannelUser = await this.prisma.channelUser.update({
@@ -462,19 +472,25 @@ export class ChannelsService {
       throw new WsException(`You are not in channel ${channel.name}`);
     }
 
-    if (channelUser.role !== ChannelRole.OWNER) {
-      throw new WsException('You must be the channel owner to demote someone');
+    if (channelUser.role === ChannelRole.USER) {
+      throw new WsException('You must be an administrator to demote someone');
     }
 
     if (demotion.username === user.username) {
       throw new WsException('You cannot demote yourself');
     }
 
-    const toDemoteUser = await this.userService.getUserByUsername(demotion.username);
-    const toDemoteChannelUser = channel.users.find((u) => u.userId === toDemoteUser.id);
+    const toDemoteUser = await this.userService.getUserByUsername(
+      demotion.username,
+    );
+    const toDemoteChannelUser = channel.users.find(
+      (u) => u.userId === toDemoteUser.id,
+    );
 
     if (!toDemoteChannelUser) {
-      throw new WsException(`${toDemoteUser.username} is not in channel ${channel.name}`);
+      throw new WsException(
+        `${toDemoteUser.username} is not in channel ${channel.name}`,
+      );
     }
 
     const updatedChannelUser = await this.prisma.channelUser.update({
@@ -515,10 +531,14 @@ export class ChannelsService {
     }
 
     const toKickUser = await this.userService.getUserByUsername(kick.username);
-    const toKickChannelUser = channel.users.find((u) => u.userId === toKickUser.id);
+    const toKickChannelUser = channel.users.find(
+      (u) => u.userId === toKickUser.id,
+    );
 
     if (!toKickChannelUser) {
-      throw new WsException(`${toKickUser.username} is not in channel ${channel.name}`);
+      throw new WsException(
+        `${toKickUser.username} is not in channel ${channel.name}`,
+      );
     }
 
     if (toKickChannelUser.role !== ChannelRole.USER) {
@@ -548,10 +568,14 @@ export class ChannelsService {
     }
 
     const toBanUser = await this.userService.getUserByUsername(ban.username);
-    const toBanChannelUser = channel.users.find((u) => u.userId === toBanUser.id);
+    const toBanChannelUser = channel.users.find(
+      (u) => u.userId === toBanUser.id,
+    );
 
     if (!toBanChannelUser) {
-      throw new WsException(`${toBanUser.username} is not in channel ${channel.name}`);
+      throw new WsException(
+        `${toBanUser.username} is not in channel ${channel.name}`,
+      );
     }
 
     if (toBanChannelUser.role !== ChannelRole.USER) {
@@ -592,10 +616,14 @@ export class ChannelsService {
     }
 
     const toMuteUser = await this.userService.getUserByUsername(mute.username);
-    const toMuteChannelUser = channel.users.find((u) => u.userId === toMuteUser.id);
+    const toMuteChannelUser = channel.users.find(
+      (u) => u.userId === toMuteUser.id,
+    );
 
     if (!toMuteChannelUser) {
-      throw new WsException(`${toMuteUser.username} is not in channel ${channel.name}`);
+      throw new WsException(
+        `${toMuteUser.username} is not in channel ${channel.name}`,
+      );
     }
 
     if (toMuteChannelUser.role !== ChannelRole.USER) {

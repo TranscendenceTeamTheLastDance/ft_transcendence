@@ -29,7 +29,7 @@ const FriendsList = () => {
 
 	return (
 		<div className="bg-white w-[600px] mt-8 pb-[30px] rounded-lg z-10">
-		  <h2 className="text-black text-xl font-bold mx-auto pt-4 text-center">FRIENDS</h2>
+		  <h2 className="text-black text-2xl font-bold mx-auto mt-8 text-center">FRIENDS</h2>
 		  <div className="flex justify-center items-center overflow-x-auto py-4 px-4" style={{ minHeight: '100px' }}>
 			{friends.length > 0 ? (
 			  <div className="flex flex-nowrap" style={{ gap: '20px' }}>
