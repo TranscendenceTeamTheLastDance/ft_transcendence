@@ -59,9 +59,9 @@ export class GameGateway {
     @SubscribeMessage('join')
     handleJoin(@ConnectedSocket() client: Socket, 
     @MessageBody() data: { username: string, userId: number }) {
-      const existingPlayer = this.waitingPlayersInvite.find(player => player.client.id === client.id);
+      const existingPlayer = this.waitingPlayers.find(player => player.userId === data.userId);
       if (existingPlayer)
-          return;
+        return;
       this.waitingPlayers.push({ client, username: data.username, userId: data.userId });
   
       if (this.waitingPlayers.length >= 2) {
@@ -84,7 +84,7 @@ export class GameGateway {
     @SubscribeMessage('join-freestyle')
     handleJoinFreestyle(@ConnectedSocket() client: Socket, 
     @MessageBody() data: { username: string, userId: number }) {
-      const existingPlayer = this.waitingPlayersInvite.find(player => player.client.id === client.id);
+      const existingPlayer = this.waitingPlayersFreestyle.find(player => player.userId === data.userId);
       if (existingPlayer)
           return;
 
@@ -110,7 +110,7 @@ export class GameGateway {
     @SubscribeMessage('join-invite')
     handleJoinInvite(@ConnectedSocket() client: Socket, 
         @MessageBody() data: { username: string, userId: number, inviteID: string }) {
-          const existingPlayer = this.waitingPlayersInvite.find(player => player.client.id === client.id);
+          const existingPlayer = this.waitingPlayersInvite.find(player => player.userId === data.userId);
           if (existingPlayer)
               return;
           this.waitingPlayersInvite.push({ client, username: data.username, userId: data.userId, inviteID: data.inviteID });

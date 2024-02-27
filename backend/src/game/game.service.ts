@@ -101,7 +101,7 @@ export class GameService {
       // Mise à jour de la position de la balle
 
       ball.x += ball.velocityX;
-      ball.y += freestyle ? ball.velocityY * Math.cos(ball.x / 100) : ball.velocityY;
+      ball.y += freestyle ? ball.velocityY* 1.5 * Math.cos(ball.x / 100) : ball.velocityY;
     
       // Collision avec les murs supérieur et inférieur
       if (ball.y - ball.radius < 1 || ball.y + ball.radius > this.gameState.canvasHeight - 1) {
@@ -143,8 +143,11 @@ export class GameService {
       collidePoint = collidePoint / (paddle.height / 2);
       let angleRad = (Math.PI / 4) * collidePoint;
       let direction = ball.x + ball.radius < canvasWidth / 2 ? 1 : -1;
-      if (freestyle && ball.speed < 15) {
-        ball.speed = ball.speed + 1;
+      if (freestyle) {
+        if (Math.random() > 0.5)
+          ball.speed = 7;
+        else
+          ball.speed = 10;
       }
       ball.velocityX = direction * ball.speed * Math.cos(angleRad);
       ball.velocityY = ball.speed * Math.sin(angleRad);
