@@ -73,7 +73,7 @@ const Leaderboard = () => {
 
 
     return (
-        <div className="overflow-auto">
+        <div className="overflow-hidden">
     <div className="flex justify-center w-full">
         <h2 className="text-xl font-semibold text-white mb-4">👑 LEADERBOARD 👑</h2>
     </div>

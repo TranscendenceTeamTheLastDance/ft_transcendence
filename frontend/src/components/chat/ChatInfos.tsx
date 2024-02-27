@@ -12,6 +12,7 @@ import kick_icon from "../assets/chat/kick.svg";
 import mute_icon from "../assets/chat/mute.svg";
 import avatar_icon from "../assets/avatar.png";
 import addFriendIcon from "../assets/chat/Group_add_light.png";
+import isFriendIcon from "../assets/chat/is_friend.png";
 
 import ChatModal from "./ChatModal";
 import { UserType } from "./DmConversation";
@@ -42,7 +43,7 @@ const ChatInfos = ({
   setBlockedUsers,
 }: ChatInfosProps) => {
   const [users, setUsers] = useState<UserType[]>([]);
-  const [, setFriendIds] = useState<number[]>([]);
+  const [friendIds, setFriendIds] = useState<number[]>([]);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [showMuteModal, setShowMuteModal] = useState<boolean>(false);
   const [muteUserState, setMuteUser] = useState<UserType>();
@@ -54,9 +55,7 @@ const ChatInfos = ({
       "userList",
       { channel: channelName },
       (res: UserListResponse) => {
-        setUsers(
-          res.users.filter((user) => user.username !== currentUserLogin)
-        );
+        setUsers(res.users.filter((user) => user.username));
         const user =
           res.users.find((user) => user.username === currentUserLogin) || null;
         if (user && (user.role === "ADMIN" || user.role === "OWNER"))
@@ -161,8 +160,8 @@ const ChatInfos = ({
   };
 
   const startGame = () => {
-    // const code = (Math.random() + 1).toString(36).substring(7);
-    const message = `Come join me in a Pong game! ${window.location.origin}/play`;
+    const code = (Math.random() + 1).toString(36).substring(7);
+    const message = `Come join me in a Pong game! ${window.location.origin}/play?pwd=${code}`;
     socket.emit("message", { channel: channelName, content: message });
   };
 
@@ -180,6 +179,235 @@ const ChatInfos = ({
       </div>
       <div className="flex flex-col gap-2">
         {users.map((user) => {
+          if (user.username !== currentUserLogin) {
+            return (
+              <div
+                key={user.id}
+                className="flex items-center justify-between gap-4"
+              >
+                <Link to={"/user/" + user.username}>
+                  <div className="flex items-center gap-2">
+                    <img
+                      className="w-8 rounded-full"
+                      src={user.profilePic ? user.profilePic : avatar_icon}
+                      alt="user"
+                    />
+                    <h3
+                      className={`"text-lg" ${
+                        user.role === "ADMIN" || user.role === "OWNER"
+                          ? "bg-darkBlue-2 rounded-md text-white"
+                          : ""
+                      }`}
+                    >
+                      {user.username ? user.username : "NO USERNAME"}
+                    </h3>
+                  </div>
+                </Link>
+                <div className="flex gap-2">
+                  <button
+                    className="rounded-full p-1 hover:bg-green-1"
+                    title="Start a game"
+                    onClick={() => startGame()}
+                  >
+                    <img className="w-6" src={game_icon} alt="close" />
+                  </button>
+                  {friendIds.includes(user.id) ? (
+                    <button
+                      className="rounded-full p-1 hover:bg-green-1"
+                      title="User is already your friend"
+                    >
+                      <img
+                        className="w-6"
+                        src={isFriendIcon}
+                        alt="is friend icon"
+                      />
+                    </button>
+                  ) : (
+                    <button
+                      className="rounded-full p-1 hover:bg-green-1"
+                      title="Add friend"
+                      onClick={() => addFriend(user.id)}
+                    >
+                      {/* show panel "friend added" ?*/}
+                      <img
+                        className="w-6"
+                        src={addFriendIcon}
+                        alt="add friend icon"
+                      />
+                    </button>
+                  )}
+                  {user.role === "ADMIN" || user.role === "OWNER" ? (
+                    <button
+                      className="rounded-full p-1 enabled:hover:bg-yellow-1 disabled:cursor-not-allowed"
+                      title={
+                        !isAdmin
+                          ? "Can't demote user because you are not admin"
+                          : "Demote user"
+                      }
+                      disabled={!isAdmin}
+                      onClick={() => demoteUser(user)}
+                    >
+                      <img className="w-6" src={demote_icon} alt="demote" />
+                    </button>
+                  ) : (
+                    <button
+                      className="rounded-full p-1 enabled:hover:bg-yellow-1 disabled:cursor-not-allowed"
+                      title={
+                        !isAdmin
+                          ? "Can't promote user because you are not admin"
+                          : "Promote user to admin"
+                      }
+                      disabled={!isAdmin}
+                      onClick={() => promoteUser(user)}
+                    >
+                      <img className="w-6" src={promote_icon} alt="promote" />
+                    </button>
+                  )}
+                  {user.role === "ADMIN" || user.role === "OWNER" ? (
+                    <button
+                      className="rounded-full p-1 enabled:hover:bg-red disabled:cursor-not-allowed"
+                      title={
+                        isAdmin
+                          ? "Can't kick other admins"
+                          : "Can't kick user because you are not admin"
+                      }
+                      disabled
+                      onClick={() => kickUser(user)}
+                    >
+                      <img className="w-6" src={kick_icon} alt="kick" />
+                    </button>
+                  ) : (
+                    <button
+                      className="rounded-full p-1 enabled:hover:bg-red disabled:cursor-not-allowed"
+                      title={
+                        isAdmin
+                          ? "Kick user"
+                          : "Can't kick user because you are not admin"
+                      }
+                      disabled={!isAdmin}
+                      onClick={() => kickUser(user)}
+                    >
+                      <img className="w-6" src={kick_icon} alt="kick" />
+                    </button>
+                  )}
+                  {user.role === "ADMIN" || user.role === "OWNER" ? (
+                    <button
+                      className="rounded-full p-1 enabled:hover:bg-red disabled:cursor-not-allowed"
+                      title={
+                        isAdmin
+                          ? "Can't ban other admins"
+                          : "Can't ban user because you are not admin"
+                      }
+                      disabled={true}
+                      onClick={() => banUser(user)}
+                    >
+                      <img className="w-6" src={ban_icon} alt="ban" />
+                    </button>
+                  ) : (
+                    <button
+                      className="rounded-full p-1 enabled:hover:bg-red disabled:cursor-not-allowed"
+                      title={
+                        isAdmin
+                          ? "Ban user"
+                          : "Can't ban user because you are not admin"
+                      }
+                      disabled={!isAdmin}
+                      onClick={() => banUser(user)}
+                    >
+                      <img className="w-6" src={ban_icon} alt="ban" />
+                    </button>
+                  )}
+                  {user.role === "ADMIN" || user.role === "OWNER" ? (
+                    <button
+                      className="rounded-full p-1 enabled:hover:bg-red disabled:cursor-not-allowed"
+                      title={
+                        isAdmin
+                          ? "Can't mute other admins"
+                          : "Can't mute user because you are not admin"
+                      }
+                      disabled
+                      onClick={() => {
+                        setShowMuteModal(true);
+                        setMuteUser(user);
+                      }}
+                    >
+                      <img className="w-6" src={mute_icon} alt="mute" />
+                    </button>
+                  ) : (
+                    <button
+                      className="rounded-full p-1 enabled:hover:bg-red disabled:cursor-not-allowed"
+                      title={
+                        isAdmin
+                          ? "Mute user"
+                          : "Can't mute user because you are not admin"
+                      }
+                      disabled={!isAdmin}
+                      onClick={() => {
+                        setShowMuteModal(true);
+                        setMuteUser(user);
+                      }}
+                    >
+                      <img className="w-6" src={mute_icon} alt="mute" />
+                    </button>
+                  )}
+                  {blockedUsers.some((u) => u.id === user.id) ? (
+                    <button
+                      className="rounded-full p-1 enabled:hover:bg-green-1 disabled:cursor-not-allowed"
+                      title="Unblock user"
+                      onClick={() => unblockUser(user)}
+                    >
+                      <img className="w-6" src={unblock_icon} alt="block" />
+                    </button>
+                  ) : (
+                    <button
+                      className="rounded-full p-1 enabled:hover:bg-red disabled:cursor-not-allowed"
+                      title="Block user"
+                      onClick={() => blockUser(user)}
+                    >
+                      <img className="w-6" src={block_icon} alt="block" />
+                    </button>
+                  )}
+                  {showMuteModal && (
+                    <ChatModal>
+                      <div className="flex flex-col gap-2 rounded-lg bg-white-1 p-4">
+                        <div className="flex flex-col items-center justify-between gap-4">
+                          <h2 className="text-2xl">Mute user</h2>
+                          <form
+                            className="flex flex-col gap-2"
+                            onSubmit={(e) => muteUser(e)}
+                          >
+                            <input
+                              className="rounded-lg border-2 border-white-3 p-2"
+                              placeholder="Mute duration in seconds"
+                              ref={muteDurationRef}
+                              required
+                            ></input>
+                            <input
+                              className="rounded-lg border-2 border-white-3 p-2"
+                              placeholder="Mute reason (optional)"
+                              ref={muteReasonRef}
+                            ></input>
+                            <div className="flex justify-between">
+                              <button
+                                onClick={() => setShowMuteModal(false)}
+                                className="rounded-lg border-2 border-white-3 p-2 hover:bg-red hover:text-white-1"
+                              >
+                                Cancel
+                              </button>
+                              <button className="rounded-lg border-2 border-white-3 p-2 hover:bg-darkBlue-2 hover:text-white-1">
+                                Mute
+                              </button>
+                            </div>
+                          </form>
+                        </div>
+                        <div className="flex flex-col gap-2"></div>
+                      </div>
+                    </ChatModal>
+                  )}
+                </div>
+              </div>
+            );
+          }
           return (
             <div
               key={user.id}
@@ -192,144 +420,18 @@ const ChatInfos = ({
                     src={user.profilePic ? user.profilePic : avatar_icon}
                     alt="user"
                   />
-                  <h3 className="text-lg">
-                    {user.username ? user.username : "NO USERNAME"}
+                  <h3
+                    className={`"text-lg" ${
+                      user.role === "ADMIN" || user.role === "OWNER"
+                        ? "bg-darkBlue-2 rounded-md text-white"
+                        : ""
+                    }`}
+                  >
+                    {user.username ? user.username : "NO USERNAME"}{" "}
                   </h3>
+                  <h3>{" (you)"}</h3>
                 </div>
               </Link>
-              <div className="flex gap-2">
-                <button
-                  className="rounded-full p-1 hover:bg-green-1"
-                  title="Start a game"
-                  onClick={() => startGame()}
-                >
-                  <img className="w-6" src={game_icon} alt="close" />
-                </button>
-                {user.role === "ADMIN" || user.role === "OWNER" ? (
-                  <button
-                    className="rounded-full p-1 enabled:hover:bg-yellow-1 disabled:cursor-not-allowed"
-                    title={"Demote user"}
-                    disabled={!isAdmin || user.role === "OWNER"}
-                    onClick={() => demoteUser(user)}
-                  >
-                    <img className="w-6" src={demote_icon} alt="demote" />
-                  </button>
-                ) : (
-                  <button
-                    className="rounded-full p-1 enabled:hover:bg-yellow-1 disabled:cursor-not-allowed"
-                    title={"Promote user to admin"}
-                    disabled={!isAdmin}
-                    onClick={() => promoteUser(user)}
-                  >
-                    <img className="w-6" src={promote_icon} alt="promote" />
-                  </button>
-                )}
-                <button
-                  className="rounded-full p-1 hover:bg-green-1"
-                  title="Add friend"
-                  onClick={() => addFriend(user.id)}
-                >
-                  {/* show panel "friend added" ?*/}
-                  <img
-                    className="w-6"
-                    src={addFriendIcon}
-                    alt="add friend icon"
-                  />
-                </button>
-                <button
-                  className="rounded-full p-1 enabled:hover:bg-red disabled:cursor-not-allowed"
-                  title={
-                    isAdmin
-                      ? "Kick user"
-                      : "Can't kick user because you are not admin"
-                  }
-                  disabled={!isAdmin}
-                  onClick={() => kickUser(user)}
-                >
-                  <img className="w-6" src={kick_icon} alt="kick" />
-                </button>
-                <button
-                  className="rounded-full p-1 enabled:hover:bg-red disabled:cursor-not-allowed"
-                  title={
-                    isAdmin
-                      ? "Ban user"
-                      : "Can't ban user because you are not admin"
-                  }
-                  disabled={!isAdmin}
-                  onClick={() => banUser(user)}
-                >
-                  <img className="w-6" src={ban_icon} alt="ban" />
-                </button>
-                <button
-                  className="rounded-full p-1 enabled:hover:bg-red disabled:cursor-not-allowed"
-                  title={
-                    isAdmin
-                      ? "Mute user"
-                      : "Can't mute user because you are not admin"
-                  }
-                  disabled={!isAdmin}
-                  onClick={() => {
-                    setShowMuteModal(true);
-                    setMuteUser(user);
-                  }}
-                >
-                  <img className="w-6" src={mute_icon} alt="mute" />
-                </button>
-                {blockedUsers.some((u) => u.id === user.id) ? (
-                  <button
-                    className="rounded-full p-1 enabled:hover:bg-green-1 disabled:cursor-not-allowed"
-                    title="Unblock user"
-                    onClick={() => unblockUser(user)}
-                  >
-                    <img className="w-6" src={unblock_icon} alt="block" />
-                  </button>
-                ) : (
-                  <button
-                    className="rounded-full p-1 enabled:hover:bg-red disabled:cursor-not-allowed"
-                    title="Block user"
-                    onClick={() => blockUser(user)}
-                  >
-                    <img className="w-6" src={block_icon} alt="block" />
-                  </button>
-                )}
-                {showMuteModal && (
-                  <ChatModal>
-                    <div className="flex flex-col gap-2 rounded-lg bg-white-1 p-4">
-                      <div className="flex flex-col items-center justify-between gap-4">
-                        <h2 className="text-2xl">Mute user</h2>
-                        <form
-                          className="flex flex-col gap-2"
-                          onSubmit={(e) => muteUser(e)}
-                        >
-                          <input
-                            className="rounded-lg border-2 border-white-3 p-2"
-                            placeholder="Mute duration in seconds"
-                            ref={muteDurationRef}
-                            required
-                          ></input>
-                          <input
-                            className="rounded-lg border-2 border-white-3 p-2"
-                            placeholder="Mute reason (optional)"
-                            ref={muteReasonRef}
-                          ></input>
-                          <div className="flex justify-between">
-                            <button
-                              onClick={() => setShowMuteModal(false)}
-                              className="rounded-lg border-2 border-white-3 p-2 hover:bg-red hover:text-white-1"
-                            >
-                              Cancel
-                            </button>
-                            <button className="rounded-lg border-2 border-white-3 p-2 hover:bg-darkBlue-2 hover:text-white-1">
-                              Mute
-                            </button>
-                          </div>
-                        </form>
-                      </div>
-                      <div className="flex flex-col gap-2"></div>
-                    </div>
-                  </ChatModal>
-                )}
-              </div>
             </div>
           );
         })}
