@@ -144,7 +144,7 @@ const Chat = () => {
       socket?.disconnect();
     };
     // eslint-disable-next-line
-  }, [user]);  
+  }, []);  
 
   useEffect(() => {
     socket?.on("youLeft", (data: any) => {
