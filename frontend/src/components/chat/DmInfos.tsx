@@ -103,8 +103,7 @@ const DmInfos = ({
                 >
                   <img className="w-6" src={game_icon} alt="close" />
                 </button>
-                {Array.isArray(blockUser) &&
-                blockedUsers.some((u) => u.id === user.id) ? (
+                {blockedUsers.some((u) => u.id === user.id) ? (
                   <button
                     className="rounded-full p-1 enabled:hover:bg-green-1 disabled:cursor-not-allowed"
                     title="Unblock user"
