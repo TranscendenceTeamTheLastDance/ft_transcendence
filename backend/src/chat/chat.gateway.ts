@@ -41,8 +41,6 @@ import { ChatEvent } from './chat.state';
 import { ChannelsService } from './channels.service';
 import { UserService } from '../user/user.service';
 import { ConfigService } from '@nestjs/config';
-import { JwtGuard } from '../auth/guard';
-import { userType } from '@/common/userType.interface';
 
 @UsePipes(new ValidationPipe())
 @WebSocketGateway({

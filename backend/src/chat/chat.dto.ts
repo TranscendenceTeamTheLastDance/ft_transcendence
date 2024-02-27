@@ -13,7 +13,7 @@ import {
 
 export class CreateChannelDTO {
   @IsNotEmpty()
-  @MaxLength(100)
+  @MaxLength(20)
   @IsAlphanumeric()
   name: string;
 
@@ -31,7 +31,7 @@ export class UpdateChannelDTO extends CreateChannelDTO {}
 
 export class SendDmDTO {
   @IsNotEmpty()
-  @MaxLength(100)
+  @MaxLength(20)
   username: string;
 
   @IsNotEmpty()
@@ -41,13 +41,13 @@ export class SendDmDTO {
 
 export class BlockUserDTO {
   @IsNotEmpty()
-  @MaxLength(100)
+  @MaxLength(20)
   username: string;
 }
 
 export class JoinChannelDTO {
   @IsNotEmpty()
-  @MaxLength(100)
+  @MaxLength(20)
   name: string;
 
   @IsOptional()
@@ -57,13 +57,13 @@ export class JoinChannelDTO {
 
 export class LeaveChannelDTO {
   @IsNotEmpty()
-  @MaxLength(100)
+  @MaxLength(20)
   name: string;
 }
 
 export class SendMessageDTO {
   @IsNotEmpty()
-  @MaxLength(100)
+  @MaxLength(20)
   channel: string;
 
   @IsNotEmpty()
@@ -73,7 +73,7 @@ export class SendMessageDTO {
 
 export class MessageHistoryDTO {
   @IsNotEmpty()
-  @MaxLength(100)
+  @MaxLength(20)
   channel: string;
 
   @IsNotEmpty()
@@ -90,17 +90,17 @@ export class MessageHistoryDTO {
 
 export class UserListInChannelDTO {
   @IsNotEmpty()
-  @MaxLength(100)
+  @MaxLength(20)
   channel: string;
 }
 
 export class PromoteUserDTO {
   @IsNotEmpty()
-  @MaxLength(100)
+  @MaxLength(20)
   channel: string;
 
   @IsNotEmpty()
-  @MaxLength(100)
+  @MaxLength(20)
   username: string;
 }
 
@@ -108,11 +108,11 @@ export class DemoteUserDTO extends PromoteUserDTO {}
 
 export class KickUserDTO {
   @IsNotEmpty()
-  @MaxLength(100)
+  @MaxLength(20)
   channel: string;
 
   @IsNotEmpty()
-  @MaxLength(100)
+  @MaxLength(20)
   username: string;
 
   @IsOptional()
@@ -124,11 +124,11 @@ export class BanUserDTO extends KickUserDTO {}
 
 export class MuteUserDTO {
   @IsNotEmpty()
-  @MaxLength(100)
+  @MaxLength(20)
   channel: string;
 
   @IsNotEmpty()
-  @MaxLength(100)
+  @MaxLength(20)
   username: string;
 
   @IsOptional()
