@@ -165,7 +165,6 @@ const ChatInfos = ({
   };
 
   const currentUser = users.find((user) => user.username === currentUserLogin);
-  console.log(currentUser);
 
   // Contains the list of members in the channel, whith a possibility to kick them, to promote them as admin, and to start a game with them
   return (
