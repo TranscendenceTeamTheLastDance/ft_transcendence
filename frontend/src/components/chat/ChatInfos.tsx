@@ -12,6 +12,7 @@ import kick_icon from "../assets/chat/kick.svg";
 import mute_icon from "../assets/chat/mute.svg";
 import avatar_icon from "../assets/avatar.png";
 import addFriendIcon from "../assets/chat/Group_add_light.png";
+import isFriendIcon from "../assets/chat/is_friend.png";
 
 import ChatModal from "./ChatModal";
 import { UserType } from "./DmConversation";
@@ -42,7 +43,7 @@ const ChatInfos = ({
   setBlockedUsers,
 }: ChatInfosProps) => {
   const [users, setUsers] = useState<UserType[]>([]);
-  const [, setFriendIds] = useState<number[]>([]);
+  const [friendIds, setFriendIds] = useState<number[]>([]);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [showMuteModal, setShowMuteModal] = useState<boolean>(false);
   const [muteUserState, setMuteUser] = useState<UserType>();
@@ -210,18 +211,31 @@ const ChatInfos = ({
                   >
                     <img className="w-6" src={game_icon} alt="close" />
                   </button>
-                  <button
-                    className="rounded-full p-1 hover:bg-green-1"
-                    title="Add friend"
-                    onClick={() => addFriend(user.id)}
-                  >
-                    {/* show panel "friend added" ?*/}
-                    <img
-                      className="w-6"
-                      src={addFriendIcon}
-                      alt="add friend icon"
-                    />
-                  </button>
+                  {friendIds.includes(user.id) ? (
+                    <button
+                      className="rounded-full p-1 hover:bg-green-1"
+                      title="User is already your friend"
+                    >
+                      <img
+                        className="w-6"
+                        src={isFriendIcon}
+                        alt="is friend icon"
+                      />
+                    </button>
+                  ) : (
+                    <button
+                      className="rounded-full p-1 hover:bg-green-1"
+                      title="Add friend"
+                      onClick={() => addFriend(user.id)}
+                    >
+                      {/* show panel "friend added" ?*/}
+                      <img
+                        className="w-6"
+                        src={addFriendIcon}
+                        alt="add friend icon"
+                      />
+                    </button>
+                  )}
                   {user.role === "ADMIN" || user.role === "OWNER" ? (
                     <button
                       className="rounded-full p-1 enabled:hover:bg-yellow-1 disabled:cursor-not-allowed"
