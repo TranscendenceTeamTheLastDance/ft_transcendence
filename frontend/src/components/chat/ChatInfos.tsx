@@ -69,7 +69,7 @@ const ChatInfos = ({
     const fetchFriends = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/users/friends",
+          `http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/users/friends`,
           {
             withCredentials: true,
           }
@@ -86,7 +86,7 @@ const ChatInfos = ({
   const addFriend = async (friendId: number) => {
     try {
       const response = await axios.post(
-        "http://localhost:8080/users/add-friend",
+        `http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/users/add-friend`,
         {
           userId: currentUserLogin,
           friendId,

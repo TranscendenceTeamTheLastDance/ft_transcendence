@@ -52,7 +52,7 @@ function UserProfile() {
 	  if (!userProfile) return <NotFound />;
 	
 	return (
-		<div className="flex items-center justify-center min-h-screen relative pb-8">
+		<div className="flex items-center justify-center min-h-screen relative pb-8" style={{ minHeight: `calc(100vh - 210px)` }}>
 			<Particles className="absolute inset-0 -z-10" quantity={1000} />
 			<div className="container mx-auto flex-row justify-center" style={{ flexDirection: 'row' }}>
 				<div className="bg-white max-w-md mt-8 pb-8 rounded-lg shadow-md">

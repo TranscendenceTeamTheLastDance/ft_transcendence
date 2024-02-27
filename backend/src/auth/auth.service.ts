@@ -28,7 +28,7 @@ export class AuthService {
           client_id: process.env.API_UID,
           client_secret: process.env.API_SECRET,
           code: code,
-          redirect_uri: 'http://localhost:3000/signwith42',
+          redirect_uri: `http://${process.env.REACT_APP_SERVER_ADDRESS}:3000/signwith42`,
         },
         { headers: { 'Content-Type': 'application/json' } },
       );

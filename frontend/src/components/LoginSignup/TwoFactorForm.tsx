@@ -32,7 +32,7 @@ const TwoFactorFormMod: React.FC<Props> = ({
 
 		try {
 			const response = await axios.post(
-				"http://localhost:8080/auth/Auth-2FA", {
+				`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/auth/Auth-2FA`, {
 				email: mail,
 				code: data.validationCode,
 				},

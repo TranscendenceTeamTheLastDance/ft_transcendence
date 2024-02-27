@@ -18,7 +18,7 @@ const Leaderboard = () => {
     useEffect(() => {
         const fetchUsersList = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/users/all', {
+                const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/users/all`, {
                     withCredentials: true,
                 });
               const sortedUsers = response.data.sort((a, b) => b.totalPoints - a.totalPoints);
@@ -30,7 +30,7 @@ const Leaderboard = () => {
           
         const fetchFriends = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/users/friends', {
+                const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/users/friends`, {
                     withCredentials: true,
                 });
                 console.log('response:', response.data)
@@ -43,7 +43,7 @@ const Leaderboard = () => {
         const fetchUserId = async () => {
             try {
             // We could just use the user context here
-            const response = await axios.get('http://localhost:8080/users/my-id', {
+            const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/users/my-id`, {
                 withCredentials: true,
             });
             console.log('response:', response.data)
@@ -60,7 +60,7 @@ const Leaderboard = () => {
 
     const addFriend = async (userId: number, friendId: number) => {
         try {
-            const response = await axios.post('http://localhost:8080/users/add-friend', {userId, friendId}, {
+            const response = await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/users/add-friend`, {userId, friendId}, {
                 withCredentials: true,
             });
             console.log('response:', response.data);
