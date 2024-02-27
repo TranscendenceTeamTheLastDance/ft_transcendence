@@ -13,7 +13,7 @@ import {
 
 export class CreateChannelDTO {
   @IsNotEmpty()
-  @MaxLength(20)
+  @MaxLength(100)
   @IsAlphanumeric()
   name: string;
 
@@ -31,7 +31,7 @@ export class UpdateChannelDTO extends CreateChannelDTO {}
 
 export class SendDmDTO {
   @IsNotEmpty()
-  @MaxLength(8)
+  @MaxLength(100)
   username: string;
 
   @IsNotEmpty()
@@ -41,13 +41,13 @@ export class SendDmDTO {
 
 export class BlockUserDTO {
   @IsNotEmpty()
-  @MaxLength(8)
+  @MaxLength(100)
   username: string;
 }
 
 export class JoinChannelDTO {
   @IsNotEmpty()
-  @MaxLength(20)
+  @MaxLength(100)
   name: string;
 
   @IsOptional()
@@ -57,13 +57,13 @@ export class JoinChannelDTO {
 
 export class LeaveChannelDTO {
   @IsNotEmpty()
-  @MaxLength(20)
+  @MaxLength(100)
   name: string;
 }
 
 export class SendMessageDTO {
   @IsNotEmpty()
-  @MaxLength(20)
+  @MaxLength(100)
   channel: string;
 
   @IsNotEmpty()
@@ -73,7 +73,7 @@ export class SendMessageDTO {
 
 export class MessageHistoryDTO {
   @IsNotEmpty()
-  @MaxLength(20)
+  @MaxLength(100)
   channel: string;
 
   @IsNotEmpty()
@@ -90,17 +90,17 @@ export class MessageHistoryDTO {
 
 export class UserListInChannelDTO {
   @IsNotEmpty()
-  @MaxLength(20)
+  @MaxLength(100)
   channel: string;
 }
 
 export class PromoteUserDTO {
   @IsNotEmpty()
-  @MaxLength(20)
+  @MaxLength(100)
   channel: string;
 
   @IsNotEmpty()
-  @MaxLength(8)
+  @MaxLength(100)
   username: string;
 }
 
@@ -108,15 +108,15 @@ export class DemoteUserDTO extends PromoteUserDTO {}
 
 export class KickUserDTO {
   @IsNotEmpty()
-  @MaxLength(20)
+  @MaxLength(100)
   channel: string;
 
   @IsNotEmpty()
-  @MaxLength(8)
+  @MaxLength(100)
   username: string;
 
   @IsOptional()
-  @MaxLength(30)
+  @MaxLength(100)
   reason: string;
 }
 
@@ -124,15 +124,15 @@ export class BanUserDTO extends KickUserDTO {}
 
 export class MuteUserDTO {
   @IsNotEmpty()
-  @MaxLength(20)
+  @MaxLength(100)
   channel: string;
 
   @IsNotEmpty()
-  @MaxLength(8)
+  @MaxLength(100)
   username: string;
 
   @IsOptional()
-  @MaxLength(30)
+  @MaxLength(100)
   reason: string;
 
   @IsNotEmpty()

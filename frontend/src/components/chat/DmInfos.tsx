@@ -59,8 +59,8 @@ const DmInfos = ({
   };
 
   const startGame = () => {
-    // const code = (Math.random() + 1).toString(36).substring(7);
-    const message = `Come join me in a Pong game! ${window.location.origin}/play`;
+    const code = (Math.random() + 1).toString(36).substring(7);
+    const message = `Come join me in a Pong game! ${window.location.origin}/play?pwd=${code}`;
     const names = channelName.substring(1).split("_");
     const otherLogin = names[0] === currentUserLogin ? names[1] : names[0];
     socket.emit("dm", { username: otherLogin, content: message });
