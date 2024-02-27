@@ -47,7 +47,7 @@ import { userType } from '@/common/userType.interface';
 @UsePipes(new ValidationPipe())
 @WebSocketGateway({
   cors: {
-    origin: 'http://localhost:3000', // Autoriser l'origine du message pour établir la connexion
+    origin: `http://${process.env.REACT_APP_SERVER_ADDRESS}:3000`, // Autoriser l'origine du message pour établir la connexion
     credentials: true, // Autoriser l'envoi de cookies
   },
   namespace: 'chat', // Spécifier le namespace pour éviter les conflits

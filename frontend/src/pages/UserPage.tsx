@@ -190,7 +190,7 @@ const User = () => {
 						</div>
 	
 						{/* Right Section: Game Stats */}
-						<div className="flex-1">
+						<div className="flex flex-col flex-1">
 							<UserGameStats />
 						</div>
 					</div>

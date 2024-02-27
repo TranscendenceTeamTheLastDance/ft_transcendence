@@ -108,7 +108,7 @@ const Chat = () => {
 
   useEffect(() => {
     setLoading(true);
-    const tmpSocket = io("http://localhost:8080/chat", {
+    const tmpSocket = io(`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/chat`, {
       withCredentials: true,
     });
     tmpSocket.on("connect", () => {
