@@ -85,7 +85,7 @@ const CanvasGame: React.FC<{ infoGame: InfoGame }>= ({ infoGame }) => {
     let player1: Paddle = {
         x: 0,
         y: (canvas.height - 100) / 2,
-        width: 10,
+        width: 13,
         height: canvas.height / 4,
         score: 0,
         color: "WHITE",
@@ -98,7 +98,7 @@ const CanvasGame: React.FC<{ infoGame: InfoGame }>= ({ infoGame }) => {
     let player2: Paddle = {
         x: canvas.width - 10,
         y: (canvas.height - 100) / 2,
-        width: 10,
+        width: 13,
         height: canvas.height / 4,
         score: 0,
         color: "WHITE",
@@ -112,7 +112,7 @@ const CanvasGame: React.FC<{ infoGame: InfoGame }>= ({ infoGame }) => {
     let ball: Ball = {
         x: canvas.width / 2,
         y: canvas.height / 2,
-        radius: 10,
+        radius: 7,
         velocityX: 5,
         velocityY: 5,
         speed: 7,

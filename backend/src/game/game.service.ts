@@ -10,7 +10,7 @@ class Paddle {
   color: string;
 
   constructor(canvasHeight: number, isUser: boolean, canvasWidth: number) {
-      this.width = 10;
+      this.width = 13;
       this.height = 100;
       this.score = 0;
       this.color = "WHITE";
@@ -34,7 +34,7 @@ class Ball {
   color: string;
 
   constructor(canvasWidth: number, canvasHeight: number) {
-      this.radius = 10;
+      this.radius = 7;
       this.velocityX = 5;
       this.velocityY = 5;
       this.speed = 7;
@@ -101,10 +101,10 @@ export class GameService {
       // Mise à jour de la position de la balle
 
       ball.x += ball.velocityX;
-      ball.y += freestyle ? ball.velocityY * Math.cos(ball.x / 100) : ball.velocityY;
+      ball.y += freestyle ? ball.velocityY* 1.5 * Math.cos(ball.x / 100) : ball.velocityY;
     
       // Collision avec les murs supérieur et inférieur
-      if (ball.y - ball.radius < 1 || ball.y + ball.radius > this.gameState.canvasHeight - 1) {
+      if (ball.y - ball.radius < 2 || ball.y + ball.radius > this.gameState.canvasHeight - 2) {
         ball.velocityY = -ball.velocityY;
       }
     
@@ -143,8 +143,8 @@ export class GameService {
       collidePoint = collidePoint / (paddle.height / 2);
       let angleRad = (Math.PI / 4) * collidePoint;
       let direction = ball.x + ball.radius < canvasWidth / 2 ? 1 : -1;
-      if (freestyle && ball.speed < 15) {
-        ball.speed = ball.speed + 1;
+      if (ball.speed < 11) {
+          ball.speed = ball.speed + 0.5;
       }
       ball.velocityX = direction * ball.speed * Math.cos(angleRad);
       ball.velocityY = ball.speed * Math.sin(angleRad);

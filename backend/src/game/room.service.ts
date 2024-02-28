@@ -10,7 +10,7 @@ export class GameRoom {
   private player2: Socket;
   private gameService: GameService;
   private gameLoopInterval: NodeJS.Timeout | null = null;
-  private updateInterval = 1000 / 50;
+  private updateInterval = 1000 / 60;
   private prisma: PrismaService;
 
   constructor(

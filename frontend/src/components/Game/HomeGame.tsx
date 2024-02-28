@@ -55,8 +55,8 @@ const PongGame: React.FC = () => {
         const password = urlParams.get('pwd');
         if (password && clienInfoCookie?.username && clienInfoCookie?.id) {
             socketRef.current.emit('join-invite', { 
-                username: clienInfoCookie.username, 
-                userId: clienInfoCookie.id, 
+                username: clienInfoCookie?.username, 
+                userId: clienInfoCookie?.id, 
                 inviteID: password 
             });
             setJoinedGame(true);
@@ -119,11 +119,23 @@ const PongGame: React.FC = () => {
             }
             socket.emit('finish');
         });
+
+        const handleUnload = () => {
+            console.log("Page is being refreshed or closed. Disconnecting socket...");
+            socket.emit('client-disconnect'); // Émettre un événement de déconnexion au serveur
+            socket.disconnect(); // Déconnexion explicite du socket
+        };
+    
+        window.addEventListener('beforeunload', handleUnload);
+
         return () => {
+            console.log("client-disconnect");
             socket.emit('client-disconnect');
             socket.off('room-id');
             socket.off('player-left-game');
             socket.off('finish');
+            socket.disconnect();
+            window.removeEventListener('beforeunload', handleUnload);
 
         };
         // eslint-disable-next-line
