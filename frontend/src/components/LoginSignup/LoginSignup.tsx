@@ -23,7 +23,6 @@ const LoginSignup = () => {
 	const handleChange = (e) => {
 		const newFormData = ({ ...formData, [e.target.name]: e.target.value });
 		setFormData(newFormData)
-		console.log(newFormData)
 	};
 
 	const handleSignUp = async (e) => {
@@ -62,14 +61,13 @@ const LoginSignup = () => {
 		const data = await response.json();
 		if (!response.ok) {
 			toast.error(`Login failed: ${data.message}`);
-			throw new Error('Signin failed encule');
+			throw new Error('Signin failed');
 		}
 		if (data.user.twoFactorEnabled) {
 			setUserMail(data.user.email);
 			setTwoFactor(true);
 		} else {
 		navigate('/home');}
-		console.log('2FA value:', data.user.twoFactorEnabled);
 		console.log('Signin successful:', data); }
 	catch (error) {
 		console.error('Error during signin:', error); }
@@ -130,7 +128,7 @@ const LoginSignup = () => {
 
 				</div>
 			</div>
-			<motion.div className='submit-container' whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.5 }}>
+			<motion.div className='submit-container' whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.8 }}>
 				{action==="Login" ? <div></div>:
 				<button 
 					className="logsbutton"
@@ -161,7 +159,7 @@ const LoginSignup = () => {
     		  </div>
     		)}
   			</div>
-			<motion.div className="button42" onClick={handleRedir42} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.5 }}>
+			<motion.div className="button42" onClick={handleRedir42} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.8 }}>
 				<Lottie className='animation42' onMouseOver={() => {phoneRef.current?.play()}} lottieRef={phoneRef} animationData={animationData} style={{width: '50px', height: '50px'}} />
 				<button className="buttonsubmit42"> Login with 42</button>
 			</motion.div>

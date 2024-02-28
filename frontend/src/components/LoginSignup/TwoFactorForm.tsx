@@ -21,7 +21,6 @@ const TwoFactorFormMod: React.FC<Props> = ({
 	title,
 	closeModal,
 }) => {
-	console.log("frontend: mail:", mail);
 	const {
 		handleSubmit,
 		register,

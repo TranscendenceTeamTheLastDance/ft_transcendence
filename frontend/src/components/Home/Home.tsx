@@ -51,7 +51,7 @@ const Home = () => {
 			{navigation.map((item) => (
 			  <motion.li key={item.href} 
 			  	whileHover={{ scale: 1.2 }}
-			  	whileTap={{ scale: 0.5 }}>
+			  	whileTap={{ scale: 0.8 }}>
 				<Link
 				  to={item.href}
 				  className="text-5xl duration-500 text-zinc-500 hover:text-zinc-300"
@@ -62,8 +62,8 @@ const Home = () => {
 
 			))}
 			<motion.button onClick={handleLogOut} className="text-5xl bg-red-500 text-red font-bold py-1 rounded"
-				whileHover={{ scale: 1.5 }}
-				whileTap={{ scale: 0.5 }}>
+				whileHover={{ scale: 1.2 }}
+				whileTap={{ scale: 0.8 }}>
             	⏻
         	</motion.button>
 		  </ul>
