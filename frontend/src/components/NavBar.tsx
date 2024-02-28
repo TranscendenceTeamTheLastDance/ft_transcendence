@@ -61,10 +61,12 @@ const navigation = [
 				{navigation.map((item) => (
 				  <motion.li key={item.href} 
 				  	whileHover={{ scale: 1.2 }}
-				  	whileTap={{ scale: 0.5 }}>
+				  	whileTap={{ scale: 0.8 }}>
 					<Link
 					  to={item.href}
-					  className="text-4xl duration-500 text-zinc-500 hover:text-zinc-300"
+					  className={`text-4xl duration-500 hover:text-zinc-300 ${
+						location.pathname === item.href ? 'text-zinc-300' : 'text-zinc-500'
+					  }`}
 					>
 					  {item.name}
 					</Link>
