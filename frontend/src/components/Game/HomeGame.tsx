@@ -120,14 +120,6 @@ const PongGame: React.FC = () => {
             socket.emit('finish');
         });
 
-        const handleUnload = () => {
-            console.log("Page is being refreshed or closed. Disconnecting socket...");
-            socket.emit('client-disconnect'); // Émettre un événement de déconnexion au serveur
-            socket.disconnect(); // Déconnexion explicite du socket
-        };
-    
-        window.addEventListener('beforeunload', handleUnload);
-
         return () => {
             console.log("client-disconnect");
             socket.emit('client-disconnect');
@@ -135,8 +127,6 @@ const PongGame: React.FC = () => {
             socket.off('player-left-game');
             socket.off('finish');
             socket.disconnect();
-            window.removeEventListener('beforeunload', handleUnload);
-
         };
         // eslint-disable-next-line
     }, [joinedGame]);
