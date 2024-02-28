@@ -45,6 +45,18 @@ export class UserService {
     try {
       const user = await this.prisma.user.findUnique({
         where: { username: username },
+        include: {
+          gamesWon: {
+            select: {
+              winnerScore: true,
+            },
+          },
+          gamesLose: {
+            select: {
+              loserScore: true,
+            },
+          },
+        },
       });
       return user;
     } catch (error) {
@@ -65,7 +77,6 @@ export class UserService {
         where: { id: userId },
         data: { profilePic: imageBase64 },
       });
-      console.log('backend: profile pic successfully updated');
       return user;
     } catch (error) {
       throw error;
@@ -85,12 +96,10 @@ export class UserService {
           ...dto,
         },
       });
-      console.log('backend: current user info:', user);
       return user;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          console.log(error.meta);
           if (error.meta.target[0] === 'username')
             throw new ForbiddenException('Username already exists');
           else if (error.meta.target[0] === 'email')
@@ -290,6 +299,50 @@ export class UserService {
 
     // Merge, map, and sort all games by createdAt, including opponent username and scores
     // to get history without adding anything to the schema
+    const allGames = [
+      ...gamesWon.map((game) => ({
+        ...game,
+        opponentUsername: game.loser.username,
+        userScore: game.winnerScore,
+        opponentScore: game.loserScore,
+      })),
+      ...gamesLost.map((game) => ({
+        ...game,
+        opponentUsername: game.winner.username,
+        userScore: game.loserScore,
+        opponentScore: game.winnerScore,
+      })),
+    ].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+
+    return allGames;
+  }
+
+  // duplicates the above but fetches another user's match history
+  async getOtherUserMatchHistory(userId: number): Promise<any> {
+    const gamesWon = await this.prisma.game.findMany({
+      where: { winnerId: userId },
+      include: {
+        loser: {
+          select: {
+            username: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    const gamesLost = await this.prisma.game.findMany({
+      where: { loserId: userId },
+      include: {
+        winner: {
+          select: {
+            username: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+
     const allGames = [
       ...gamesWon.map((game) => ({
         ...game,

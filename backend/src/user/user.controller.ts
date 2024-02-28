@@ -63,8 +63,6 @@ export class UserController {
     @Body() dto: EditUserDto,
     @Res() res: Response,
   ) {
-    console.log('user id being amended:', userId);
-    console.log('dto of user being amended:', dto);
     await this.userService
       .editUser(userId, dto)
       .then(() => {
@@ -79,7 +77,6 @@ export class UserController {
   @UseGuards(JwtGuard)
   @Get('2FAInit')
   async twoFactorAuthInit(@GetUser() user: User) {
-    console.log('backend: 2FA init');
     return this.userService.twoFactorAuthenticationInit(user);
   }
 
@@ -90,7 +87,6 @@ export class UserController {
     @Body() dto: TwoFactorCodeDto,
     @Res() res: Response,
   ) {
-    console.log('backend: 2FA ENABLE');
     this.userService
       .enableTwoFactorAuthentication(user, dto.code)
       .then(() => {
@@ -108,7 +104,6 @@ export class UserController {
     @Body() dto: TwoFactorCodeDto,
     @Res() res: Response,
   ) {
-    console.log('backend: 2FA DISABLE');
     this.userService
       .disableTwoFactorAuthentication(user, dto.code)
       .then(() => {
@@ -152,5 +147,11 @@ export class UserController {
   @Get('match-history')
   async getUserMatchHistory(@GetUser('id') userId: number) {
     return this.userService.getUserMatchHistory(userId);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('user-match-history/:userId')
+  async getOtherUserMatchHistory(@Param('userId') userId: number) {
+    return this.userService.getOtherUserMatchHistory(userId);
   }
 }

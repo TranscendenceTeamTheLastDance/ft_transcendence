@@ -7,7 +7,7 @@ interface Props {
 
 const AuthAxiosContext = React.createContext<Props>({
 	authAxios: axios.create({
-        baseURL: `http://localhost:8080`,
+        baseURL: `http://${process.env.REACT_APP_SERVER_ADDRESS}:8080`,
         headers: {
             'Content-Type': 'application/json',
         },
@@ -21,7 +21,7 @@ interface AuthAxiosProviderProps {
 const AuthAxiosProvider: React.FC<AuthAxiosProviderProps> = ({ children }) => {
 
 	const authAxios = axios.create({
-        baseURL: `http://localhost:8080`,
+        baseURL: `http://${process.env.REACT_APP_SERVER_ADDRESS}:8080`,
         headers: {
             'Content-Type': 'application/json',
         },
@@ -30,14 +30,12 @@ const AuthAxiosProvider: React.FC<AuthAxiosProviderProps> = ({ children }) => {
 	authAxios.interceptors.response.use(
 		(response) => response,
 		async (error) => {
-			console.log('Interceptor OK');
 			const originalRequest = error.config;
 			if (error.response.status === 401 && !originalRequest._retry) {
-				console.log("ICI GROS ZGEG");
 				originalRequest._retry = true;
 				try
 				{
-					await axios.get('http://localhost:8080/auth/refresh', { withCredentials: true });
+					await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/auth/refresh`, { withCredentials: true });
 					return axios.request(originalRequest);
 				} catch (refreshError: any) {
 					console.error('frontend: error refreshing token:', error);

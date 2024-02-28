@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useUserContext } from '../../context/UserContext';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
-const MatchHistory = () => {
+const OtherMatchHistory = ({userId}) => {
     const [matches, setMatches] = useState([]);
     const { user } = useUserContext();
-
+	const { username } = useParams();
+    console.log("USERNAME: ", username);
+    
     useEffect(() => {
         const fetchUserMatchHistory = async () => {
             try {
-                const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/users/match-history`, {
+                const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/users/user-match-history/${userId}`, {
                     withCredentials: true,
                 });
                 setMatches(response.data);
@@ -21,14 +24,14 @@ const MatchHistory = () => {
         if (user) {
             fetchUserMatchHistory();
         }
-    }, [user]);
+    }, [user, userId]);
 
     return (
-        <div className="mt-20 bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4 w-full overflow-auto">
-            <h2 className="text-xl font-semibold text-white mb-4 text-center">MATCH HISTORY</h2>
-            <table className="w-full text-white">
+        <div className="mt-20 bg-red bg-opacity-20 backdrop-blur-sm rounded-lg p-4 w-full overflow-auto">
+            <h2 className="text-xl font-semibold text-black mb-4 text-center">MATCH HISTORY</h2>
+            <table className="w-full text-black">
                 <thead>
-                    <tr className="border-b border-white">
+                    <tr className="border-b border-red">
                         <th className="px-4 py-2 text-left">GAME</th>
                         <th className="px-4 py-2 text-left">OPPONENT</th>
                         <th className="px-4 py-2 text-center">SCORE</th>
@@ -37,7 +40,7 @@ const MatchHistory = () => {
                 </thead>
                 <tbody>
                     {matches.map((match, index) => (
-                        <tr key={index} className="even:bg-white even:bg-opacity-10 odd:bg-opacity-0">
+                        <tr key={index} className="even:bg-red even:bg-opacity-10 odd:bg-opacity-0">
                             <td className="px-4 py-2 text-left">{index + 1}</td>
                             <td className="px-4 py-2 text-left">{match.opponentUsername}</td> 
                             <td className="px-4 py-2 text-center">{`${match.userScore} - ${match.opponentScore}`}</td>
@@ -53,4 +56,4 @@ const MatchHistory = () => {
     
 };
 
-export default MatchHistory;
+export default OtherMatchHistory;

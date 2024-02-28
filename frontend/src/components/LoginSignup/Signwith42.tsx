@@ -24,14 +24,13 @@ const Signwith42 = () => {
 		}
 		const fetchToken = async () => {
 			try {
-				const response = await axios.get('http://localhost:8080/auth/signin42', 
+				const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/auth/signin42`, 
 					{ params: {code}, withCredentials: true });
 				if (response.data.user) {
 					if (response.data.user.twoFactorEnabled) {
 						setTwoFactor(true);
 						setUserMail(response.data.user.email);
 					} else {
-					console.log(response.data.user);
 					navigate('/home');}
 				}
 			} catch (error: any) {

@@ -23,13 +23,12 @@ const LoginSignup = () => {
 	const handleChange = (e) => {
 		const newFormData = ({ ...formData, [e.target.name]: e.target.value });
 		setFormData(newFormData)
-		console.log(newFormData)
 	};
 
 	const handleSignUp = async (e) => {
 		e.preventDefault();
 		try {
-			const response = await fetch('http://localhost:8080/auth/signup', {
+			const response = await fetch(`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/auth/signup`, {
 			method: 'POST',
 			credentials: 'include',
 			headers: {
@@ -42,8 +41,7 @@ const LoginSignup = () => {
 			toast.error(`Signup failed: ${data.message}`);
 			throw new Error('Signup failed');
 		}
-		navigate('/home');
-		console.log('Signup successful:', data); }
+		navigate('/home'); }
 	catch (error) {
 		console.error('Error during signup:', error); }
 	};
@@ -51,7 +49,7 @@ const LoginSignup = () => {
 	const handleSignIn = async (e) => {
 		e.preventDefault();
 		try {
-			const response = await fetch('http://localhost:8080/auth/signin', {
+			const response = await fetch(`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/auth/signin`, {
 			method: 'POST',
 			credentials: 'include',
 			headers: {
@@ -62,15 +60,13 @@ const LoginSignup = () => {
 		const data = await response.json();
 		if (!response.ok) {
 			toast.error(`Login failed: ${data.message}`);
-			throw new Error('Signin failed encule');
+			throw new Error('Signin failed');
 		}
 		if (data.user.twoFactorEnabled) {
 			setUserMail(data.user.email);
 			setTwoFactor(true);
 		} else {
-		navigate('/home');}
-		console.log('2FA value:', data.user.twoFactorEnabled);
-		console.log('Signin successful:', data); }
+		navigate('/home');}}
 	catch (error) {
 		console.error('Error during signin:', error); }
 	};
@@ -79,7 +75,7 @@ const LoginSignup = () => {
 
 	const handleRedir42 = (event: React.FormEvent) => {
         event.preventDefault();
-        window.location.href = `https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-fefc1c5e4c70bebd2ed7324e9922eba3a64229d2bb0de7c6842cec51f3ee8f2b&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fsignwith42&response_type=code`;
+        window.location.href = `https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-fefc1c5e4c70bebd2ed7324e9922eba3a64229d2bb0de7c6842cec51f3ee8f2b&redirect_uri=http%3A%2F%2F${process.env.REACT_APP_SERVER_ADDRESS}%3A3000%2Fsignwith42&response_type=code`;
     };
 
 	return (
@@ -130,7 +126,7 @@ const LoginSignup = () => {
 
 				</div>
 			</div>
-			<motion.div className='submit-container' whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.5 }}>
+			<motion.div className='submit-container' whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.8 }}>
 				{action==="Login" ? <div></div>:
 				<button 
 					className="logsbutton"
@@ -161,7 +157,7 @@ const LoginSignup = () => {
     		  </div>
     		)}
   			</div>
-			<motion.div className="button42" onClick={handleRedir42} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.5 }}>
+			<motion.div className="button42" onClick={handleRedir42} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.8 }}>
 				<Lottie className='animation42' onMouseOver={() => {phoneRef.current?.play()}} lottieRef={phoneRef} animationData={animationData} style={{width: '50px', height: '50px'}} />
 				<button className="buttonsubmit42"> Login with 42</button>
 			</motion.div>

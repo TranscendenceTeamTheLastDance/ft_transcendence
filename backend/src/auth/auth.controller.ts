@@ -36,7 +36,6 @@ export class AuthController {
             user,
           });
         } else {
-          console.log(user);
           res.status(201).json({
             message: 'signin with 42 success',
             user,
@@ -50,13 +49,12 @@ export class AuthController {
 
   // this function creates a user in the database
   // unless you delete the volume
-  // you can access your users on localhost:5555
+  // you can access your users on ${process.env.REACT_APP_SERVER_ADDRESS}:5555
   @Post('signup')
   signup(@Body() dto: SignupDto, @Res() res: Response) {
     this.authService
       .signup(dto, res)
       .then((user) => {
-        console.log(user);
         res.status(201).json({
           message: 'signup success',
           user,
@@ -80,7 +78,6 @@ export class AuthController {
             user,
           });
         } else {
-          console.log(user);
           res.status(200).json({
             message: 'signin success',
             user,
@@ -97,7 +94,6 @@ export class AuthController {
     this.authService
       .Authenticate2FA(dto.email, dto.code, res)
       .then((user) => {
-        console.log(user);
         res.status(200).json({
           message: 'Authentication 2FA success',
           user,

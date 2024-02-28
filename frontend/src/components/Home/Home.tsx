@@ -24,22 +24,18 @@ const Home = () => {
 	  }, [fetchUserData]);
 
 	const handleLogOut = async () => {
-		console.log('frontend: logging out...');
 		try {
-			const response = await authAxios.get('/auth/logout', {
+			await authAxios.get('/auth/logout', {
 				withCredentials: true,
 			});
-			console.log(response.data);
 			setUser(null); 
-			console.log('user info cleared.');
 			navigate('/');
 		} catch (error: any) {
-			console.log(error.response.data.message);
 		}
 	};
 	
 	return user ? (
-	<div className="flex flex-col items-center justify-center w-screen h-screen overflow-hidden bg-gradient-to-tl from-black via-zinc-600/20 to-black">
+	<div className="flex flex-col items-center justify-center w-screen h-screen overflow-auto bg-gradient-to-tl from-black via-zinc-600/20 to-black">
 	  <motion.div animate={{
       	scale: [1, 1.5, 1.5, 1, 1, 1.5, 1.5, 1, 1],
       	x: [0, 180, 0, -180, 0, 180, 0, -180, 0],
@@ -51,7 +47,7 @@ const Home = () => {
 			{navigation.map((item) => (
 			  <motion.li key={item.href} 
 			  	whileHover={{ scale: 1.2 }}
-			  	whileTap={{ scale: 0.5 }}>
+			  	whileTap={{ scale: 0.8 }}>
 				<Link
 				  to={item.href}
 				  className="text-5xl duration-500 text-zinc-500 hover:text-zinc-300"
@@ -62,15 +58,14 @@ const Home = () => {
 
 			))}
 			<motion.button onClick={handleLogOut} className="text-5xl bg-red-500 text-red font-bold py-1 rounded"
-				whileHover={{ scale: 1.5 }}
-				whileTap={{ scale: 0.5 }}>
+				whileHover={{ scale: 1.2 }}
+				whileTap={{ scale: 0.8 }}>
             	⏻
         	</motion.button>
 		  </ul>
 	  </nav>
 	  <Particles className="absolute inset-0 -z-10" quantity={1000} />
-	  {/* Leaderboard container */}
-	  	<div className="mt-20 bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4 max-w-lg w-full">
+	  <div className="mt-20 bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4 max-w-lg w-full mx-auto">
           <Leaderboard />
     	</div>
 	</div>

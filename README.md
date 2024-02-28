@@ -5,9 +5,9 @@
 
 To run on 42 Machines, you can just `make` to launch every container. To see if they are working correctly : 
 * `docker ps` to see if they have all been created
-* `localhost:3000` to check the frontend
-* `localhost:5555` to check the database via prisma studio
-* try sending requests to `localhost:3333/auth/test` or `localhost:8080/auth/test` for the backend   
+* `${process.env.REACT_APP_SERVER_ADDRESS}:3000` to check the frontend
+* `${process.env.REACT_APP_SERVER_ADDRESS}:5555` to check the database via prisma studio
+* try sending requests to `${process.env.REACT_APP_SERVER_ADDRESS}:3333/auth/test` or `${process.env.REACT_APP_SERVER_ADDRESS}:8080/auth/test` for the backend   
 
 If you want to just launch one container (easier for debugging) : 
 
@@ -35,11 +35,11 @@ Then each module has at least one controller and one provider. Controllers are r
 
 <details><summary><h2>CONNECT FRONT AND BACK (WIP)</h2></summary>
  
-To integrate a React frontend with a NestJS backend, and to apply frontend's style to a specific route like `localhost:8080/auth/test` , we need to set up the React app to handle the frontend rendering and make calls to the NestJS backend for data. Here's how to approach this:
+To integrate a React frontend with a NestJS backend, and to apply frontend's style to a specific route like `${process.env.REACT_APP_SERVER_ADDRESS}:8080/auth/test` , we need to set up the React app to handle the frontend rendering and make calls to the NestJS backend for data. Here's how to approach this:
 
 **Step 1: Serve the frontend**
 
-First, we ensure that the React app is built and served correctly. Checks can be done on localhost:3000 or by checking the container's log to see if all is well. Then we need to configure the React app to make API calls to the NestJS backend so create test js files that start on App.js.
+First, we ensure that the React app is built and served correctly. Checks can be done on ${process.env.REACT_APP_SERVER_ADDRESS}:3000 or by checking the container's log to see if all is well. Then we need to configure the React app to make API calls to the NestJS backend so create test js files that start on App.js.
 
 **Step 2: Configure the backend API endpoints**
 
@@ -51,7 +51,7 @@ The NestJS backend must serve as an API server. The React app will make requests
 
 In the React app, we will make HTTP requests to the NestJS backend to fetch data or perform actions. We can use fetch API or libraries like axios for this but in this project we use Axios :   
 
-* Fetch Data in React: When a user navigates to a route in the React app (like /auth/test), we make an API call to the NestJS backend to retrieve the necessary data. For example, we use axios.get('http://localhost:3000/auth/test') to get a "Hello World" response which is the message provided by the test function in the backend.
+* Fetch Data in React: When a user navigates to a route in the React app (like /auth/test), we make an API call to the NestJS backend to retrieve the necessary data. For example, we use axios.get('http://${process.env.REACT_APP_SERVER_ADDRESS}:3000/auth/test') to get a "Hello World" response which is the message provided by the test function in the backend.
 * Display Data in React: We use the data received from the NestJS backend to render our React components. This way, the content and style of the application are controlled by React, while NestJS acts as the data source.
 
 ⚠️ Download Axios on your machine as a development dependency (in frontend) if you dont have sudo access : `npm install axios --save-dev`

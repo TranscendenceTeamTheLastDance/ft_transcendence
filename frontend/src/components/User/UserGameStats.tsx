@@ -10,11 +10,10 @@ const UserGameStats = () => {
 	const { user } = useUserContext();
 	
 	const gameStats = {
-		gamesPlayed:user.gamesPlayed? user.gamesPlayed : 0, //@TODO amend this to win + losses
+		gamesPlayed:user.gamesPlayed? user.gamesPlayed : 0,
 		totalWins:user.gamesWon? user.gamesWon.length : 0,
 		totalLosses:user.gamesLose? user.gamesLose.length : 0,
 		totalPoints:user.totalPoints? user.totalPoints : 0,
-		rank:1,
 	};	
 
 	useEffect(() => {
@@ -27,7 +26,7 @@ const UserGameStats = () => {
 	}, [gameStats.totalWins, gameStats.totalLosses, gameStats.gamesPlayed]);
 
 	return (
-	<div className="bg-white rounded-lg z-10">
+	<div className="bg-white pb-[44px] rounded-lg z-10">
 		<h2 className="text-black text-2xl font-bold mx-auto mt-8 text-center">STATS</h2>
 			<div className="p-4 flex flex-col items-center">
 			<div className="font-bold mt-4">Wins</div>

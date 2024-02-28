@@ -6,7 +6,7 @@ return (
     <>
         <motion.button
 			className="bg-gray-500 text-white py-2 px-4 rounded-lg text-lg font-bold mx-2"
-			onClick={onClick} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.5 }}>
+			onClick={onClick} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.8 }}>
 			{text}
 	    </motion.button>
     </>

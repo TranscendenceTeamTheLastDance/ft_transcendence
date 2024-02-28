@@ -59,8 +59,8 @@ const DmInfos = ({
   };
 
   const startGame = () => {
-    // const code = (Math.random() + 1).toString(36).substring(7);
-    const message = `Come join me in a Pong game! ${window.location.origin}/play`;
+    const code = (Math.random() + 1).toString(36).substring(7);
+    const message = `Come join me in a Pong game! ${window.location.origin}/play?pwd=${code}`;
     const names = channelName.substring(1).split("_");
     const otherLogin = names[0] === currentUserLogin ? names[1] : names[0];
     socket.emit("dm", { username: otherLogin, content: message });
@@ -103,8 +103,7 @@ const DmInfos = ({
                 >
                   <img className="w-6" src={game_icon} alt="close" />
                 </button>
-                {Array.isArray(blockUser) &&
-                blockedUsers.some((u) => u.id === user.id) ? (
+                {blockedUsers.some((u) => u.id === user.id) ? (
                   <button
                     className="rounded-full p-1 enabled:hover:bg-green-1 disabled:cursor-not-allowed"
                     title="Unblock user"

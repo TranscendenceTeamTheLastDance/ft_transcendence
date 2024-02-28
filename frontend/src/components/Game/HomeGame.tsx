@@ -31,7 +31,7 @@ interface userDto {
   }
 
 const PongGame: React.FC = () => {
-    const socketRef = useRef(io('http://localhost:8080/game'));
+    const socketRef = useRef(io(`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/game`));
     const identifiandPlayer = useRef(0);
     const [infoGame, setInfoGame] = useState<InfoGame | null>(null);
     const [playerLeftGame, setPlayerLeftGame] = useState(false);
