@@ -67,14 +67,12 @@ export class AuthService {
     });
     // if the user does not exist, throw an error
     if (!user) {
-      console.log('user not found');
       throw new ForbiddenException('Credential Incorrect');
     }
     // compare password
     const pwMatches = await argon.verify(user.hash, dto.password);
     // if paswsword does not match, throw an error
     if (!pwMatches) {
-      console.log('password not found');
       throw new ForbiddenException('Credential Incorrect');
     }
     user.hash = undefined;
@@ -107,7 +105,7 @@ export class AuthService {
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          throw new ForbiddenException('Email already exists');
+          throw new ForbiddenException('User already exists');
         }
       }
       throw error;

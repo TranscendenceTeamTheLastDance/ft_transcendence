@@ -33,7 +33,6 @@ const User = () => {
 	  }, [fetchUserData]);
 
 	useEffect(() => {
-		console.log(showUpdateModal ? "modal is ON" : "modal is OFF");
 	  }, [showUpdateModal]);
 
 	const onAvatarFileSelect = (file) => {
@@ -45,12 +44,10 @@ const User = () => {
 		setShowUpdateModal(true);
 		setTimeout(() => {
 		  setShowUpdateModal(false);
-		}, 2000); // Hide modal after 2 seconds
+		}, 2000);
 	  };
 
 	const handleUpdateProfile = async () => {
-
-		// Send new data if updated
 		const userData = {
 			username: user.username,
 			firstName: user.firstName,
@@ -58,12 +55,10 @@ const User = () => {
 			email: user.email,
 			hash: user.password,
 		  };
-		  console.log("frontend: data being passed to back:", userData);
 		  try {
-			const response = await authAxios.patch('/users', userData, {
+			await authAxios.patch('/users', userData, {
 			  withCredentials: true,
 			});
-				console.log('frontend: user information successfully updated!', response.data);
 				setUpdateModalMessage('User information successfully updated!');
 				triggerModal(true); 
 			} catch (error) {
@@ -71,21 +66,17 @@ const User = () => {
 				setUpdateModalMessage('Error updating user information.');
 				triggerModal(false); 
 			}
-		
-		// Check if there's a new avatar to upload
 		if (avatarFile) {
 			const formData = new FormData();
 			formData.append('file', avatarFile);
-			console.log("frontend: image being sent :", formData);
 
 			try {
-				const response = await authAxios.post('/users/upload-profile-picture', formData, {
+				await authAxios.post('/users/upload-profile-picture', formData, {
 					withCredentials: true,
 					headers: {
 						'Content-Type': undefined,
 					},
 				});
-				console.log('frontend: new profile pic successfully uploaded!', response.data);
 				setUpdateModalMessage('new profile pic successfully uploaded!');
 				triggerModal(true); 
 			} catch (error) {
@@ -94,7 +85,6 @@ const User = () => {
 				triggerModal(false);
 			}
 		} else {
-			console.log('frontend: no new avatar to upload, no request made to back.');
 		}
 	};
 	
@@ -106,11 +96,9 @@ const User = () => {
 		setQrCodeDataUrl(response.data.qrCode);
 		setTwoFactorSecret(response.data.secret);
 		setDisplay2FAModal(true);
-		//updateUser({ twoFactorEnabled: true });
 		}
 	else if (user && user.twoFactorEnabled === true) {
 		setDisplay2FADisableModal(true);
-		//updateUser({ twoFactorEnabled: false });
 		}
 	};
 
@@ -123,26 +111,21 @@ const User = () => {
 	};
 
 	useEffect(() => {
-		console.log(is2FAEnabled ? "2FA ON" : "2FA OFF");
 	  }, [is2FAEnabled]);
 
 
 
 	const enableTwoFactor = async (data: ModalInputs) => {
 		try {
-			console.log('frontend: data2FA being pass to back:', data);
 			await authAxios.post('/users/2FAEnable', 
 				{code: data.validationCode }, 
 				{withCredentials: true});
 			setDisplay2FAModal(false);
 			setError(undefined);
 			updateUser({ twoFactorEnabled: true });
-			console.log('frontend: user information successfully updated!');
 			setIs2FAEnabled(true);
-			console.log('is2FAEnabled =====', is2FAEnabled)
 		} catch (error: any) {
 			console.error('frontend: error enabling 2FA:', error);
-			console.log('frontend: error enabling 2FA:', error.response.data.message);
 			setError(error.response.data.message);
 		}
 	};
@@ -167,35 +150,24 @@ const User = () => {
 	return (
 		<div className="flex items-center justify-center flex-col min-h-screen relative pb-8 " style={{ minHeight: `calc(100vh - 210px)` }}>
 			<Particles className="absolute inset-0 -z-10" quantity={1000} />
-			{/* Conditional rendering of the update status modal */}
 			<UpdateModal showUpdateModal={showUpdateModal} updateModalMessage={updateModalMessage} isUpdateSuccessful={isUpdateSuccessful}/>
 	
-			{/* Centering Container with Max Width */}
-			<div className="w-full max-w-4xl mx-auto px-4"> {/* Adjust max-w-4xl based on your desired max width, px-4 for some padding */}
-	
-				{/* Flex Container for User Info and Game Stats, plus the Button */}
+			<div className="w-full max-w-4xl mx-auto px-4">
 				<div className="flex flex-col justify-center items-center space-y-4"> 
-					{/* Inner Flex Container for Horizontal Layout of User Info and Game Stats */}
 					<div className="flex flex-col md:flex-row justify-center items-start md:items-center space-y-4 md:space-y-0 md:space-x-4 w-full"> 
-						{/* Left Section: User Information and Friends */}
 						<div className="flex flex-col flex-1">
 							<UserInformation 
 								handle2FAToggle={handle2FAToggle}
 								handleUpdateProfile={handleUpdateProfile}
 								onAvatarFileSelect={onAvatarFileSelect}
 							/>
-	
-							{/* Friends Box */}
 							<FriendsList/>
 						</div>
 	
-						{/* Right Section: Game Stats */}
 						<div className="flex flex-col flex-1">
 							<UserGameStats />
 						</div>
 					</div>
-	
-					{/* Button Centered underneath both sections */}
 					<div className="w-full flex justify-center">
 						<button className="mt-4 bg-red-500 text-white py-2 px-4 rounded" onClick={() => setShowMatchHistory(!showMatchHistory)}>click for match history..</button>
 					</div>

@@ -30,10 +30,8 @@ const AuthAxiosProvider: React.FC<AuthAxiosProviderProps> = ({ children }) => {
 	authAxios.interceptors.response.use(
 		(response) => response,
 		async (error) => {
-			console.log('Interceptor OK');
 			const originalRequest = error.config;
 			if (error.response.status === 401 && !originalRequest._retry) {
-				console.log("ICI GROS ZGEG");
 				originalRequest._retry = true;
 				try
 				{

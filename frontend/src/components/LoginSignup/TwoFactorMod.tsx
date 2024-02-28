@@ -44,7 +44,7 @@ const TwoFactorMod: React.FC<Props> = ({
               <motion.button
                 type="button"
                 className="text-white bg-gray-500 hover:bg-transparent hover:text-gray-500 border border-gray-500 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-200 dark:hover:text-gray-900 mt-2 mb-6"
-                onClick={closeModal} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.5 }}
+                onClick={closeModal} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.8 }}
               >
                 X
                 <span className="sr-only">Close modal</span>
@@ -96,7 +96,7 @@ const TwoFactorMod: React.FC<Props> = ({
                 </p>
               )}
               <div className="flex flex-col items-center">
-                <motion.button type="submit" className="bg-gray-500 text-white py-2 px-4 rounded-lg text-lg font-bold mx-2" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.5 }}>
+                <motion.button type="submit" className="bg-gray-500 text-white py-2 px-4 rounded-lg text-lg font-bold mx-2" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.8 }}>
                   {qrCodeDataUrl ? 'Enable' : 'Disable'}
                 </motion.button>
               </div>

@@ -23,7 +23,6 @@ interface userProfileDto {
 function UserProfile() {
 	const { user } = useUserContext();
 	const { username } = useParams();
-	console.log(username);
 
 	const [userProfile, setUserProfile] = useState<userProfileDto | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -33,9 +32,7 @@ function UserProfile() {
 		const fetchUserData = async () => {
 		  try {
 			setLoading(true);
-			console.log("Fetching user data for:", username);
 			const userResponse = await authAxios.get(`/users/profile/${username}`);
-			console.log("User data received:", userResponse.data);
 			setUserProfile(userResponse.data);
 			setLoading(false);
 		  } catch (error) {
@@ -75,12 +72,11 @@ function UserProfile() {
 						GAME STATS
 					</h2>
 					<div className="p-4 flex flex-col items-center">
-						<div className="font-bold mt-4">Wins: {userProfile.gamesWon ? userProfile.gamesWon : 0}</div>
-						<div className="font-bold mt-4">Losses: {userProfile.gamesLose ? userProfile.gamesLose : 0}</div>
+					<div className="font-bold mt-4">Wins: {userProfile.gamesWon?.length || 0}</div>
+					<div className="font-bold mt-4">Losses: {userProfile.gamesLose?.length || 0}</div>
 						<div className="font-bold mt-4">
 							Games Played: {userProfile.gamesPlayed}
 						</div>
-						{/* Add more game stats as needed */}
 					</div>
 				</div>
 			</div>

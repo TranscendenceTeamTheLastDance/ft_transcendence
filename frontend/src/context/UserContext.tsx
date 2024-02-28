@@ -14,7 +14,6 @@ export const UserProvider = ({ children }) => {
 		// Access the cookie using the key
 		const cookies = new Cookies();
 		const access_token = cookies.get(process.env.REACT_APP_JWT_ACCESS_TOKEN_COOKIE);
-		console.log(access_token ? ("frontend: user cookie defined.") : ("frontend: user cookie undefined, for now..."));
 		if (access_token) 
 		{
 			try {
@@ -55,15 +54,6 @@ export const UserProvider = ({ children }) => {
 		fetchUserData();
 	}, [fetchUserData]);
 
-	// For debug purposes, prints latest user info 
-	useEffect(() => {
-		if (user) {
-			console.log("frontend: current user info:", user);
-		  } else {
-			console.log("frontend: no user info available, for now...");
-		  }		  
-	}, [user]);
-
 	// Updates user info, you can pass anything to it
 	const updateUser = (updatedFields) => {
 		setUser((currentUser) => {
@@ -71,7 +61,6 @@ export const UserProvider = ({ children }) => {
 				...currentUser,
 				...updatedFields,
 			};
-			console.log("frontend: user info successfully updated !");
 
 			return updatedUser;
 		});
