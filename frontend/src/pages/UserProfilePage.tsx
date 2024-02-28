@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom';
 import avatar_icon from '../components/assets/avatar.png';
 import { useUserContext } from '../context/UserContext';
 import NotFound from '../components/NotFound.tsx';
+import OtherMatchHistory from '../components/User/OtherUserMatchHistory.tsx';
 
 interface userProfileDto {
 	id: number;
@@ -23,8 +24,9 @@ interface userProfileDto {
 function UserProfile() {
 	const { user } = useUserContext();
 	const { username } = useParams();
-
+	
 	const [userProfile, setUserProfile] = useState<userProfileDto | null>(null);
+	const [showMatchHistory, setShowMatchHistory] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const authAxios = useAuthAxios();
 	
@@ -49,9 +51,11 @@ function UserProfile() {
 	  if (!userProfile) return <NotFound />;
 	
 	return (
-		<div className="flex items-center justify-center min-h-screen relative pb-8" style={{ minHeight: `calc(100vh - 210px)` }}>
+		<div className="flex items-center justify-center flex-col min-h-screen relative pb-8 " style={{ minHeight: `calc(100vh - 210px)` }}>
 			<Particles className="absolute inset-0 -z-10" quantity={1000} />
+			
 			<div className="container mx-auto flex-row justify-center" style={{ flexDirection: 'row' }}>
+			<div className="flex flex-col justify-center items-center space-y-4"> 
 				<div className="bg-white max-w-md mt-8 pb-8 rounded-lg shadow-md">
 					<div className="flex justify-center items-center py-4 px-4">
 						<div className="flex flex-col items-center">
@@ -79,8 +83,13 @@ function UserProfile() {
 						</div>
 					</div>
 				</div>
+				<div className="w-full flex justify-center">
+						<button className="mt-4 bg-red-500 text-red py-2 px-4 rounded" onClick={() => setShowMatchHistory(!showMatchHistory)}>click for match history..</button>
+					</div>				
+				{showMatchHistory && <OtherMatchHistory userId={userProfile.id} />}
 			</div>
 		</div>
+	</div>
 	)
 }
 

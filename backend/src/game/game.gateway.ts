@@ -55,44 +55,50 @@ export class GameGateway {
     handleClientDisconnect(@ConnectedSocket() client: Socket) {
       this.handleDisconnect(client);
     }
-  
+
+findCouplePlayer(player: { client: Socket, username: string, userId: number }) {
+    const player2Index = this.waitingPlayers.findIndex(Player => Player.userId !== player.userId);
+    return player2Index;
+}
+
     @SubscribeMessage('join')
-    handleJoin(@ConnectedSocket() client: Socket, 
-    @MessageBody() data: { username: string, userId: number }) {
-      const existingPlayer = this.waitingPlayersInvite.find(player => player.client.id === client.id);
-      if (existingPlayer)
-          return;
-      this.waitingPlayers.push({ client, username: data.username, userId: data.userId });
-  
-      if (this.waitingPlayers.length >= 2) {
-        const player1 = this.waitingPlayers.shift();
-        const player2 = this.waitingPlayers.shift();
-  
-        if (player1 && player2 && player1.userId !== player2.userId) {
-          const roomID = this.createRoomID(player1.client, player2.client);
-          const gameRoom = new GameRoom(player1.client, player2.client, player1.userId, player2.userId, this.prisma);
-          this.gameRooms.set(roomID, gameRoom);
-  
-          player1.client.emit('room-id', {roomID : roomID, NumPlayer : 1, playerName1: player1.username, playerName2: player2.username});
-          player2.client.emit('room-id', {roomID : roomID, NumPlayer : 2, playerName1: player1.username, playerName2: player2.username});
-          
-          gameRoom.startGameLoop();
+handleJoin(@ConnectedSocket() client: Socket, 
+@MessageBody() data: { username: string, userId: number }) {
+
+    this.waitingPlayers.push({ client, username: data.username, userId: data.userId });
+
+    const findCouplePlayerIndex = this.findCouplePlayer(this.waitingPlayers[0]);
+
+    if (this.waitingPlayers.length >= 2 && findCouplePlayerIndex !== -1) {
+      const player1Index = this.waitingPlayers.findIndex(player => player.userId !== this.waitingPlayers[findCouplePlayerIndex].userId);
+      const player1 = this.waitingPlayers.splice(player1Index, 1)[0];
+      const player2 = this.waitingPlayers.splice(findCouplePlayerIndex - 1, 1)[0]; // Retire le joueur de la liste
+
+        if (player2 && player1) {
+            const roomID = this.createRoomID(player1.client, player2.client);
+            const gameRoom = new GameRoom(player1.client, player2.client, player1.userId, player2.userId, this.prisma);
+            this.gameRooms.set(roomID, gameRoom);
+
+            player1.client.emit('room-id', { roomID: roomID, NumPlayer: 1, playerName1: player1.username, playerName2: player2.username });
+            player2.client.emit('room-id', { roomID: roomID, NumPlayer: 2, playerName1: player1.username, playerName2: player2.username });
+
+            gameRoom.startGameLoop();
         }
-      }
     }
+}
 
     @SubscribeMessage('join-freestyle')
     handleJoinFreestyle(@ConnectedSocket() client: Socket, 
     @MessageBody() data: { username: string, userId: number }) {
-      const existingPlayer = this.waitingPlayersInvite.find(player => player.client.id === client.id);
-      if (existingPlayer)
-          return;
 
       this.waitingPlayersFreestyle.push({ client, username: data.username, userId: data.userId });
+
+      const findCouplePlayerIndex = this.findCouplePlayer(this.waitingPlayersFreestyle[0]);
   
-      if (this.waitingPlayersFreestyle.length >= 2) {
-        const player1 = this.waitingPlayersFreestyle.shift();
-        const player2 = this.waitingPlayersFreestyle.shift();
+      if (this.waitingPlayersFreestyle.length >= 2 && findCouplePlayerIndex !== -1) {
+        const player1Index = this.waitingPlayersFreestyle.findIndex(player => player.userId !== this.waitingPlayersFreestyle[findCouplePlayerIndex].userId);
+        const player1 = this.waitingPlayersFreestyle.splice(player1Index, 1)[0];
+        const player2 = this.waitingPlayersFreestyle.splice(findCouplePlayerIndex - 1, 1)[0]; // Retire le joueur de la liste
   
         if (player1 && player2) {
           const roomID = this.createRoomID(player1.client, player2.client);
@@ -113,10 +119,12 @@ export class GameGateway {
           const existingPlayer = this.waitingPlayersInvite.find(player => player.client.id === client.id);
           if (existingPlayer)
               return;
+        
           this.waitingPlayersInvite.push({ client, username: data.username, userId: data.userId, inviteID: data.inviteID });
       
-          const playersWithSameInviteID = this.waitingPlayersInvite.filter(player => 
+          let playersWithSameInviteID = this.waitingPlayersInvite.filter(player => 
             player.inviteID === data.inviteID);
+
           
           if (playersWithSameInviteID.length >= 2) {
               const player1Index = this.waitingPlayersInvite.indexOf(playersWithSameInviteID[0]);
