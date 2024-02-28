@@ -148,4 +148,10 @@ export class UserController {
   async getUserMatchHistory(@GetUser('id') userId: number) {
     return this.userService.getUserMatchHistory(userId);
   }
+
+  @UseGuards(JwtGuard)
+  @Get('user-match-history/:userId')
+  async getOtherUserMatchHistory(@Param('userId') userId: number) {
+    return this.userService.getOtherUserMatchHistory(userId);
+  }
 }

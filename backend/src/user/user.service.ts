@@ -316,4 +316,48 @@ export class UserService {
 
     return allGames;
   }
+
+  // duplicates the above but fetches another user's match history
+  async getOtherUserMatchHistory(userId: number): Promise<any> {
+    const gamesWon = await this.prisma.game.findMany({
+      where: { winnerId: userId },
+      include: {
+        loser: {
+          select: {
+            username: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    const gamesLost = await this.prisma.game.findMany({
+      where: { loserId: userId },
+      include: {
+        winner: {
+          select: {
+            username: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    const allGames = [
+      ...gamesWon.map((game) => ({
+        ...game,
+        opponentUsername: game.loser.username,
+        userScore: game.winnerScore,
+        opponentScore: game.loserScore,
+      })),
+      ...gamesLost.map((game) => ({
+        ...game,
+        opponentUsername: game.winner.username,
+        userScore: game.loserScore,
+        opponentScore: game.winnerScore,
+      })),
+    ].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+
+    return allGames;
+  }
 }
