@@ -56,9 +56,15 @@ export class GameGateway {
       this.handleDisconnect(client);
     }
 
-findCouplePlayer(player: { client: Socket, username: string, userId: number }) {
+findCouplePlayerNormal(player: { client: Socket, username: string, userId: number }) {
     const player2Index = this.waitingPlayers.findIndex(Player => Player.userId !== player.userId);
     return player2Index;
+}
+
+
+findCouplePlayerFreestyle(player: { client: Socket, username: string, userId: number }) {
+  const player2Index = this.waitingPlayersFreestyle.findIndex(Player => Player.userId !== player.userId);
+  return player2Index;
 }
 
     @SubscribeMessage('join')
@@ -67,7 +73,7 @@ handleJoin(@ConnectedSocket() client: Socket,
 
     this.waitingPlayers.push({ client, username: data.username, userId: data.userId });
 
-    const findCouplePlayerIndex = this.findCouplePlayer(this.waitingPlayers[0]);
+    const findCouplePlayerIndex = this.findCouplePlayerNormal(this.waitingPlayers[0]);
 
     if (this.waitingPlayers.length >= 2 && findCouplePlayerIndex !== -1) {
       const player1Index = this.waitingPlayers.findIndex(player => player.userId !== this.waitingPlayers[findCouplePlayerIndex].userId);
@@ -93,7 +99,7 @@ handleJoin(@ConnectedSocket() client: Socket,
 
       this.waitingPlayersFreestyle.push({ client, username: data.username, userId: data.userId });
 
-      const findCouplePlayerIndex = this.findCouplePlayer(this.waitingPlayersFreestyle[0]);
+      const findCouplePlayerIndex = this.findCouplePlayerFreestyle(this.waitingPlayersFreestyle[0]);
   
       if (this.waitingPlayersFreestyle.length >= 2 && findCouplePlayerIndex !== -1) {
         const player1Index = this.waitingPlayersFreestyle.findIndex(player => player.userId !== this.waitingPlayersFreestyle[findCouplePlayerIndex].userId);
