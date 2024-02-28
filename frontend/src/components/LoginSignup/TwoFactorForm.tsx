@@ -30,15 +30,13 @@ const TwoFactorFormMod: React.FC<Props> = ({
 	const onSubmit = async (data: TwoFactorInputs) => {
 
 		try {
-			const response = await axios.post(
+			await axios.post(
 				`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/auth/Auth-2FA`, {
 				email: mail,
 				code: data.validationCode,
 				},
 				{ withCredentials: true }
 			);
-			const userData = response.data;
-			console.log("frontend: user data:", userData);
 			navigate("/home");
 		} catch (error: any) {
 			setError(error.response.data.message);

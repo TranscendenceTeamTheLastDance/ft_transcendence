@@ -63,8 +63,6 @@ export class UserController {
     @Body() dto: EditUserDto,
     @Res() res: Response,
   ) {
-    console.log('user id being amended:', userId);
-    console.log('dto of user being amended:', dto);
     await this.userService
       .editUser(userId, dto)
       .then(() => {

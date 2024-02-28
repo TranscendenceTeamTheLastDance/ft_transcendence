@@ -41,8 +41,7 @@ const LoginSignup = () => {
 			toast.error(`Signup failed: ${data.message}`);
 			throw new Error('Signup failed');
 		}
-		navigate('/home');
-		console.log('Signup successful:', data); }
+		navigate('/home'); }
 	catch (error) {
 		console.error('Error during signup:', error); }
 	};
@@ -67,8 +66,7 @@ const LoginSignup = () => {
 			setUserMail(data.user.email);
 			setTwoFactor(true);
 		} else {
-		navigate('/home');}
-		console.log('Signin successful:', data); }
+		navigate('/home');}}
 	catch (error) {
 		console.error('Error during signin:', error); }
 	};

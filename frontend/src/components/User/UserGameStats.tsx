@@ -10,11 +10,10 @@ const UserGameStats = () => {
 	const { user } = useUserContext();
 	
 	const gameStats = {
-		gamesPlayed:user.gamesPlayed? user.gamesPlayed : 0, //@TODO amend this to win + losses
+		gamesPlayed:user.gamesPlayed? user.gamesPlayed : 0,
 		totalWins:user.gamesWon? user.gamesWon.length : 0,
 		totalLosses:user.gamesLose? user.gamesLose.length : 0,
 		totalPoints:user.totalPoints? user.totalPoints : 0,
-		rank:1,
 	};	
 
 	useEffect(() => {

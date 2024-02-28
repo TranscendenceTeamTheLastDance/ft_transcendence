@@ -77,7 +77,6 @@ export class UserService {
         where: { id: userId },
         data: { profilePic: imageBase64 },
       });
-      console.log('backend: profile pic successfully updated');
       return user;
     } catch (error) {
       throw error;
@@ -97,12 +96,10 @@ export class UserService {
           ...dto,
         },
       });
-      console.log('backend: current user info:', user);
       return user;
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          console.log(error.meta);
           if (error.meta.target[0] === 'username')
             throw new ForbiddenException('Username already exists');
           else if (error.meta.target[0] === 'email')
