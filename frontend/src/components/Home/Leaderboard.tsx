@@ -11,9 +11,9 @@ interface User {
 
 const Leaderboard = () => {
 
-    const [usersList, setUsersList] = useState<User[]>([]); // List of all users
-    const [userId, setUserId] = useState<number>([]); // User is the current user
-    const [friendIds, setFriendIds] = useState<number[]>([]); // List of friend IDs
+    const [usersList, setUsersList] = useState<User[]>([]);
+    const [userId, setUserId] = useState<number>([]);
+    const [friendIds, setFriendIds] = useState<number[]>([]);
 
     useEffect(() => {
         const fetchUsersList = async () => {
@@ -33,7 +33,6 @@ const Leaderboard = () => {
                 const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/users/friends`, {
                     withCredentials: true,
                 });
-                console.log('response:', response.data)
                 setFriendIds(response.data.map(friend => friend.id));
             } catch (error) {
                 console.error('Failed to fetch friends:', error);
@@ -42,11 +41,9 @@ const Leaderboard = () => {
 
         const fetchUserId = async () => {
             try {
-            // We could just use the user context here
             const response = await axios.get(`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/users/my-id`, {
                 withCredentials: true,
             });
-            console.log('response:', response.data)
             setUserId(response.data);
             } catch (error) {
                 console.error('Failed to fetch user:', error);
@@ -60,10 +57,9 @@ const Leaderboard = () => {
 
     const addFriend = async (userId: number, friendId: number) => {
         try {
-            const response = await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/users/add-friend`, {userId, friendId}, {
+            await axios.post(`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/users/add-friend`, {userId, friendId}, {
                 withCredentials: true,
             });
-            console.log('response:', response.data);
             setFriendIds(prevFriendIds => [...prevFriendIds, friendId]);
         }
         catch (error) {
@@ -90,7 +86,6 @@ const Leaderboard = () => {
                 ) : (
                     <div style={{ width: '100px', margin: '0 4px', visibility: 'hidden' }}>Placeholder</div>
                 )}
-                {/* offline / online status dot */}
                 <span className={`h-3 w-3 ${
                     user.status === 1 ? 'bg-green-500' : 
                     user.status === 2 ? 'bg-orange-500' : 'bg-red'

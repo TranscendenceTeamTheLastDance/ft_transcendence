@@ -23,7 +23,6 @@ const LoginSignup = () => {
 	const handleChange = (e) => {
 		const newFormData = ({ ...formData, [e.target.name]: e.target.value });
 		setFormData(newFormData)
-		console.log(newFormData)
 	};
 
 	const handleSignUp = async (e) => {
@@ -42,8 +41,7 @@ const LoginSignup = () => {
 			toast.error(`Signup failed: ${data.message}`);
 			throw new Error('Signup failed');
 		}
-		navigate('/home');
-		console.log('Signup successful:', data); }
+		navigate('/home'); }
 	catch (error) {
 		console.error('Error during signup:', error); }
 	};
@@ -68,9 +66,7 @@ const LoginSignup = () => {
 			setUserMail(data.user.email);
 			setTwoFactor(true);
 		} else {
-		navigate('/home');}
-		console.log('2FA value:', data.user.twoFactorEnabled);
-		console.log('Signin successful:', data); }
+		navigate('/home');}}
 	catch (error) {
 		console.error('Error during signin:', error); }
 	};

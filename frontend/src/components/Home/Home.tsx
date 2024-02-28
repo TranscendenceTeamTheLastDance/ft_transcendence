@@ -24,17 +24,13 @@ const Home = () => {
 	  }, [fetchUserData]);
 
 	const handleLogOut = async () => {
-		console.log('frontend: logging out...');
 		try {
-			const response = await authAxios.get('/auth/logout', {
+			await authAxios.get('/auth/logout', {
 				withCredentials: true,
 			});
-			console.log(response.data);
 			setUser(null); 
-			console.log('user info cleared.');
 			navigate('/');
 		} catch (error: any) {
-			console.log(error.response.data.message);
 		}
 	};
 	
