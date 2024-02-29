@@ -110,17 +110,37 @@ export class GameService {
     
       // Gestion des scores et réinitialisation de la balle
       if (ball.x - ball.radius < 0) {
-        this.gameState.score.scoreU2++;
+        if (freestyle)
+        {
+          let alea = Math.random();
+          if (alea > 0.4)
+            this.gameState.score.scoreU2++;
+          else if (alea < 0.2)
+            if (this.gameState.score.scoreU2 > 0)
+              this.gameState.score.scoreU2--;
+        }
+        else
+          this.gameState.score.scoreU2++;
         this.resetBall(this.gameState);
       } else if (ball.x + ball.radius > this.gameState.canvasWidth) {
-        this.gameState.score.scoreU1++;
+        if (freestyle)
+        {
+          let alea = Math.random();
+          if (alea > 0.4)
+            this.gameState.score.scoreU1++;
+          else if (alea < 0.2)
+            if (this.gameState.score.scoreU1 > 0)
+              this.gameState.score.scoreU1--;
+        }
+        else
+          this.gameState.score.scoreU1++;
         this.resetBall(this.gameState);
       }
     
       // Détection de la collision avec les raquettes
       let player = (ball.x + ball.radius < this.gameState.canvasWidth / 2) ? this.gameState.padU1 : this.gameState.padU2;
       if (this.collision(ball, player)) {
-        this.handleBallPaddleCollision(ball, player, this.gameState.canvasWidth, freestyle);
+        this.handleBallPaddleCollision(ball, player, this.gameState.canvasWidth);
       }
     }
 
@@ -138,7 +158,7 @@ export class GameService {
       return pLeft < bRight && pTop < bBottom && pRight > bLeft && pBottom > bTop;
   }
 
-  handleBallPaddleCollision(ball: Ball, paddle: Paddle, canvasWidth: number, freestyle: boolean): void {
+  handleBallPaddleCollision(ball: Ball, paddle: Paddle, canvasWidth: number): void {
       let collidePoint = (ball.y - (paddle.y + paddle.height / 2));
       collidePoint = collidePoint / (paddle.height / 2);
       let angleRad = (Math.PI / 4) * collidePoint;
