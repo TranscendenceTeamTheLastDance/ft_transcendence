@@ -31,7 +31,7 @@ interface userDto {
   }
 
 const PongGame: React.FC = () => {
-    const socketRef = useRef(io(`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/game`));
+    const socketRef = useRef(io(`http://${process.env.REACT_APP_SERVER_ADDRESS}:8080/game`, {withCredentials: true}));
     const identifiandPlayer = useRef(0);
     const [infoGame, setInfoGame] = useState<InfoGame | null>(null);
     const [playerLeftGame, setPlayerLeftGame] = useState(false);
@@ -155,7 +155,7 @@ const PongGame: React.FC = () => {
                             </div>
                         ) : (
                             <div className='game-content'>
-                                <p className="text-4xl text-zinc-300 ">the match is played in 11 points </p>
+                                <p className="text-4xl text-zinc-300 ">the match is played in 5 points </p>
                                 <div className='canvas-container'>
                                     <CanvasGame infoGame={infoGame} />
                                 </div>
