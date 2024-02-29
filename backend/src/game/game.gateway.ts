@@ -7,7 +7,6 @@ import { PrismaService } from 'nestjs-prisma'; // Import PrismaService
 @WebSocketGateway({
     cors: {
         origin : `http://${process.env.REACT_APP_SERVER_ADDRESS}:3000`,//mettre une variable pour pouvoir modifie en temp reel
-        credentials: true,//pour accepter l'envoi de cookies
       },
     namespace: 'game',//specification pour pas que sa rentre en conflit
 })
