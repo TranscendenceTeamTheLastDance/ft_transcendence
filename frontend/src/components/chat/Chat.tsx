@@ -89,14 +89,14 @@ const Chat = () => {
     };
 
     fetchData();
-  }, [authAxios, users, user]);
+  }, [authAxios, user]);
 
   useEffect(() => {
     const fetchMe = async () => {
       try {
         const currentUser = user;
         setMe(currentUser);
-        console.log("User main", currentUser);
+        // console.log("User main", currentUser);
       } catch (error) {
         console.error("Error fetching me:", error);
       }

@@ -121,7 +121,7 @@ const PongGame: React.FC = () => {
         });
 
         return () => {
-            console.log("client-disconnect");
+            // console.log("client-disconnect");
             socket.emit('client-disconnect');
             socket.off('room-id');
             socket.off('player-left-game');
